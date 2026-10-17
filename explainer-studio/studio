@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs the orchestrator inside the project's Python environment.
+DIR="$(cd "$(dirname "$0")" && pwd)"
+exec "$DIR/.venv/bin/python" "$DIR/studio.py" "$@"

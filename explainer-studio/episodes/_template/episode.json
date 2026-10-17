@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "__EPISODE_ID__",
+  "title": "Replace with the episode title",
+  "learningObjective": "One sentence: what the viewer can do after watching.",
+  "status": "draft",
+  "voice": {"lang": "a", "voice": "af_heart", "speed": 1.0},
+  "pacing": {"leadInSec": 0.5, "tailSec": 1.4, "segmentGapSec": 0.3},
+
+  "narration": {
+    "segments": [
+      {"id": "s01", "text": "Hook: state the surprising symptom in one sentence."},
+      {"id": "s02", "text": "Caption text may differ from speech, like ₹600.", "speech": "Caption text may differ from speech, like six hundred rupees."},
+      {"id": "s03", "text": "Close with one thing to check next time."}
+    ]
+  },
+
+  "chapters": [
+    {"label": "Symptom", "segment": "s01"},
+    {"label": "Recap", "segment": "s03"}
+  ],
+
+  "scenes": [
+    {
+      "id": "symptom", "type": "kpi-mismatch", "segments": ["s01", "s02"],
+      "params": {
+        "pipelineChecks": ["Load job", "Tests"],
+        "dashboard": {"label": "Dashboard", "value": "₹1,800"},
+        "expected": {"label": "Source of truth", "value": "₹600"}
+      }
+    },
+    {
+      "id": "recap", "type": "cards", "segments": ["s03"],
+      "params": {
+        "title": "What to check",
+        "cards": [{"heading": "Checklist", "tag": "2 steps", "lines": [{"text": "1  Count the rows"}, {"text": "2  Count the entities", "tone": "good"}]}]
+      }
+    }
+  ],
+
+  "events": [
+    {"segment": "s01", "at": "start", "cue": "checks"},
+    {"segment": "s01", "at": "start", "expression": "happy"},
+    {"segment": "s01", "at": {"word": 5}, "cue": "dashboard"},
+    {"segment": "s02", "at": "start", "cue": "expected"},
+    {"segment": "s02", "at": {"word": 3}, "cue": "mismatch"},
+    {"segment": "s02", "at": {"word": 3}, "expression": "surprised"},
+    {"segment": "s03", "at": "start", "cue": "card-1"},
+    {"segment": "s03", "at": "start", "expression": "happy"}
+  ],
+
+  "sources": [],
+  "reviewNotes": [{"text": "Replace with technical review notes (assumptions, simplifications, dialect differences)."}],
+  "previews": {}
+}

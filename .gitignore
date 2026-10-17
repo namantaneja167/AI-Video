@@ -1,0 +1,14 @@
+# OS / editor noise for everything in this repository
+.DS_Store
+.AppleDouble
+.Spotlight-V100
+.Trashes
+Thumbs.db
+*.swp
+*~
+.idea/
+
+# Secrets (none are used today; keep it that way)
+.env
+.env.*
+!.env.example

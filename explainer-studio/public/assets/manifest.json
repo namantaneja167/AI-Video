@@ -1,0 +1,158 @@
+[
+  {
+    "file": "3dicons/rupee.png",
+    "original": "3dicons/src/rupee-clay-dynamic-500.webp",
+    "source": "https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/879a83-rupee/dynamic/500/clay.webp",
+    "sha256_original": "a97cddc460b7be6c8a4493f2f4670e09206c349e613e8e7eda8979a8f3567b42",
+    "license": "CC0-1.0",
+    "author": "Vijay Verma (realvjy) / 3dicons.co",
+    "attribution": "Not required (CC0); credited as a courtesy",
+    "note": "alpha derived by colour-keying the white background"
+  },
+  {
+    "file": "3dicons/bag.png",
+    "original": "3dicons/src/bag-clay-dynamic-500.webp",
+    "source": "https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/f71a3e-bag/dynamic/500/clay.webp",
+    "sha256_original": "f9df26a55ba003ddd4b187f455d7f52eb02130e7db4174e2a6f9964ab826bb25",
+    "license": "CC0-1.0",
+    "author": "Vijay Verma (realvjy) / 3dicons.co",
+    "attribution": "Not required (CC0); credited as a courtesy",
+    "note": "alpha derived by colour-keying the white background"
+  },
+  {
+    "file": "3dicons/clock.png",
+    "original": "3dicons/src/clock-clay-dynamic-500.webp",
+    "source": "https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/8ef1fa-clock/dynamic/500/clay.webp",
+    "sha256_original": "64c449d4610a7a6b4872e2ede8917858ff62dfdde7952acfb244f1e4fa449b79",
+    "license": "CC0-1.0",
+    "author": "Vijay Verma (realvjy) / 3dicons.co",
+    "attribution": "Not required (CC0); credited as a courtesy",
+    "note": "alpha derived by colour-keying the white background"
+  },
+  {
+    "file": "3dicons/key.png",
+    "original": "3dicons/src/key-clay-dynamic-500.webp",
+    "source": "https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/778c78-key/dynamic/500/clay.webp",
+    "sha256_original": "8d698811f3b4aad9433d485e2f404bc09d17fcff007028679b811e50019089dd",
+    "license": "CC0-1.0",
+    "author": "Vijay Verma (realvjy) / 3dicons.co",
+    "attribution": "Not required (CC0); credited as a courtesy",
+    "note": "alpha derived by colour-keying the white background"
+  },
+  {
+    "file": "3dicons/copy.png",
+    "original": "3dicons/src/copy-clay-dynamic-500.webp",
+    "source": "https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/d3d0c8-copy/dynamic/500/clay.webp",
+    "sha256_original": "814d37f2781e856c256df642f04ba0cd79cb735a9dbe860265eb552c8b69fb85",
+    "license": "CC0-1.0",
+    "author": "Vijay Verma (realvjy) / 3dicons.co",
+    "attribution": "Not required (CC0); credited as a courtesy",
+    "note": "alpha derived by colour-keying the white background"
+  },
+  {
+    "file": "3dicons/tick.png",
+    "original": "3dicons/src/tick-clay-dynamic-500.webp",
+    "source": "https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/1b714e-tick/dynamic/500/clay.webp",
+    "sha256_original": "0fd15cf00dcdb822dbee9729b639d26cdc3c61b8784f41ce93870dc74d014bd3",
+    "license": "CC0-1.0",
+    "author": "Vijay Verma (realvjy) / 3dicons.co",
+    "attribution": "Not required (CC0); credited as a courtesy",
+    "note": "alpha derived by colour-keying the white background"
+  },
+  {
+    "file": "lucide/receipt-indian-rupee.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/receipt-indian-rupee.svg",
+    "sha256": "a5a4a7614328ac7d910e63f4bad749d6366c62e8611fae43fbc196715761c967",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/history.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/history.svg",
+    "sha256": "2cc779bfbb62de9870eaa619254329c4fccf5305f8a3582eded7b69a8ddfd0c9",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/table-2.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/table-2.svg",
+    "sha256": "0120b45546a12c28b501a8458e449dd5c052bb8b4ef4aeb1bffc0c7ab69fedfe",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/git-merge.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/git-merge.svg",
+    "sha256": "622c274d5896a4c65c0c604bfefee9e0bed2e375b9d1aadc62f6349666b61b9b",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/key-round.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/key-round.svg",
+    "sha256": "87f61ac46b8bd9087e90dc37d0ee161e2f9bc4a007f454eaa4d49da307bb9908",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/copy.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/copy.svg",
+    "sha256": "3c2495e7be35f9e2df45e1c471136996670f365a34263477ff878963c9da4ecd",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/arrow-down.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/arrow-down.svg",
+    "sha256": "bfbfb708818e6cc0b02d830254c8b00f6b6dae659f50006ea253b37b8b05a5bf",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/equal.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/equal.svg",
+    "sha256": "d668787549a045ef5163ce25230dddac6844ba5078a295766e5a5705452a44c7",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/split.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/split.svg",
+    "sha256": "8b5a093d82d52b97a8190ec97f32b2aa79605571047b822a14c51825d41598a0",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/layers.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/layers.svg",
+    "sha256": "2db56bec69d08216e9118099b76cab533791e7ab9c93894b3d26f7b9b9664fcc",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "lucide/circle-check.svg",
+    "source": "https://cdn.jsdelivr.net/npm/lucide-static@1.59.0/icons/circle-check.svg",
+    "sha256": "9900fe241c753aea818440aa0cebb52299c5b760a27560ced52926a16105d43a",
+    "license": "ISC (Feather-derived icons: MIT)",
+    "author": "Lucide Icons and Contributors",
+    "attribution": "Keep the copyright and permission notice (licenses/lucide-LICENSE.txt)"
+  },
+  {
+    "file": "simple-icons/postgresql.svg",
+    "source": "https://cdn.jsdelivr.net/npm/simple-icons@16.35.0/icons/postgresql.svg",
+    "sha256": "c8ccadbd88c9312c2ad3734c4861b31d3485ce179ee91d64793143f83cfa745c",
+    "license": "CC0-1.0 (package); logo trademark belongs to its owner",
+    "author": "Simple Icons contributors",
+    "attribution": "None required; follow the brand's guidelines (licenses/simple-icons-DISCLAIMER.md)"
+  }
+]
