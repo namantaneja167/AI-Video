@@ -10,6 +10,10 @@ import {PipBoard, BOARD_W, BOARD_H} from './art/pip/PipBoard';
 import {PipSheet, SHEET_W as PIP_SHEET_W, SHEET_H as PIP_SHEET_H} from './art/pip2/PipSheet';
 import {PipScene} from './art/pip2/PipScene';
 import {PipExport} from './art/pip2/PipExport';
+import {PipRecon, REF_W, REF_H} from './art/pip-layers/PipRecon';
+import {PipLayersScene} from './art/pip-layers/PipLayersScene';
+import {PipLayersSheet, SHEET_W as LAYERS_SHEET_W, SHEET_H as LAYERS_SHEET_H} from './art/pip-layers/PipLayersSheet';
+import {PipLayersSheetWithNotes} from './art/pip-layers/notes';
 import {ContactSheet, SHEET_H, SHEET_W} from './art/ContactSheet';
 import manifest from './generated/manifest.json';
 
@@ -37,6 +41,9 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="art-presenter-concept-annotated" component={PresenterConcept} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{annotate: true}} />
     <Composition id="art-pip-sheet" component={PipSheet} width={PIP_SHEET_W} height={PIP_SHEET_H} fps={FPS} durationInFrames={1} />
     <Composition id="art-pip-scene" component={PipScene} width={W} height={H} fps={FPS} durationInFrames={1} />
+    <Composition id="art-pip-layers-recon" component={PipRecon} width={REF_W} height={REF_H} fps={FPS} durationInFrames={1} defaultProps={{bg: true}} />
+    <Composition id="art-pip-layers-scene" component={PipLayersScene} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{view: 'skeptical' as const}} />
+    <Composition id="art-pip-layers-sheet" component={PipLayersSheetWithNotes} width={LAYERS_SHEET_W} height={LAYERS_SHEET_H} fps={FPS} durationInFrames={1} />
     <Composition id="art-pip-export" component={PipExport} width={1200} height={1200} fps={FPS} durationInFrames={1} defaultProps={{expr: 'neutral' as const}} />
     <Composition id="art-pip-board" component={PipBoard} width={BOARD_W} height={BOARD_H} fps={FPS} durationInFrames={1} />
     <Composition id="art-contact-sheet" component={ContactSheet} width={SHEET_W} height={SHEET_H} fps={FPS} durationInFrames={1} />
