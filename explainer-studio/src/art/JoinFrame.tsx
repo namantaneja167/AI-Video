@@ -2,7 +2,6 @@ import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {P, SANS, MONO} from './palette';
 import {Clay, ClayFilters, Lucide, Placeholder, type ClayName} from './Asset';
-import {Presenter} from '../components/Presenter';
 import {Arrowhead, Backdrop, Barcode, Caption, FlatCoin, Header, Section, Slab, Tag, W, H} from './parts';
 import {AMOUNT, AMOUNT_CENTER, HIST, HISTORY, KEY_X, ORDER, ORDER_ID, PILL, RES, TRUNK_X, histY, resMidY, resY} from './layout';
 
@@ -90,7 +89,6 @@ export const JoinFrame: React.FC<{assets: boolean}> = ({assets}) => {
     <AbsoluteFill style={{fontFamily: SANS, color: P.ink, overflow: 'hidden', background: P.cream}}>
       <ClayFilters />
       <Backdrop />
-      <div style={{position: 'absolute', left: 80, top: 1420, width: 120, height: 26, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(60,45,20,0.22), transparent 70%)'}} />
 
       <svg width={W} height={H} style={{position: 'absolute', left: 0, top: 0}}>
         <g stroke={P.amber.solid} strokeWidth={8} strokeLinecap="round" strokeLinejoin="round" fill="none">
@@ -145,10 +143,6 @@ export const JoinFrame: React.FC<{assets: boolean}> = ({assets}) => {
       <Art real={assets} name="key" size={112} tint="amber" rotate={-24} style={{left: 436, top: midOrder - 118}} />
       <Art real={assets} name="clock" size={104} style={{left: 908, top: 64}} />
       <Art real={assets} name="copy" size={104} tint="rose" style={{left: TRUNK_X + 44, top: 756}} />
-
-      <div style={{position: 'absolute', left: 36, top: 1100, filter: 'drop-shadow(0 8px 8px rgba(60,45,20,0.2))'}}>
-        <Presenter t={0.2} expression="pointing" prevExpression="pointing" expressionSince={5} mouth={0} width={200} />
-      </div>
 
       <Caption lit="Join every" dim="history row," />
     </AbsoluteFill>

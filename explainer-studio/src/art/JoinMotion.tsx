@@ -2,7 +2,6 @@ import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {P, SANS, MONO} from './palette';
 import {Clay, ClayFilters, Lucide} from './Asset';
-import {Presenter} from '../components/Presenter';
 import {Arrowhead, Backdrop, Caption, FlatCoin, Section, Slab, W, H} from './parts';
 import {AMOUNT, AMOUNT_CENTER, HIST, HISTORY, KEY_X, ORDER, RES, TRUNK_X, histY, pillCenter, resMidY, resY} from './layout';
 import {AmountPill, COIN, HistoryCardBody, OrderCardBody, ResultRowBody} from './JoinFrame';
@@ -36,19 +35,12 @@ const CAPTIONS = [
   {from: 54, to: 90, text: 'Three history records.'},
   {from: 92, to: 126, text: 'Same order ID.'},
   {from: 128, to: 168, text: 'Carry the ₹100 down.'},
-  {from: 170, to: 240, text: '1 order → 3 joined rows'},
-];
-
-const EXPRESSIONS: [number, string][] = [
-  [0, 'neutral'],
-  [90, 'thinking'],
-  [126, 'pointing'],
-  [170, 'happy'],
+  {from: 170, to: 999, text: 'The ₹100 counts three times.'},
 ];
 
 // Polyline with a rounded corner: order amount → down the rose trunk → right into row i.
 const chipPath = (i: number) => {
-  const a = AMOUNT_CENTER;
+  const a = {x: AMOUNT_CENTER.x, y: AMOUNT_CENTER.y + 112}; // copies drop out from beneath the amount, not on top of it
   const b = {x: TRUNK_X, y: ORDER.y + ORDER.h + 30};
   const end = pillCenter(i);
   const corner = {x: TRUNK_X, y: end.y};
@@ -109,14 +101,6 @@ export const JoinMotion: React.FC = () => {
   const focus = prog(f, BEATS.carry, 10) * (1 - prog(f, BEATS.joinLabel + 6, 14) * 0.6);
   const linkOpacity = 1 - 0.55 * focus;
 
-  const [curExpr, prevExpr, since] = (() => {
-    let idx = 0;
-    EXPRESSIONS.forEach(([fr], i) => {
-      if (f >= fr) idx = i;
-    });
-    return [EXPRESSIONS[idx][1], EXPRESSIONS[Math.max(0, idx - 1)][1], (f - EXPRESSIONS[idx][0]) / 30];
-  })();
-
   const caption = CAPTIONS.find((c) => f >= c.from && f < c.to);
   const capIn = caption ? prog(f, caption.from, 6, easeBack) : 0;
   const capOut = caption ? 1 - prog(f, caption.to - 4, 4) : 1;
@@ -125,7 +109,6 @@ export const JoinMotion: React.FC = () => {
     <AbsoluteFill style={{fontFamily: SANS, color: P.ink, overflow: 'hidden', background: P.cream}}>
       <ClayFilters />
       <Backdrop drift={f * 0.25} />
-      <div style={{position: 'absolute', left: 80, top: 1420, width: 120, height: 26, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(60,45,20,0.22), transparent 70%)'}} />
 
       {/* ---- links (under the cards) ---- */}
       <svg width={W} height={H} style={{position: 'absolute', left: 0, top: 0}}>
@@ -175,6 +158,8 @@ export const JoinMotion: React.FC = () => {
         <Slab x={0} y={0} w={ORDER.w} h={ORDER.h} thickness={12} radius={28}>
           <OrderCardBody tagAmber={orderAmber} />
         </Slab>
+        {/* rose underline marks the amount being copied */}
+        <div style={{position: 'absolute', left: 30, top: AMOUNT_CENTER.y - ORDER.y + 70, width: 330, height: 9, borderRadius: 5, background: P.rose.solid, transformOrigin: '0 50%', transform: `scaleX(${prog(f, BEATS.carry, 12, easeInOut)})`, opacity: 1 - prog(f, BEATS.joinLabel + 8, 12)}} />
         {/* tag halo sits on top so it can pulse outside the card's clipped body */}
         <div style={{position: 'absolute', left: 30, top: 110, width: 136, height: 52, borderRadius: 999, boxShadow: ring(BEATS.idHighlight), transform: `scale(${bump(BEATS.idHighlight)})`, pointerEvents: 'none'}} />
         <div style={{position: 'absolute', left: COIN.left - ORDER.x, top: COIN.top - ORDER.y, perspective: 700, opacity: coinFlip, transform: `scale(${lerp(0.4, 1, coinFlip)})`}}>
@@ -200,7 +185,7 @@ export const JoinMotion: React.FC = () => {
       {/* ---- result slots → rows ---- */}
       {HISTORY.map((h, i) => {
         const slot = prog(f, BEATS.carry + i * 3, 10);
-        const row = pop(f, landFrame(i) - 8, 14);
+        const row = pop(f, landFrame(i) - 2, 12);
         const landed = f >= landFrame(i);
         return (
           <React.Fragment key={h.id}>
@@ -235,7 +220,7 @@ export const JoinMotion: React.FC = () => {
         if (f < start || f >= landFrame(i)) return null;
         const pos = pointAt(chipPath(i), u);
         const peel = prog(f, start, 8, easeOut);
-        const scale = lerp(1.45, 1, prog(f, start, 10, easeOut));
+        const scale = lerp(0.3, 0.72, peel) + 0.28 * clamp01((u - 0.8) / 0.2); // small while travelling, full size as it lands
         return (
           <div key={i} style={{position: 'absolute', left: pos.x - 88, top: pos.y - 36, opacity: 0.35 + 0.65 * peel, transform: `scale(${scale})`, filter: 'drop-shadow(0 12px 10px rgba(160,60,50,0.28))'}}>
             <AmountPill />
@@ -244,8 +229,8 @@ export const JoinMotion: React.FC = () => {
       })}
 
       {/* ---- the operation labels ---- */}
-      <div style={{position: 'absolute', left: 675 - 230, top: 786, width: 460, height: 60, borderRadius: 30, background: '#211F1C', boxShadow: '0 12px 22px -10px rgba(40,30,10,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, color: '#fff', fontFamily: MONO, fontWeight: 700, fontSize: 25, opacity: prog(f, BEATS.joinLabel, 8), transform: `scale(${lerp(0.8, 1, pop(f, BEATS.joinLabel))})`}}>
-        <Lucide name="git-merge" color={P.amber.solid} size={28} />
+      <div style={{position: 'absolute', left: 675 - 300, top: 768, width: 600, height: 78, borderRadius: 39, background: '#211F1C', boxShadow: '0 12px 22px -10px rgba(40,30,10,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, color: '#fff', fontFamily: MONO, fontWeight: 700, fontSize: 35, opacity: prog(f, BEATS.joinLabel, 8), transform: `scale(${lerp(0.8, 1, pop(f, BEATS.joinLabel))})`}}>
+        <Lucide name="git-merge" color={P.amber.solid} size={38} />
         1 order → 3 joined rows
       </div>
 
@@ -260,22 +245,11 @@ export const JoinMotion: React.FC = () => {
           <div style={{background: P.rose.solid, color: '#fff', borderRadius: 20, padding: '4px 28px', fontSize: 64, lineHeight: '78px', boxShadow: '0 14px 22px -10px rgba(190,70,60,0.5)'}}>₹{TOTAL}</div>
         </div>
       </div>
-      <div style={{position: 'absolute', left: RES.x, top: 1444, fontFamily: MONO, fontSize: 22, fontWeight: 600, color: P.muted, opacity: prog(f, BEATS.formula + 26, 10)}}>order 101 now counts ₹{TOTAL}, not ₹{AMOUNT}</div>
+      <div style={{position: 'absolute', left: RES.x, top: 1444, fontFamily: MONO, fontSize: 26, fontWeight: 600, color: P.muted, opacity: prog(f, BEATS.formula + 26, 10)}}>order 101 now counts ₹{TOTAL}, not ₹{AMOUNT}</div>
 
-      {/* ---- 3D objects, each introduced with its operation ---- */}
-      <div style={{position: 'absolute', left: 908, top: 64, opacity: pop(f, BEATS.histFirst), transform: `scale(${lerp(0.3, 1, pop(f, BEATS.histFirst))})`}}>
-        <Clay name="clock" size={104} />
-      </div>
+      {/* ---- 3D object: the key joins the amber link, nothing else is decorative ---- */}
       <div style={{position: 'absolute', left: 436, top: midOrder - 118, opacity: pop(f, BEATS.idHighlight + 6), transform: `scale(${lerp(0.3, 1, pop(f, BEATS.idHighlight + 6))})`}}>
         <Clay name="key" size={112} tint="amber" rotate={-24} />
-      </div>
-      <div style={{position: 'absolute', left: TRUNK_X + 44, top: 756, opacity: pop(f, BEATS.carry + 4) * (1 - 0.0), transform: `scale(${lerp(0.3, 1, pop(f, BEATS.carry + 4))})`}}>
-        <Clay name="copy" size={104} tint="rose" />
-      </div>
-
-      {/* ---- presenter (temporary placeholder) ---- */}
-      <div style={{position: 'absolute', left: 36, top: 1100, filter: 'drop-shadow(0 8px 8px rgba(60,45,20,0.2))'}}>
-        <Presenter t={f / 30} expression={curExpr} prevExpression={prevExpr} expressionSince={since} mouth={0} width={200} />
       </div>
 
       {caption ? <Caption lit={caption.text} opacity={capIn * capOut} scale={lerp(0.94, 1, capIn)} /> : null}
