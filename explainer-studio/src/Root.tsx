@@ -51,6 +51,20 @@ export const RemotionRoot: React.FC = () => (
         return {durationInFrames: timing.frames, props: {...props, timing}};
       }}
     />
+    {/* Studio render jobs: everything arrives as input props and a job-specific public dir; nothing is read from the repo's generated folders. */}
+    <Composition
+      id="studio-episode"
+      component={EpisodeVideo}
+      width={W}
+      height={H}
+      fps={FPS}
+      durationInFrames={FPS * 10}
+      defaultProps={{episode: '', variant: '', data: null} satisfies EpisodeProps}
+      calculateMetadata={({props}) => {
+        if (!props.data) throw new Error('studio-episode needs {episode, variant, data} input props');
+        return {durationInFrames: Math.ceil(props.data.timeline.durationSec * FPS)};
+      }}
+    />
     <Composition id="art-join-frame-concept" component={JoinFrame} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{assets: false}} />
     <Composition id="art-join-frame" component={JoinFrame} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{assets: true}} />
     <Composition id="art-join-motion" component={JoinMotion} width={W} height={H} fps={FPS} durationInFrames={MOTION_FRAMES} />

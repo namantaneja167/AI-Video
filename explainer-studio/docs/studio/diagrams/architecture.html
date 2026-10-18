@@ -5158,12 +5158,12 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <!-- Boundaries (behind everything) -->
         <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="Your Mac: offline while running" x="10" y="68" width="1130" height="532" rx="12" class="c-region" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="security-group" data-composition-frame-id="1" data-composition-frame-label="Heavy lane: one job at a time" x="700" y="190" width="210" height="270" rx="8" class="c-security-group" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="security-group" data-composition-frame-id="1" data-composition-frame-label="Heavy lane: one job, model unloaded between" x="697.7935354870967" y="190" width="214.41292902580645" height="270" rx="8" class="c-security-group" stroke-width="1"/>
 
         <!-- Connection paths (before components for correct z-order) -->
         <path data-edge-from="import" data-edge-to="ui" data-edge-label="paste" data-edge-key="0" data-edge-id="import-to-ui" data-composition-points="115,150;115,300" d="M 115 150 L 115 300" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="ui" data-edge-to="server" data-edge-label="HTTP + SSE" data-edge-key="1" data-edge-id="ui-to-server" data-composition-points="190,330;270,330" d="M 190 330 L 270 330" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="server" data-edge-to="store" data-edge-label="read, write" data-edge-key="2" data-edge-id="server-to-store" data-composition-points="345,300;345,200" d="M 345 300 L 345 200" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="server" data-edge-to="store" data-edge-label="commit" data-edge-key="2" data-edge-id="server-to-store" data-composition-points="345,300;345,200" d="M 345 300 L 345 200" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="schema" data-edge-to="server" data-edge-label="validate" data-edge-key="3" data-edge-id="schema-to-server" data-composition-points="345,460;345,360" d="M 345 460 L 345 360" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
         <path data-edge-from="server" data-edge-to="runner" data-edge-label="enqueue" data-edge-key="4" data-edge-id="server-to-runner" data-composition-points="420,330;500,330" d="M 420 330 L 500 330" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="runner" data-edge-to="tts" data-edge-label="stdio JSON" data-edge-key="5" data-edge-id="runner-to-tts" data-composition-points="650,323;690,323;690,250;730,250" d="M 650 323 L 682 323 Q 690 323 690 315 L 690 258 Q 690 250 698 250 L 730 250" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
@@ -5210,8 +5210,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="345" y="344" class="t-muted" font-size="9" text-anchor="middle">Node 26: HTTP + SSE</text>
         </g>
 
-        <g id="node-store" data-node-id="store" data-node-label="Project store" tabindex="0" role="button" aria-label="Focus Project store, JSON docs + SQLite, Your Mac: offline while running" aria-pressed="false" data-node-kind="database" data-node-sublabel="JSON docs + SQLite" data-node-context="Your Mac: offline while running">
-          <title>Project store · JSON docs + SQLite · Your Mac: offline while running</title>
+        <g id="node-store" data-node-id="store" data-node-label="Project store" tabindex="0" role="button" aria-label="Focus Project store, SQLite: single authority, Your Mac: offline while running" aria-pressed="false" data-node-kind="database" data-node-sublabel="SQLite: single authority" data-node-context="Your Mac: offline while running">
+          <title>Project store · SQLite: single authority · Your Mac: offline while running</title>
           <rect x="270" y="140" width="150" height="60" rx="6" class="c-mask"/>
           <rect x="270" y="140" width="150" height="60" rx="6" class="c-database" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(276 146) scale(0.6875)">
@@ -5219,44 +5219,44 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="345" y="168" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Project store</text>
-        <text data-detail="context" x="345" y="184" class="t-muted" font-size="9" text-anchor="middle">JSON docs + SQLite</text>
+        <text data-detail="context" x="345" y="184" class="t-muted" font-size="9" text-anchor="middle">SQLite: single authority</text>
         </g>
 
-        <g id="node-schema" data-node-id="schema" data-node-label="Shared schema" tabindex="0" role="button" aria-label="Focus Shared schema, Zod: validate + timeline, Your Mac: offline while running" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Zod: validate + timeline" data-node-context="Your Mac: offline while running">
-          <title>Shared schema · Zod: validate + timeline · Your Mac: offline while running</title>
+        <g id="node-schema" data-node-id="schema" data-node-label="Shared schema" tabindex="0" role="button" aria-label="Focus Shared schema, Zod: validate + migrate, Your Mac: offline while running" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Zod: validate + migrate" data-node-context="Your Mac: offline while running">
+          <title>Shared schema · Zod: validate + migrate · Your Mac: offline while running</title>
           <rect x="270" y="460" width="150" height="60" rx="6" class="c-mask"/>
           <rect x="270" y="460" width="150" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(276 466) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="345" y="488" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Shared schema</text>
-        <text data-detail="context" x="345" y="504" class="t-muted" font-size="9" text-anchor="middle">Zod: validate + timeline</text>
+        <text data-detail="context" x="345" y="504" class="t-muted" font-size="9" text-anchor="middle">Zod: validate + migrate</text>
         </g>
 
-        <g id="node-runner" data-node-id="runner" data-node-label="Job runner" tabindex="0" role="button" aria-label="Focus Job runner, queue, cancel, retry, Your Mac: offline while running" aria-pressed="false" data-node-kind="backend" data-node-sublabel="queue, cancel, retry" data-node-context="Your Mac: offline while running">
-          <title>Job runner · queue, cancel, retry · Your Mac: offline while running</title>
+        <g id="node-runner" data-node-id="runner" data-node-label="Job runner" tabindex="0" role="button" aria-label="Focus Job runner, snapshot, queue, cancel, Your Mac: offline while running" aria-pressed="false" data-node-kind="backend" data-node-sublabel="snapshot, queue, cancel" data-node-context="Your Mac: offline while running">
+          <title>Job runner · snapshot, queue, cancel · Your Mac: offline while running</title>
           <rect x="500" y="300" width="150" height="60" rx="6" class="c-mask"/>
           <rect x="500" y="300" width="150" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(506 306) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="575" y="328" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Job runner</text>
-        <text data-detail="context" x="575" y="344" class="t-muted" font-size="9" text-anchor="middle">queue, cancel, retry</text>
+        <text data-detail="context" x="575" y="344" class="t-muted" font-size="9" text-anchor="middle">snapshot, queue, cancel</text>
         </g>
 
-        <g id="node-tts" data-node-id="tts" data-node-label="TTS worker" tabindex="0" role="button" aria-label="Focus TTS worker, Qwen3-TTS Base, MLX, Your Mac: offline while running › Heavy lane: one job at a time" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Qwen3-TTS Base, MLX" data-node-context="Your Mac: offline while running › Heavy lane: one job at a time">
-          <title>TTS worker · Qwen3-TTS Base, MLX · Your Mac: offline while running › Heavy lane: one job at a time</title>
+        <g id="node-tts" data-node-id="tts" data-node-label="Audio worker" tabindex="0" role="button" aria-label="Focus Audio worker, Qwen3-TTS, then aligner, Your Mac: offline while running › Heavy lane: one job, model unloaded between" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Qwen3-TTS, then aligner" data-node-context="Your Mac: offline while running › Heavy lane: one job, model unloaded between">
+          <title>Audio worker · Qwen3-TTS, then aligner · Your Mac: offline while running › Heavy lane: one job, model unloaded between</title>
           <rect x="730" y="220" width="150" height="60" rx="6" class="c-mask"/>
           <rect x="730" y="220" width="150" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(736 226) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="805" y="248" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">TTS worker</text>
-        <text data-detail="context" x="805" y="264" class="t-muted" font-size="9" text-anchor="middle">Qwen3-TTS Base, MLX</text>
+          <text data-node-label="" data-detail-anchor="" x="805" y="248" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Audio worker</text>
+        <text data-detail="context" x="805" y="264" class="t-muted" font-size="9" text-anchor="middle">Qwen3-TTS, then aligner</text>
         </g>
 
-        <g id="node-render" data-node-id="render" data-node-label="Render worker" tabindex="0" role="button" aria-label="Focus Render worker, Remotion renderer, Your Mac: offline while running › Heavy lane: one job at a time" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Remotion renderer" data-node-context="Your Mac: offline while running › Heavy lane: one job at a time">
-          <title>Render worker · Remotion renderer · Your Mac: offline while running › Heavy lane: one job at a time</title>
+        <g id="node-render" data-node-id="render" data-node-label="Render worker" tabindex="0" role="button" aria-label="Focus Render worker, Remotion renderer, Your Mac: offline while running › Heavy lane: one job, model unloaded between" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Remotion renderer" data-node-context="Your Mac: offline while running › Heavy lane: one job, model unloaded between">
+          <title>Render worker · Remotion renderer · Your Mac: offline while running › Heavy lane: one job, model unloaded between</title>
           <rect x="730" y="380" width="150" height="60" rx="6" class="c-mask"/>
           <rect x="730" y="380" width="150" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(736 386) scale(0.6875)">
@@ -5280,16 +5280,16 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="805" y="564" class="t-muted" font-size="9" text-anchor="middle">Remotion compositions</text>
         </g>
 
-        <g id="node-cache" data-node-id="cache" data-node-label="Artifact cache" tabindex="0" role="button" aria-label="Focus Artifact cache, audio, timing, MP4, Your Mac: offline while running" aria-pressed="false" data-node-kind="database" data-node-sublabel="audio, timing, MP4" data-node-context="Your Mac: offline while running">
-          <title>Artifact cache · audio, timing, MP4 · Your Mac: offline while running</title>
+        <g id="node-cache" data-node-id="cache" data-node-label="Blob store" tabindex="0" role="button" aria-label="Focus Blob store, hashed files, by reference, Your Mac: offline while running" aria-pressed="false" data-node-kind="database" data-node-sublabel="hashed files, by reference" data-node-context="Your Mac: offline while running">
+          <title>Blob store · hashed files, by reference · Your Mac: offline while running</title>
           <rect x="960" y="300" width="150" height="60" rx="6" class="c-mask"/>
           <rect x="960" y="300" width="150" height="60" rx="6" class="c-database" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(966 306) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1035" y="328" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Artifact cache</text>
-        <text data-detail="context" x="1035" y="344" class="t-muted" font-size="9" text-anchor="middle">audio, timing, MP4</text>
+          <text data-node-label="" data-detail-anchor="" x="1035" y="328" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Blob store</text>
+        <text data-detail="context" x="1035" y="344" class="t-muted" font-size="9" text-anchor="middle">hashed files, by reference</text>
         </g>
 
         <!-- Connection labels -->
@@ -5301,9 +5301,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <rect x="201" y="310" width="58" height="14" rx="3" class="c-mask"/>
           <text x="230" y="320" class="t-backend" font-size="8" text-anchor="middle">HTTP + SSE</text>
         </g>
-        <g data-detail="context" data-edge-from="server" data-edge-to="store" data-edge-label="read, write" data-edge-key="2" data-edge-id="server-to-store">
-          <rect x="313.6" y="280" width="62.8" height="14" rx="3" class="c-mask"/>
-          <text x="345" y="290" class="t-muted" font-size="8" text-anchor="middle">read, write</text>
+        <g data-detail="context" data-edge-from="server" data-edge-to="store" data-edge-label="commit" data-edge-key="2" data-edge-id="server-to-store">
+          <rect x="325.6" y="280" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="345" y="290" class="t-muted" font-size="8" text-anchor="middle">commit</text>
         </g>
         <g data-detail="context" data-edge-from="schema" data-edge-to="server" data-edge-label="validate" data-edge-key="3" data-edge-id="schema-to-server">
           <rect x="320.8" y="440" width="48.4" height="14" rx="3" class="c-mask"/>
@@ -5340,9 +5340,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <text data-boundary-label="" x="18" y="85" class="t-cloud" font-size="9" font-weight="600">Your Mac: offline while running</text>
         </g>
 
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="security-group" data-composition-frame-label="Heavy lane: one job at a time">
-          <rect data-graph-role="structural-frame-label-mask" x="704" y="200" width="166.6" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="708" y="213" class="t-security" font-size="9" font-weight="600">Heavy lane: one job at a time</text>
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="security-group" data-composition-frame-label="Heavy lane: one job, model unloaded between">
+          <rect data-graph-role="structural-frame-label-mask" x="701.7935354870967" y="200" width="206.41292902580645" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="705.7935354870967" y="211.61290422580646" class="t-security" font-size="7.612904225806452" font-weight="600">Heavy lane: one job, model unloaded between</text>
         </g>
 
         <!-- Legend -->
@@ -5557,8 +5557,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Authoring</h3>
         </div>
         <ul>
-          <li>&bull; UI edits go to the server as small patches</li>
-          <li>&bull; Every patch is journaled before it is acknowledged</li>
+          <li>&bull; Each edit is one SQLite transaction, acknowledged after commit</li>
+          <li>&bull; episode.json is a projection for git, never the authority</li>
         </ul>
       </div>
 
@@ -5568,8 +5568,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Execution</h3>
         </div>
         <ul>
-          <li>&bull; The runner owns every long job</li>
-          <li>&bull; TTS and render never overlap on this 16 GB machine</li>
+          <li>&bull; Every job reads an immutable input snapshot</li>
+          <li>&bull; Qwen is unloaded and confirmed gone before a render starts</li>
         </ul>
       </div>
 
@@ -5579,8 +5579,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Trust</h3>
         </div>
         <ul>
-          <li>&bull; One schema validates edits, timing and render input</li>
-          <li>&bull; Artifacts are keyed by content hash, so stale output cannot be shown as current</li>
+          <li>&bull; Outputs are keyed by input hash; a finished job never replaces the approved file</li>
+          <li>&bull; Export copies the approved file, it never re-renders</li>
         </ul>
       </div>
     </div>

@@ -1,0 +1,677 @@
+{
+  "schemaVersion": 1,
+  "id": "join-fanout",
+  "title": "Your pipeline succeeded. Why is the dashboard wrong?",
+  "learningObjective": "Recognise a join fan-out (one-to-many join inflating a SUM), diagnose it with row and distinct-order counts, and repair it by picking one deterministic latest-status row per order before joining.",
+  "status": "draft",
+  "voice": {
+    "lang": "a",
+    "voice": "af_heart",
+    "speed": 1
+  },
+  "pacing": {
+    "leadInSec": 0.5,
+    "tailSec": 1.4,
+    "segmentGapSec": 0.3
+  },
+  "narration": {
+    "segments": [
+      {
+        "id": "s01",
+        "text": "Your pipeline succeeded. Every test is green. So why is the dashboard wrong?"
+      },
+      {
+        "id": "s02",
+        "text": "Finance says paid revenue is ₹600. The dashboard says ₹1,800.",
+        "speech": "Finance says paid revenue is six hundred rupees. The dashboard says eighteen hundred rupees."
+      },
+      {
+        "id": "s03",
+        "text": "Nothing crashed. The join changed the grain, meaning what one row represents."
+      },
+      {
+        "id": "s03b",
+        "text": "The load job and the row-count test only prove the data arrived. Neither checks what one row means."
+      },
+      {
+        "id": "s04",
+        "text": "Take three paid orders: ₹100, ₹200, and ₹300.",
+        "speech": "Take three paid orders: one hundred, two hundred, and three hundred rupees.",
+        "captions": [
+          "Take three paid orders:",
+          "₹100, ₹200, and ₹300."
+        ]
+      },
+      {
+        "id": "s05",
+        "text": "Each order has three status changes in the history table."
+      },
+      {
+        "id": "s06",
+        "text": "Join every history row, and each order is copied three times."
+      },
+      {
+        "id": "s07",
+        "text": "Nine rows now. Sum them, and ₹600 becomes ₹1,800.",
+        "speech": "Nine rows now. Sum them, and six hundred rupees becomes eighteen hundred.",
+        "pauseAfter": 0.3
+      },
+      {
+        "id": "s08",
+        "text": "That is a one-to-many join. The amount repeats for every history row."
+      },
+      {
+        "id": "s09",
+        "text": "To catch it, compare counts. Nine joined rows, but only three distinct orders."
+      },
+      {
+        "id": "s10",
+        "text": "Then inspect one order. Order 102 shows the same ₹200 three times.",
+        "speech": "Then inspect one order. Order one oh two shows the same two hundred rupees three times."
+      },
+      {
+        "id": "s10b",
+        "text": "Same order, same amount, three rows. Every extra history row adds the amount again."
+      },
+      {
+        "id": "s11",
+        "text": "For a current-status report, pick one latest history row per order before joining."
+      },
+      {
+        "id": "s12",
+        "text": "Sort each order's history by time, break ties with the history ID, and keep the first row.",
+        "speech": "Sort each order's history by time, break ties with the history I D, and keep the first row."
+      },
+      {
+        "id": "s12b",
+        "text": "Without that tie-breaker, two rows with the same timestamp could swap places between runs."
+      },
+      {
+        "id": "s13",
+        "text": "Now each order matches exactly one row. Three orders, three rows."
+      },
+      {
+        "id": "s14",
+        "text": "The total is ₹600 again, and the counts agree.",
+        "speech": "The total is six hundred rupees again, and the counts agree."
+      },
+      {
+        "id": "s14b",
+        "text": "The fix did not change the data. It changed which rows reach the join."
+      },
+      {
+        "id": "s15",
+        "text": "Need orders that were ever paid? That is different logic: check whether any history row says paid."
+      },
+      {
+        "id": "s16",
+        "text": "And SUM(DISTINCT amount) is not a general fix. Two different orders can share the same amount.",
+        "speech": "And sum distinct amount is not a general fix. Two different orders can share the same amount."
+      },
+      {
+        "id": "s16b",
+        "text": "DISTINCT removes repeated values, not duplicate rows. Those are different things."
+      },
+      {
+        "id": "s17",
+        "text": "So when a total looks wrong, check the grain. Count the rows, then count the orders."
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "label": "Symptom",
+      "segment": "s01"
+    },
+    {
+      "label": "Join",
+      "segment": "s04"
+    },
+    {
+      "label": "Diagnose",
+      "segment": "s09"
+    },
+    {
+      "label": "Repair",
+      "segment": "s11"
+    },
+    {
+      "label": "Edge cases",
+      "segment": "s15"
+    },
+    {
+      "label": "Recap",
+      "segment": "s17"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "symptom",
+      "segments": [
+        "s01",
+        "s02",
+        "s03",
+        "s03b"
+      ],
+      "type": "kpi-mismatch",
+      "params": {
+        "pipelineChecks": [
+          "Load job",
+          "Row-count test",
+          "Schedule"
+        ],
+        "dashboard": {
+          "label": "Dashboard · paid revenue",
+          "value": "₹1,800"
+        },
+        "expected": {
+          "label": "Finance · paid revenue",
+          "value": "₹600"
+        }
+      }
+    },
+    {
+      "id": "lab",
+      "segments": [
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09",
+        "s10",
+        "s10b",
+        "s11",
+        "s12",
+        "s12b",
+        "s13",
+        "s14",
+        "s14b"
+      ],
+      "type": "tables-lab",
+      "params": {
+        "currency": "₹",
+        "orders": [
+          {
+            "id": 101,
+            "amount": 100
+          },
+          {
+            "id": 102,
+            "amount": 200
+          },
+          {
+            "id": 103,
+            "amount": 300
+          }
+        ],
+        "history": [
+          {
+            "id": 1,
+            "orderId": 101,
+            "status": "created",
+            "at": "09:00"
+          },
+          {
+            "id": 2,
+            "orderId": 101,
+            "status": "authorized",
+            "at": "09:01"
+          },
+          {
+            "id": 3,
+            "orderId": 101,
+            "status": "paid",
+            "at": "09:02"
+          },
+          {
+            "id": 4,
+            "orderId": 102,
+            "status": "created",
+            "at": "09:05"
+          },
+          {
+            "id": 5,
+            "orderId": 102,
+            "status": "authorized",
+            "at": "09:06"
+          },
+          {
+            "id": 6,
+            "orderId": 102,
+            "status": "paid",
+            "at": "09:07"
+          },
+          {
+            "id": 7,
+            "orderId": 103,
+            "status": "created",
+            "at": "09:10"
+          },
+          {
+            "id": 8,
+            "orderId": 103,
+            "status": "authorized",
+            "at": "09:11"
+          },
+          {
+            "id": 9,
+            "orderId": 103,
+            "status": "paid",
+            "at": "09:12"
+          }
+        ],
+        "inspectOrderId": 102,
+        "wrongSql": "SELECT SUM(o.amount) AS revenue\nFROM orders o\nJOIN order_status_history h\n  ON h.order_id = o.order_id;",
+        "fixedSql": "WITH latest AS (\n  SELECT order_id, status FROM (\n    SELECT order_id, status, ROW_NUMBER() OVER (\n      PARTITION BY order_id\n      ORDER BY changed_at DESC, id DESC) rn\n    FROM order_status_history) t\n  WHERE rn = 1)\nSELECT SUM(o.amount) AS revenue FROM orders o\nJOIN latest l USING (order_id)\nWHERE l.status = 'paid';"
+      }
+    },
+    {
+      "id": "ever-paid",
+      "segments": [
+        "s15"
+      ],
+      "type": "cards",
+      "params": {
+        "title": "Two different questions",
+        "cards": [
+          {
+            "heading": "Current status",
+            "tag": "latest row",
+            "lines": [
+              {
+                "text": "Is it paid right now?",
+                "tone": "neutral"
+              },
+              {
+                "text": "ROW_NUMBER() … rn = 1",
+                "tone": "code"
+              }
+            ]
+          },
+          {
+            "heading": "Ever paid",
+            "tag": "any row",
+            "lines": [
+              {
+                "text": "Was it ever paid?",
+                "tone": "neutral"
+              },
+              {
+                "text": "EXISTS (status = 'paid')",
+                "tone": "code"
+              },
+              {
+                "text": "Different logic, different answer",
+                "tone": "good"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "distinct",
+      "segments": [
+        "s16",
+        "s16b"
+      ],
+      "type": "cards",
+      "params": {
+        "title": "SUM(DISTINCT) is not a repair",
+        "cards": [
+          {
+            "heading": "Two real orders",
+            "tag": "same amount",
+            "lines": [
+              {
+                "text": "order 102 → ₹200",
+                "tone": "neutral"
+              },
+              {
+                "text": "order 104 → ₹200",
+                "tone": "neutral"
+              },
+              {
+                "text": "SUM(amount) = ₹400",
+                "tone": "good"
+              }
+            ]
+          },
+          {
+            "heading": "DISTINCT on amount",
+            "tag": "wrong",
+            "lines": [
+              {
+                "text": "Collapses equal amounts",
+                "tone": "neutral"
+              },
+              {
+                "text": "SUM(DISTINCT amount) = ₹200",
+                "tone": "bad"
+              },
+              {
+                "text": "One real order disappears",
+                "tone": "bad"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "recap",
+      "segments": [
+        "s17"
+      ],
+      "type": "cards",
+      "params": {
+        "title": "Before you trust a total",
+        "cards": [
+          {
+            "heading": "Check the grain",
+            "tag": "4 steps",
+            "lines": [
+              {
+                "text": "1  Count the joined rows",
+                "tone": "neutral"
+              },
+              {
+                "text": "2  Count the distinct orders",
+                "tone": "neutral"
+              },
+              {
+                "text": "3  Inspect one order's rows",
+                "tone": "neutral"
+              },
+              {
+                "text": "4  Pick one row before joining",
+                "tone": "good"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "segment": "s01",
+      "at": "start",
+      "cue": "checks"
+    },
+    {
+      "segment": "s01",
+      "at": "start",
+      "expression": "happy"
+    },
+    {
+      "segment": "s01",
+      "at": {
+        "word": 7
+      },
+      "expression": "thinking"
+    },
+    {
+      "segment": "s01",
+      "at": {
+        "word": 9
+      },
+      "cue": "dashboard"
+    },
+    {
+      "segment": "s02",
+      "at": {
+        "word": 4
+      },
+      "cue": "expected"
+    },
+    {
+      "segment": "s02",
+      "at": {
+        "word": 9
+      },
+      "cue": "mismatch"
+    },
+    {
+      "segment": "s02",
+      "at": {
+        "word": 9
+      },
+      "expression": "surprised"
+    },
+    {
+      "segment": "s03",
+      "at": "start",
+      "expression": "concerned"
+    },
+    {
+      "segment": "s03b",
+      "at": "start",
+      "expression": "thinking"
+    },
+    {
+      "segment": "s04",
+      "at": "start",
+      "cue": "show-orders"
+    },
+    {
+      "segment": "s04",
+      "at": "start",
+      "expression": "pointing"
+    },
+    {
+      "segment": "s05",
+      "at": "start",
+      "cue": "show-history"
+    },
+    {
+      "segment": "s05",
+      "at": "start",
+      "expression": "neutral"
+    },
+    {
+      "segment": "s06",
+      "at": "start",
+      "cue": "join-start"
+    },
+    {
+      "segment": "s06",
+      "at": "start",
+      "expression": "thinking"
+    },
+    {
+      "segment": "s07",
+      "at": {
+        "word": 3
+      },
+      "cue": "sum-start"
+    },
+    {
+      "segment": "s07",
+      "at": {
+        "word": 8
+      },
+      "expression": "surprised"
+    },
+    {
+      "segment": "s08",
+      "at": "start",
+      "cue": "grain-note"
+    },
+    {
+      "segment": "s08",
+      "at": "start",
+      "expression": "pointing"
+    },
+    {
+      "segment": "s09",
+      "at": "start",
+      "cue": "counts"
+    },
+    {
+      "segment": "s09",
+      "at": "start",
+      "expression": "thinking"
+    },
+    {
+      "segment": "s10",
+      "at": "start",
+      "cue": "inspect-order"
+    },
+    {
+      "segment": "s10",
+      "at": "start",
+      "expression": "pointing"
+    },
+    {
+      "segment": "s10b",
+      "at": "start",
+      "expression": "concerned"
+    },
+    {
+      "segment": "s11",
+      "at": "start",
+      "cue": "repair-start"
+    },
+    {
+      "segment": "s11",
+      "at": "start",
+      "expression": "neutral"
+    },
+    {
+      "segment": "s12",
+      "at": "start",
+      "cue": "pick-latest"
+    },
+    {
+      "segment": "s12",
+      "at": "start",
+      "expression": "thinking"
+    },
+    {
+      "segment": "s12b",
+      "at": "start",
+      "expression": "pointing"
+    },
+    {
+      "segment": "s13",
+      "at": "start",
+      "cue": "rejoin"
+    },
+    {
+      "segment": "s13",
+      "at": "start",
+      "expression": "pointing"
+    },
+    {
+      "segment": "s14",
+      "at": "start",
+      "cue": "fixed-sum"
+    },
+    {
+      "segment": "s14",
+      "at": "start",
+      "expression": "happy"
+    },
+    {
+      "segment": "s14b",
+      "at": "start",
+      "expression": "neutral"
+    },
+    {
+      "segment": "s15",
+      "at": "start",
+      "cue": "card-1"
+    },
+    {
+      "segment": "s15",
+      "at": {
+        "word": 1
+      },
+      "cue": "card-2"
+    },
+    {
+      "segment": "s15",
+      "at": "start",
+      "expression": "thinking"
+    },
+    {
+      "segment": "s16",
+      "at": "start",
+      "cue": "card-1"
+    },
+    {
+      "segment": "s16",
+      "at": {
+        "word": 7
+      },
+      "cue": "card-2"
+    },
+    {
+      "segment": "s16",
+      "at": "start",
+      "expression": "concerned"
+    },
+    {
+      "segment": "s16b",
+      "at": "start",
+      "expression": "thinking"
+    },
+    {
+      "segment": "s17",
+      "at": "start",
+      "cue": "card-1"
+    },
+    {
+      "segment": "s17",
+      "at": "start",
+      "expression": "happy"
+    }
+  ],
+  "sources": [
+    {
+      "title": "PostgreSQL tutorial: Joins Between Tables",
+      "url": "https://www.postgresql.org/docs/current/tutorial-join.html",
+      "note": "Join semantics: each matching pair of rows produces an output row."
+    },
+    {
+      "title": "PostgreSQL tutorial: Window Functions",
+      "url": "https://www.postgresql.org/docs/current/tutorial-window.html",
+      "note": "ROW_NUMBER() OVER (PARTITION BY … ORDER BY …)."
+    },
+    {
+      "title": "SQLite: Window Functions",
+      "url": "https://www.sqlite.org/windowfunctions.html",
+      "note": "Used by `studio.py verify` to execute the on-screen SQL."
+    }
+  ],
+  "reviewNotes": [
+    {
+      "text": "The dataset is illustrative, not real data. Every sample order ends in status paid.",
+      "resolved": false
+    },
+    {
+      "text": "The failing query deliberately has no status filter, to isolate join grain. A WHERE h.status = 'paid' on the full history would hide this fan-out in the sample; real bugs usually filter on a different column or not at all. Decide whether to mention this.",
+      "resolved": false
+    },
+    {
+      "text": "ROW_NUMBER() syntax is valid in SQLite/Postgres. Snowflake and BigQuery offer QUALIFY as a shorter form. Tie-break assumes history id increases with insertion order.",
+      "resolved": false
+    },
+    {
+      "text": "Order 104 in the SUM(DISTINCT) card is not in the main dataset; the arithmetic (200 + 200 = 400, DISTINCT gives 200) is shown only on that card.",
+      "resolved": false
+    }
+  ],
+  "previews": {
+    "join-multiplication": {
+      "segments": [
+        "s04",
+        "s05",
+        "s06",
+        "s07"
+      ]
+    }
+  }
+}

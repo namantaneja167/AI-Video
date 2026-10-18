@@ -18,3 +18,21 @@ npm-debug.log*
 .tmp/
 
 # Kept in git on purpose: public/assets/ (curated art, manifest.json, licences) and episodes/
+
+# ---- Generated media policy -------------------------------------------------------------------------
+# Approved source material is tracked (episodes, sources, reference/, public/assets/, tests/fixtures/).
+# Generated media (takes, mixes, renders, exports) stays out of ordinary history and is protected by explicit
+# project backups. This only affects NEW files: media committed before this policy stays tracked.
+*.mp4
+*.webm
+*.mov
+*.wav
+*.mp3
+*.m4a
+*.flac
+!reference/**
+!public/assets/**
+!tests/fixtures/**
+
+# Project database, blobs, job workspaces (Phase 1 onward)
+.studio/

@@ -1,0 +1,24 @@
+{
+  "take": "audio/pip-scene-10x/takes/narration_seed11.wav",
+  "method": "Word onsets read BY EYE from wideband spectrograms (scripts/phase2_align_report.py, 640 px per second, 12 ms window) and written down before looking at any statistics. Marked by the AI assistant, not by a human listener: nothing was heard. Reading uncertainty is about +/-25 ms (e.g. whether a stop's closure belongs to the word). Only onsets that were visible are included; 18 of the 28 words.",
+  "marks": [
+    {"word": "Ten", "t": 0.26, "sentenceInitial": true},
+    {"word": "times", "t": 0.563},
+    {"word": "faster", "t": 1.01},
+    {"word": "Sounds", "t": 1.935, "sentenceInitial": true},
+    {"word": "This", "t": 5.19, "sentenceInitial": true},
+    {"word": "test", "t": 5.41},
+    {"word": "used", "t": 5.80},
+    {"word": "tiny", "t": 6.157},
+    {"word": "prompts", "t": 6.53},
+    {"word": "A", "t": 7.38, "sentenceInitial": true},
+    {"word": "is", "t": 8.16},
+    {"word": "different", "t": 8.32},
+    {"word": "Before", "t": 9.47, "sentenceInitial": true},
+    {"word": "trusting", "t": 9.766},
+    {"word": "headline", "t": 10.15},
+    {"word": "check", "t": 10.84, "sentenceInitial": true},
+    {"word": "what", "t": 11.08},
+    {"word": "measured", "t": 11.36}
+  ]
+}

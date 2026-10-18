@@ -53,7 +53,7 @@
       "id": "store",
       "type": "database",
       "label": "Project store",
-      "sublabel": "JSON docs + SQLite",
+      "sublabel": "SQLite: single authority",
       "pos": [
         270,
         140
@@ -67,7 +67,7 @@
       "id": "schema",
       "type": "backend",
       "label": "Shared schema",
-      "sublabel": "Zod: validate + timeline",
+      "sublabel": "Zod: validate + migrate",
       "pos": [
         270,
         460
@@ -81,7 +81,7 @@
       "id": "runner",
       "type": "backend",
       "label": "Job runner",
-      "sublabel": "queue, cancel, retry",
+      "sublabel": "snapshot, queue, cancel",
       "pos": [
         500,
         300
@@ -94,8 +94,8 @@
     {
       "id": "tts",
       "type": "backend",
-      "label": "TTS worker",
-      "sublabel": "Qwen3-TTS Base, MLX",
+      "label": "Audio worker",
+      "sublabel": "Qwen3-TTS, then aligner",
       "pos": [
         730,
         220
@@ -136,8 +136,8 @@
     {
       "id": "cache",
       "type": "database",
-      "label": "Artifact cache",
-      "sublabel": "audio, timing, MP4",
+      "label": "Blob store",
+      "sublabel": "hashed files, by reference",
       "pos": [
         960,
         300
@@ -166,7 +166,7 @@
     },
     {
       "kind": "security-group",
-      "label": "Heavy lane: one job at a time",
+      "label": "Heavy lane: one job, model unloaded between",
       "wraps": [
         "tts",
         "render"
@@ -195,7 +195,7 @@
       "id": "server-to-store",
       "from": "server",
       "to": "store",
-      "label": "read, write"
+      "label": "commit"
     },
     {
       "id": "schema-to-server",
@@ -248,24 +248,24 @@
       "dot": "cyan",
       "title": "Authoring",
       "items": [
-        "UI edits go to the server as small patches",
-        "Every patch is journaled before it is acknowledged"
+        "Each edit is one SQLite transaction, acknowledged after commit",
+        "episode.json is a projection for git, never the authority"
       ]
     },
     {
       "dot": "emerald",
       "title": "Execution",
       "items": [
-        "The runner owns every long job",
-        "TTS and render never overlap on this 16 GB machine"
+        "Every job reads an immutable input snapshot",
+        "Qwen is unloaded and confirmed gone before a render starts"
       ]
     },
     {
       "dot": "rose",
       "title": "Trust",
       "items": [
-        "One schema validates edits, timing and render input",
-        "Artifacts are keyed by content hash, so stale output cannot be shown as current"
+        "Outputs are keyed by input hash; a finished job never replaces the approved file",
+        "Export copies the approved file, it never re-renders"
       ]
     }
   ]

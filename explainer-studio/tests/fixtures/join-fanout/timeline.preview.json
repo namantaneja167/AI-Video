@@ -1,0 +1,556 @@
+{
+ "version": 1,
+ "episodeId": "join-fanout",
+ "variant": "preview-join-multiplication",
+ "source": "kokoro",
+ "audio": "audio.wav",
+ "durationSec": 18.705,
+ "segments": [
+  {
+   "id": "s04",
+   "start": 0.5,
+   "end": 4.696,
+   "words": [
+    {
+     "text": "Take",
+     "start": 0.5,
+     "end": 0.737
+    },
+    {
+     "text": "three",
+     "start": 0.737,
+     "end": 0.999
+    },
+    {
+     "text": "paid",
+     "start": 0.999,
+     "end": 1.262
+    },
+    {
+     "text": "orders:",
+     "start": 1.262,
+     "end": 2.024
+    },
+    {
+     "text": "₹100,",
+     "start": 2.024,
+     "end": 2.674
+    },
+    {
+     "text": "₹200,",
+     "start": 2.674,
+     "end": 3.324
+    },
+    {
+     "text": "and",
+     "start": 3.324,
+     "end": 3.462
+    },
+    {
+     "text": "₹300.",
+     "start": 3.462,
+     "end": 4.949
+    }
+   ]
+  },
+  {
+   "id": "s05",
+   "start": 4.996,
+   "end": 8.329,
+   "words": [
+    {
+     "text": "Each",
+     "start": 4.996,
+     "end": 5.189
+    },
+    {
+     "text": "order",
+     "start": 5.189,
+     "end": 5.539
+    },
+    {
+     "text": "has",
+     "start": 5.539,
+     "end": 5.776
+    },
+    {
+     "text": "three",
+     "start": 5.776,
+     "end": 6.051
+    },
+    {
+     "text": "status",
+     "start": 6.051,
+     "end": 6.489
+    },
+    {
+     "text": "changes",
+     "start": 6.489,
+     "end": 7.251
+    },
+    {
+     "text": "in",
+     "start": 7.251,
+     "end": 7.351
+    },
+    {
+     "text": "the",
+     "start": 7.351,
+     "end": 7.439
+    },
+    {
+     "text": "history",
+     "start": 7.439,
+     "end": 7.814
+    },
+    {
+     "text": "table.",
+     "start": 7.814,
+     "end": 8.639
+    }
+   ]
+  },
+  {
+   "id": "s06",
+   "start": 8.629,
+   "end": 12.149,
+   "words": [
+    {
+     "text": "Join",
+     "start": 8.645,
+     "end": 8.907
+    },
+    {
+     "text": "every",
+     "start": 8.907,
+     "end": 9.22
+    },
+    {
+     "text": "history",
+     "start": 9.22,
+     "end": 9.595
+    },
+    {
+     "text": "row,",
+     "start": 9.595,
+     "end": 10.145
+    },
+    {
+     "text": "and",
+     "start": 10.145,
+     "end": 10.307
+    },
+    {
+     "text": "each",
+     "start": 10.307,
+     "end": 10.545
+    },
+    {
+     "text": "order",
+     "start": 10.545,
+     "end": 10.807
+    },
+    {
+     "text": "is",
+     "start": 10.807,
+     "end": 10.945
+    },
+    {
+     "text": "copied",
+     "start": 10.945,
+     "end": 11.307
+    },
+    {
+     "text": "three",
+     "start": 11.307,
+     "end": 11.545
+    },
+    {
+     "text": "times.",
+     "start": 11.545,
+     "end": 12.395
+    }
+   ]
+  },
+  {
+   "id": "s07",
+   "start": 12.449,
+   "end": 17.005,
+   "words": [
+    {
+     "text": "Nine",
+     "start": 12.485,
+     "end": 12.785
+    },
+    {
+     "text": "rows",
+     "start": 12.785,
+     "end": 13.085
+    },
+    {
+     "text": "now.",
+     "start": 13.085,
+     "end": 13.835
+    },
+    {
+     "text": "Sum",
+     "start": 13.835,
+     "end": 14.11
+    },
+    {
+     "text": "them,",
+     "start": 14.11,
+     "end": 14.51
+    },
+    {
+     "text": "and",
+     "start": 14.51,
+     "end": 14.648
+    },
+    {
+     "text": "₹600",
+     "start": 14.648,
+     "end": 15.585
+    },
+    {
+     "text": "becomes",
+     "start": 15.585,
+     "end": 15.998
+    },
+    {
+     "text": "₹1,800.",
+     "start": 15.998,
+     "end": 17.31
+    }
+   ]
+  }
+ ],
+ "captions": [
+  {
+   "segment": "s04",
+   "text": "Take three paid orders:",
+   "start": 0.5,
+   "end": 2.024,
+   "words": [
+    {
+     "text": "Take",
+     "start": 0.5,
+     "end": 0.737
+    },
+    {
+     "text": "three",
+     "start": 0.737,
+     "end": 0.999
+    },
+    {
+     "text": "paid",
+     "start": 0.999,
+     "end": 1.262
+    },
+    {
+     "text": "orders:",
+     "start": 1.262,
+     "end": 2.024
+    }
+   ]
+  },
+  {
+   "segment": "s04",
+   "text": "₹100, ₹200, and ₹300.",
+   "start": 2.024,
+   "end": 4.996,
+   "words": [
+    {
+     "text": "₹100,",
+     "start": 2.024,
+     "end": 2.674
+    },
+    {
+     "text": "₹200,",
+     "start": 2.674,
+     "end": 3.324
+    },
+    {
+     "text": "and",
+     "start": 3.324,
+     "end": 3.462
+    },
+    {
+     "text": "₹300.",
+     "start": 3.462,
+     "end": 4.949
+    }
+   ]
+  },
+  {
+   "segment": "s05",
+   "text": "Each order has three status",
+   "start": 4.996,
+   "end": 6.489,
+   "words": [
+    {
+     "text": "Each",
+     "start": 4.996,
+     "end": 5.189
+    },
+    {
+     "text": "order",
+     "start": 5.189,
+     "end": 5.539
+    },
+    {
+     "text": "has",
+     "start": 5.539,
+     "end": 5.776
+    },
+    {
+     "text": "three",
+     "start": 5.776,
+     "end": 6.051
+    },
+    {
+     "text": "status",
+     "start": 6.051,
+     "end": 6.489
+    }
+   ]
+  },
+  {
+   "segment": "s05",
+   "text": "changes in the history table.",
+   "start": 6.489,
+   "end": 8.645,
+   "words": [
+    {
+     "text": "changes",
+     "start": 6.489,
+     "end": 7.251
+    },
+    {
+     "text": "in",
+     "start": 7.251,
+     "end": 7.351
+    },
+    {
+     "text": "the",
+     "start": 7.351,
+     "end": 7.439
+    },
+    {
+     "text": "history",
+     "start": 7.439,
+     "end": 7.814
+    },
+    {
+     "text": "table.",
+     "start": 7.814,
+     "end": 8.639
+    }
+   ]
+  },
+  {
+   "segment": "s06",
+   "text": "Join every history row,",
+   "start": 8.645,
+   "end": 10.145,
+   "words": [
+    {
+     "text": "Join",
+     "start": 8.645,
+     "end": 8.907
+    },
+    {
+     "text": "every",
+     "start": 8.907,
+     "end": 9.22
+    },
+    {
+     "text": "history",
+     "start": 9.22,
+     "end": 9.595
+    },
+    {
+     "text": "row,",
+     "start": 9.595,
+     "end": 10.145
+    }
+   ]
+  },
+  {
+   "segment": "s06",
+   "text": "and each order is",
+   "start": 10.145,
+   "end": 10.945,
+   "words": [
+    {
+     "text": "and",
+     "start": 10.145,
+     "end": 10.307
+    },
+    {
+     "text": "each",
+     "start": 10.307,
+     "end": 10.545
+    },
+    {
+     "text": "order",
+     "start": 10.545,
+     "end": 10.807
+    },
+    {
+     "text": "is",
+     "start": 10.807,
+     "end": 10.945
+    }
+   ]
+  },
+  {
+   "segment": "s06",
+   "text": "copied three times.",
+   "start": 10.945,
+   "end": 12.485,
+   "words": [
+    {
+     "text": "copied",
+     "start": 10.945,
+     "end": 11.307
+    },
+    {
+     "text": "three",
+     "start": 11.307,
+     "end": 11.545
+    },
+    {
+     "text": "times.",
+     "start": 11.545,
+     "end": 12.395
+    }
+   ]
+  },
+  {
+   "segment": "s07",
+   "text": "Nine rows now.",
+   "start": 12.485,
+   "end": 13.835,
+   "words": [
+    {
+     "text": "Nine",
+     "start": 12.485,
+     "end": 12.785
+    },
+    {
+     "text": "rows",
+     "start": 12.785,
+     "end": 13.085
+    },
+    {
+     "text": "now.",
+     "start": 13.085,
+     "end": 13.835
+    }
+   ]
+  },
+  {
+   "segment": "s07",
+   "text": "Sum them,",
+   "start": 13.835,
+   "end": 14.51,
+   "words": [
+    {
+     "text": "Sum",
+     "start": 13.835,
+     "end": 14.11
+    },
+    {
+     "text": "them,",
+     "start": 14.11,
+     "end": 14.51
+    }
+   ]
+  },
+  {
+   "segment": "s07",
+   "text": "and ₹600 becomes ₹1,800.",
+   "start": 14.51,
+   "end": 17.66,
+   "words": [
+    {
+     "text": "and",
+     "start": 14.51,
+     "end": 14.648
+    },
+    {
+     "text": "₹600",
+     "start": 14.648,
+     "end": 15.585
+    },
+    {
+     "text": "becomes",
+     "start": 15.585,
+     "end": 15.998
+    },
+    {
+     "text": "₹1,800.",
+     "start": 15.998,
+     "end": 17.31
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "segment": "s04",
+   "time": 0.42,
+   "cue": "show-orders"
+  },
+  {
+   "segment": "s04",
+   "time": 0.42,
+   "expression": "pointing"
+  },
+  {
+   "segment": "s05",
+   "time": 4.916,
+   "cue": "show-history"
+  },
+  {
+   "segment": "s05",
+   "time": 4.916,
+   "expression": "neutral"
+  },
+  {
+   "segment": "s06",
+   "time": 8.565,
+   "cue": "join-start"
+  },
+  {
+   "segment": "s06",
+   "time": 8.565,
+   "expression": "thinking"
+  },
+  {
+   "segment": "s07",
+   "time": 13.755,
+   "cue": "sum-start"
+  },
+  {
+   "segment": "s07",
+   "time": 15.918,
+   "expression": "surprised"
+  }
+ ],
+ "scenes": [
+  {
+   "id": "lab",
+   "type": "tables-lab",
+   "start": 0.0,
+   "end": 18.705
+  }
+ ],
+ "chapters": [
+  {
+   "label": "Join",
+   "start": 0.0
+  }
+ ]
+}

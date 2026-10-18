@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "__EPISODE_ID__",
+  "id": "episode-id",
   "title": "Replace with the episode title",
   "learningObjective": "One sentence: what the viewer can do after watching.",
   "status": "draft",

@@ -1,0 +1,7 @@
+{
+ "source": "episodes/join-fanout/episode.json + build/join-fanout/tts-cache (real Kokoro af_heart word timings)",
+ "segments": 22,
+ "previewName": "join-multiplication",
+ "note": "golden timelines are characterization output of pipeline/timeline.py at fixture creation time",
+ "episodeSha256": "f79538770c4ad362f050df10f514b912ed2277d1a4848999e41ceca9aa6753a2"
+}

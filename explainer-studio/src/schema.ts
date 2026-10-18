@@ -184,7 +184,9 @@ export const TimelineSchema = z.object({
   version: z.literal(1),
   episodeId: z.string(),
   variant: z.string(),
-  source: z.enum(['kokoro', 'imported']),
+  source: z.enum(['kokoro', 'imported', 'qwen-aligned', 'qwen-estimated', 'qwen-mixed']),
+  /** Per segment: how its word times were obtained. Absent for Kokoro/imported timelines. */
+  timingSources: z.record(z.string(), z.enum(['aligned', 'estimated', 'manual'])).optional(),
   audio: z.string(),
   durationSec: z.number().positive(),
   segments: z.array(z.object({id, start: z.number(), end: z.number(), words: z.array(WordSchema)})),

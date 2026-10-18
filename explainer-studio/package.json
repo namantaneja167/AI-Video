@@ -6,10 +6,19 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "typecheck": "tsc --noEmit",
-    "validate": "node scripts/validate.ts"
+    "validate": "node scripts/validate.ts",
+    "migrate": "node scripts/migrate.ts",
+    "test": "npm run test:ts && npm run test:py",
+    "test:ts": "node --test \"tests/**/*.test.ts\"",
+    "test:py": ".venv/bin/python -m unittest discover -s tests/py -v",
+    "test:slow": "STUDIO_SLOW=1 node --test tests/prototype.test.ts",
+    "project": "node scripts/project.ts"
   },
   "dependencies": {
+    "@remotion/bundler": "4.0.536",
     "@remotion/cli": "4.0.536",
+    "@remotion/player": "4.0.536",
+    "@remotion/renderer": "4.0.536",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "remotion": "4.0.536",
@@ -20,5 +29,8 @@
     "@types/react": "19.3.0",
     "typescript": "7.0.2"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  }
 }

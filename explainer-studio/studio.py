@@ -305,16 +305,20 @@ def verify(arg: str, preview: str | None) -> None:
 
 # ------------------------------------------------------------------ new
 
-def new_episode(ep_id: str) -> None:
+TEMPLATE_ID = "episode-id"  # valid under the schema so the template itself passes `check`
+
+
+def new_episode(ep_id: str, episodes_dir: Path | None = None) -> None:
     if not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", ep_id):
         die("episode id must be lowercase letters, digits, - or _")
-    dest = ROOT / "episodes" / ep_id
+    base = episodes_dir or ROOT / "episodes"
+    dest = base / ep_id
     if dest.exists():
         die(f"{dest} already exists")
-    shutil.copytree(ROOT / "episodes" / "_template", dest)
+    shutil.copytree(base / "_template", dest)
     f = dest / "episode.json"
-    f.write_text(f.read_text().replace("__EPISODE_ID__", ep_id))
-    print(f"Created {dest.relative_to(ROOT)}. Edit episode.json, then: ./studio narrate episodes/{ep_id}")
+    f.write_text(f.read_text().replace(f'"id": "{TEMPLATE_ID}"', f'"id": "{ep_id}"', 1))
+    print(f"Created {dest.relative_to(ROOT) if dest.is_relative_to(ROOT) else dest}. Edit episode.json, then: ./studio narrate episodes/{ep_id}")
 
 
 # ------------------------------------------------------------------ main
