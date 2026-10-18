@@ -1,0 +1,344 @@
+{
+  "script": "Ten times faster. Sounds impressive. But faster at what? An AI tool might answer a short question quickly, then slow down when you give it a long document. Before comparing the headline numbers, check the task, the hardware, and how speed was measured. The useful question is: will it make your work faster?",
+  "engine": "Kokoro-82M (hexgrad), local, CPU",
+  "language": "American English (lang_code a)",
+  "phonemes": "tˈɛn tˈImz fˈæstəɹ. sˈWndz əmpɹˈɛsɪv. bˌʌt fˈæstəɹ æt wˌʌt? ɐn ˈAˌI tˈul mˌIt ˈænsəɹ ɐ ʃˈɔɹt kwˈɛsʧᵊn kwˈɪkli, ðˈɛn slˈO dˌWn wˌɛn ju ɡˈɪv ɪt ɐ lˈɔŋ dˈɑkjəmənt. bəfˈɔɹ kəmpˈɛɹɪŋ ðə hˈɛdlˌIn nˈʌmbəɹz, ʧˈɛk ðə tˈæsk, ðə hˈɑɹdwˌɛɹ, ænd hˌW spˈid wʌz mˈɛʒəɹd. ðə jˈusfᵊl kwˈɛsʧᵊn ɪz: wɪl ɪt mˌAk jʊɹ wˈɜɹk fˈæstəɹ?",
+  "auditions": {
+    "A": {
+      "title": "Friendly, curious explainer",
+      "voice_preset": "af_heart",
+      "speed": 1.0,
+      "blend": false,
+      "requested_pauses_after_chunks_s": {
+        "Ten times faster.": 0.4,
+        "Sounds impressive.": 0.3,
+        "But faster at what?": 0.8,
+        "An AI tool might answer a short question quickly,": null,
+        "then slow down when you give it a long document.": 0.45,
+        "Before comparing the headline numbers, check the task, the hardware, and how speed was measured.": 0.65,
+        "The useful question is:": null
+      },
+      "inserted_pauses": [
+        {
+          "after": "Ten times faster.",
+          "natural_silence_s": 0.31,
+          "inserted_s": 0.4,
+          "starts_at_s": 1.73
+        },
+        {
+          "after": "Sounds impressive.",
+          "natural_silence_s": 0.39,
+          "inserted_s": 0.3,
+          "starts_at_s": 3.21
+        },
+        {
+          "after": "But faster at what?",
+          "natural_silence_s": 0.61,
+          "inserted_s": 0.8,
+          "starts_at_s": 4.4
+        },
+        {
+          "after": "then slow down when you give it a long document.",
+          "natural_silence_s": 0.51,
+          "inserted_s": 0.45,
+          "starts_at_s": 10.54
+        },
+        {
+          "after": "Before comparing the headline numbers, check the task, the hardware, and how speed was measured.",
+          "natural_silence_s": 0.52,
+          "inserted_s": 0.65,
+          "starts_at_s": 15.9
+        }
+      ],
+      "duration_s": 20.61,
+      "words": 53,
+      "overall_wpm": 169,
+      "approx_wpm_excluding_inserted_pauses": 196,
+      "pitch": {
+        "median_hz": 201.7,
+        "p10_hz": 167.8,
+        "p90_hz": 250.0,
+        "voiced_frames": 919
+      },
+      "loudness": {
+        "integrated_lufs": -16.4,
+        "loudness_range_lu": 2.3,
+        "true_peak_dbtp": -1.5
+      },
+      "verification": {
+        "speech_starts_s": 0.55,
+        "speech_ends_s": 19.4,
+        "silent_gaps_over_0.2s": [
+          {
+            "at_s": 1.73,
+            "length_s": 0.4
+          },
+          {
+            "at_s": 3.21,
+            "length_s": 0.3
+          },
+          {
+            "at_s": 4.4,
+            "length_s": 0.8
+          },
+          {
+            "at_s": 10.54,
+            "length_s": 0.45
+          },
+          {
+            "at_s": 12.8,
+            "length_s": 0.23
+          },
+          {
+            "at_s": 15.9,
+            "length_s": 0.65
+          },
+          {
+            "at_s": 17.76,
+            "length_s": 0.3
+          },
+          {
+            "at_s": 19.43,
+            "length_s": 1.18
+          }
+        ],
+        "speech_active_pct": 71.0,
+        "peak": 0.841
+      },
+      "files": {
+        "wav": "pip_voice_A_friendly_curious.wav",
+        "mp3": "pip_voice_A_friendly_curious.mp3"
+      }
+    },
+    "B": {
+      "title": "Playful skeptic, restrained dry humour",
+      "voice_preset": "af_bella,am_michael",
+      "speed": 1.04,
+      "blend": true,
+      "requested_pauses_after_chunks_s": {
+        "Ten times faster.": 0.5,
+        "Sounds impressive.": 0.7,
+        "But faster at what?": 0.9,
+        "An AI tool might answer a short question quickly,": 0.35,
+        "then slow down when you give it a long document.": 0.4,
+        "Before comparing the headline numbers, check the task, the hardware, and how speed was measured.": 0.6,
+        "The useful question is:": 0.3
+      },
+      "inserted_pauses": [
+        {
+          "after": "Ten times faster.",
+          "natural_silence_s": 0.31,
+          "inserted_s": 0.5,
+          "starts_at_s": 1.77
+        },
+        {
+          "after": "Sounds impressive.",
+          "natural_silence_s": 0.38,
+          "inserted_s": 0.7,
+          "starts_at_s": 3.3
+        },
+        {
+          "after": "But faster at what?",
+          "natural_silence_s": 0.61,
+          "inserted_s": 0.9,
+          "starts_at_s": 4.95
+        },
+        {
+          "after": "An AI tool might answer a short question quickly,",
+          "natural_silence_s": 0.13,
+          "inserted_s": 0.35,
+          "starts_at_s": 8.77
+        },
+        {
+          "after": "then slow down when you give it a long document.",
+          "natural_silence_s": 0.5,
+          "inserted_s": 0.4,
+          "starts_at_s": 11.72
+        },
+        {
+          "after": "Before comparing the headline numbers, check the task, the hardware, and how speed was measured.",
+          "natural_silence_s": 0.53,
+          "inserted_s": 0.6,
+          "starts_at_s": 16.99
+        },
+        {
+          "after": "The useful question is:",
+          "natural_silence_s": 0.36,
+          "inserted_s": 0.3,
+          "starts_at_s": 18.83
+        }
+      ],
+      "duration_s": 21.77,
+      "words": 53,
+      "overall_wpm": 160,
+      "approx_wpm_excluding_inserted_pauses": 197,
+      "pitch": {
+        "median_hz": 162.2,
+        "p10_hz": 133.3,
+        "p90_hz": 198.3,
+        "voiced_frames": 941
+      },
+      "loudness": {
+        "integrated_lufs": -16.8,
+        "loudness_range_lu": 3.1,
+        "true_peak_dbtp": -1.5
+      },
+      "verification": {
+        "speech_starts_s": 0.62,
+        "speech_ends_s": 20.48,
+        "silent_gaps_over_0.2s": [
+          {
+            "at_s": 1.79,
+            "length_s": 0.48
+          },
+          {
+            "at_s": 3.3,
+            "length_s": 0.69
+          },
+          {
+            "at_s": 4.95,
+            "length_s": 0.9
+          },
+          {
+            "at_s": 8.79,
+            "length_s": 0.32
+          },
+          {
+            "at_s": 11.72,
+            "length_s": 0.39
+          },
+          {
+            "at_s": 16.99,
+            "length_s": 0.59
+          },
+          {
+            "at_s": 18.84,
+            "length_s": 0.29
+          },
+          {
+            "at_s": 20.5,
+            "length_s": 1.26
+          }
+        ],
+        "speech_active_pct": 67.6,
+        "peak": 0.841
+      },
+      "files": {
+        "wav": "pip_voice_B_playful_skeptic.wav",
+        "mp3": "pip_voice_B_playful_skeptic.mp3"
+      }
+    },
+    "C": {
+      "title": "Calm, confident analyst",
+      "voice_preset": "am_michael",
+      "speed": 0.95,
+      "blend": false,
+      "requested_pauses_after_chunks_s": {
+        "Ten times faster.": 0.45,
+        "Sounds impressive.": 0.4,
+        "But faster at what?": 0.75,
+        "An AI tool might answer a short question quickly,": null,
+        "then slow down when you give it a long document.": 0.55,
+        "Before comparing the headline numbers, check the task, the hardware, and how speed was measured.": 0.7,
+        "The useful question is:": 0.25
+      },
+      "inserted_pauses": [
+        {
+          "after": "Ten times faster.",
+          "natural_silence_s": 0.32,
+          "inserted_s": 0.45,
+          "starts_at_s": 1.84
+        },
+        {
+          "after": "Sounds impressive.",
+          "natural_silence_s": 0.33,
+          "inserted_s": 0.4,
+          "starts_at_s": 3.43
+        },
+        {
+          "after": "But faster at what?",
+          "natural_silence_s": 0.51,
+          "inserted_s": 0.75,
+          "starts_at_s": 4.94
+        },
+        {
+          "after": "then slow down when you give it a long document.",
+          "natural_silence_s": 0.39,
+          "inserted_s": 0.55,
+          "starts_at_s": 11.88
+        },
+        {
+          "after": "Before comparing the headline numbers, check the task, the hardware, and how speed was measured.",
+          "natural_silence_s": 0.12,
+          "inserted_s": 0.7,
+          "starts_at_s": 18.38
+        },
+        {
+          "after": "The useful question is:",
+          "natural_silence_s": 0.39,
+          "inserted_s": 0.25,
+          "starts_at_s": 20.44
+        }
+      ],
+      "duration_s": 23.48,
+      "words": 53,
+      "overall_wpm": 148,
+      "approx_wpm_excluding_inserted_pauses": 173,
+      "pitch": {
+        "median_hz": 120.3,
+        "p10_hz": 97.6,
+        "p90_hz": 153.8,
+        "voiced_frames": 886
+      },
+      "loudness": {
+        "integrated_lufs": -16.9,
+        "loudness_range_lu": 2.2,
+        "true_peak_dbtp": -1.5
+      },
+      "verification": {
+        "speech_starts_s": 0.66,
+        "speech_ends_s": 22.11,
+        "silent_gaps_over_0.2s": [
+          {
+            "at_s": 1.86,
+            "length_s": 0.43
+          },
+          {
+            "at_s": 3.44,
+            "length_s": 0.39
+          },
+          {
+            "at_s": 4.95,
+            "length_s": 0.75
+          },
+          {
+            "at_s": 11.88,
+            "length_s": 0.54
+          },
+          {
+            "at_s": 17.95,
+            "length_s": 0.38
+          },
+          {
+            "at_s": 18.41,
+            "length_s": 0.68
+          },
+          {
+            "at_s": 20.46,
+            "length_s": 0.22
+          },
+          {
+            "at_s": 22.15,
+            "length_s": 1.32
+          }
+        ],
+        "speech_active_pct": 67.6,
+        "peak": 0.842
+      },
+      "files": {
+        "wav": "pip_voice_C_calm_analyst.wav",
+        "mp3": "pip_voice_C_calm_analyst.mp3"
+      }
+    }
+  }
+}

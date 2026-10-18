@@ -1,0 +1,47 @@
+{
+  "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+  "mlx_load_seconds": 3.4,
+  "rss_after_load_gb": 1.13,
+  "mlx_active_after_load_gb": 4.27,
+  "script": "Ten times faster. Sounds impressive. But faster at what? Give an AI a short question and it might respond instantly. Give it a long document, and the story can change. Let’s see what that headline actually means.",
+  "seed": 7,
+  "sampling_defaults": {
+    "temperature": 0.9,
+    "top_k": 50,
+    "top_p": 1.0,
+    "repetition_penalty": 1.05,
+    "max_tokens": 4096
+  },
+  "auditions": {
+    "A": {
+      "name": "warm_curious",
+      "instruct": "A warm, youthful adult voice with a medium pitch. Conversational and curious, like an engaging tech presenter explaining something to a friend. Lively but restrained emphasis, natural rhythm, clear articulation. Not breathy, not an advertising announcer, no cartoon quality.",
+      "segments_returned": 1,
+      "sample_rate": 24000,
+      "duration_s": 15.04,
+      "generation_seconds": 16.7,
+      "real_time_factor": 1.11,
+      "mlx_peak_memory_gb": 8.52,
+      "process_peak_rss_gb": 1.14,
+      "files": {
+        "wav": "pip_qwen_A_warm_curious.wav",
+        "mp3": "pip_qwen_A_warm_curious.mp3"
+      }
+    },
+    "B": {
+      "name": "mischievous_dry",
+      "instruct": "A confident adult voice with a medium pitch and a slightly mischievous, dry sense of humor. Natural conversational rhythm, like an engaging tech presenter. Inquisitive, rising emphasis on the question 'faster at what?'. Understated, not sarcastic, not breathy, not an announcer, no cartoon quality.",
+      "segments_returned": 1,
+      "sample_rate": 24000,
+      "duration_s": 14.88,
+      "generation_seconds": 11.9,
+      "real_time_factor": 0.8,
+      "mlx_peak_memory_gb": 8.51,
+      "process_peak_rss_gb": 1.14,
+      "files": {
+        "wav": "pip_qwen_B_mischievous_dry.wav",
+        "mp3": "pip_qwen_B_mischievous_dry.mp3"
+      }
+    }
+  }
+}

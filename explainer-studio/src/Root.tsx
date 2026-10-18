@@ -14,6 +14,8 @@ import {PipRecon, REF_W, REF_H} from './art/pip-layers/PipRecon';
 import {PipLayersScene} from './art/pip-layers/PipLayersScene';
 import {PipLayersSheet, SHEET_W as LAYERS_SHEET_W, SHEET_H as LAYERS_SHEET_H} from './art/pip-layers/PipLayersSheet';
 import {PipLayersSheetWithNotes} from './art/pip-layers/notes';
+import {PipScene10x} from './art/pip-scene/PipScene10x';
+import type {Timing} from './art/pip-scene/rig';
 import {ContactSheet, SHEET_H, SHEET_W} from './art/ContactSheet';
 import manifest from './generated/manifest.json';
 
@@ -34,6 +36,21 @@ const calculateMetadata: CalculateMetadataFunction<EpisodeProps> = async ({props
 
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition
+      id="pip-scene-10x"
+      component={PipScene10x}
+      width={W}
+      height={H}
+      fps={FPS}
+      durationInFrames={FPS * 16}
+      defaultProps={{timing: null as Timing | null}}
+      calculateMetadata={async ({props}) => {
+        const res = await fetch(staticFile('scenes/pip-10x/timing.json'), {cache: 'no-store'});
+        if (!res.ok) throw new Error('Missing public/scenes/pip-10x/timing.json. Run scripts/pip_scene_timing.py first.');
+        const timing = (await res.json()) as Timing;
+        return {durationInFrames: timing.frames, props: {...props, timing}};
+      }}
+    />
     <Composition id="art-join-frame-concept" component={JoinFrame} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{assets: false}} />
     <Composition id="art-join-frame" component={JoinFrame} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{assets: true}} />
     <Composition id="art-join-motion" component={JoinMotion} width={W} height={H} fps={FPS} durationInFrames={MOTION_FRAMES} />

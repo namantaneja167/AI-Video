@@ -1,0 +1,26 @@
+{
+  "voice": "Pip voice v1 = Qwen3-TTS Base + approved B-US reference",
+  "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+  "reference_wav": "reference/pip-voice/approved-v1/pip_qwen_B-US_general_american.wav",
+  "reference_sha256": "e6d84a9dd60eea5ac096582960df19db0c8e1f40ac6d12a13a226c84817be866",
+  "reference_text": "Ten times faster. Sounds impressive. But faster at what? Give an AI a short question and it might respond instantly. Give it a long document, and the story can change. Let’s see what that headline actually means.",
+  "narration": "Ten times faster. Sounds impressive. But faster at what? This test used tiny prompts. A long document is a different workload. Before trusting the headline, check what was measured.",
+  "seed": 7,
+  "sampling": {
+    "temperature": 0.9,
+    "top_k": 50,
+    "top_p": 1.0,
+    "repetition_penalty": "1.05 default, raised to 1.5 by mlx-audio in reference mode"
+  },
+  "max_tokens_cap": 600,
+  "segments": 1,
+  "sample_rate": 24000,
+  "duration_s": 11.28,
+  "load_seconds": 2.6,
+  "generation_seconds": 11.0,
+  "real_time_factor": 0.98,
+  "mlx_peak_memory_gb": 8.55,
+  "mlx_active_after_load_gb": 4.31,
+  "process_peak_rss_gb": 1.95,
+  "reference_unchanged_after": true
+}

@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Explainer Studio: UI mockup (proposal, not implemented)</title>
+<meta name="viewport" content="width=1680">
+<style>
+:root{
+  --cream:#F5F2EA; --panel:#FFFFFF; --line:#E2DBCC; --line2:#D6CFBF; --ink:#1F1D1A; --ink2:#4B463E; --muted:#8B8578; --faint:#B7B0A1;
+  --accent:#D55D26; --accent2:#F08B4C; --accentSoft:#FDEBDD;
+  --amber:#F0A030; --amberFill:#FDF0D9; --amberText:#A64F0B;
+  --rose:#F27B6C; --roseFill:#FDE6E2; --roseText:#B0302A;
+  --green:#2E9E5B; --greenFill:#E3F4EA; --greenText:#1F7A43;
+  --sans:-apple-system,"SF Pro Text","Helvetica Neue",Arial,sans-serif; --mono:"SF Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#E9E4D8;font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{height:40px;background:#211F1C;color:#fff;display:flex;align-items:center;gap:6px;padding:0 14px;font-size:13px}
+.deck b{margin-right:14px;font-weight:700;letter-spacing:.02em}
+.deck a{color:#CFC8B8;text-decoration:none;padding:6px 12px;border-radius:8px;cursor:pointer}
+.deck a.on{background:#fff;color:#1F1D1A;font-weight:700}
+.deck .tag{margin-left:auto;font-family:var(--mono);font-size:12px;color:#F0A030}
+body.bare .deck{display:none}
+.screen{display:none;width:1680px;height:1010px;background:var(--cream);position:relative;overflow:hidden}
+.screen.on{display:block}
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:76px 1fr;grid-template-rows:56px 54px 1fr;height:100%}
+.rail{grid-row:1 / span 3;background:#211F1C;display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:4px}
+.rail .logo{width:40px;height:40px;border-radius:12px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:800;font-size:17px;margin-bottom:14px;box-shadow:0 3px 0 #9d3f14}
+.rail .it{width:62px;padding:9px 0 7px;border-radius:12px;color:#BDB6A6;text-align:center;font-size:11px;line-height:1.1}
+.rail .it i{display:block;font-style:normal;font-size:19px;margin-bottom:3px}
+.rail .it.on{background:#3A3631;color:#fff}
+.rail .sp{flex:1}
+.top{display:flex;align-items:center;gap:16px;padding:0 20px;background:#fff;border-bottom:1px solid var(--line)}
+.crumb{font-size:13px;color:var(--muted)}
+.ttl{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:#F1EDE2;color:var(--ink2);border:1px solid var(--line);white-space:nowrap}
+.chip.green{background:var(--greenFill);color:var(--greenText);border-color:#BFE3CC}
+.chip.amber{background:var(--amberFill);color:var(--amberText);border-color:#EDB25A}
+.chip.rose{background:var(--roseFill);color:var(--roseText);border-color:#E8877D}
+.chip.acc{background:var(--accentSoft);color:#9b3f13;border-color:#F3B58F}
+.chip.ink{background:#211F1C;color:#fff;border-color:#211F1C}
+.spacer{flex:1}
+.btn{font:600 13px var(--sans);padding:8px 14px;border-radius:10px;border:1px solid var(--line2);background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.btn.pri{background:var(--accent);border-color:#B84C1C;color:#fff;box-shadow:0 2px 0 #9d3f14}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:8px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--green)}
+.dot.amber{background:var(--amber)} .dot.rose{background:var(--rose)} .dot.muted{background:var(--faint)} .dot.acc{background:var(--accent)}
+.spin{width:12px;height:12px;border-radius:50%;border:2px solid #F3B58F;border-top-color:var(--accent);display:inline-block}
+/* stepper */
+.steps{display:flex;align-items:center;gap:0;padding:0 20px;background:#FBF9F3;border-bottom:1px solid var(--line)}
+.step{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 8px;border-radius:12px;font-size:13px;font-weight:600;color:var(--ink2);white-space:nowrap}
+.step .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:#EFEADD;color:var(--muted)}
+.step small{display:block;font-size:11px;font-weight:500;color:var(--muted);line-height:1.1}
+.step.done .n{background:var(--green);color:#fff}
+.step.cur{background:#fff;box-shadow:0 0 0 1.5px var(--accent) inset}
+.step.cur .n{background:var(--accent);color:#fff}
+.step.warn .n{background:var(--amber);color:#fff}
+.bar{width:22px;height:2px;background:var(--line2);margin:0 2px}
+/* ---------- editor ---------- */
+.work{display:grid;grid-template-columns:332px 1fr 392px;grid-template-rows:1fr 266px;gap:0;min-height:0;height:100%}
+.pane{background:#fff;border-right:1px solid var(--line);min-height:0;overflow:hidden;position:relative}
+.ph{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;font-size:12px;font-weight:800;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;border-bottom:1px solid #EFEADD}
+.ph .r{margin-left:auto;display:flex;gap:6px}
+.outline .sc{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #F1EDE2;align-items:center}
+.outline .sc.sel{background:#FFF8EF;box-shadow:inset 3px 0 0 var(--accent)}
+.thumb{width:36px;height:64px;border-radius:7px;background:#ddd;flex:none;overflow:hidden;border:1px solid var(--line2);position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.sc b{font-size:14px;display:block;letter-spacing:-.01em}
+.sc .meta{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.segs{background:#FCFAF5;border-bottom:1px solid var(--line)}
+.seg{display:grid;grid-template-columns:44px 1fr 16px;gap:6px;padding:7px 12px 7px 16px;font-size:12px;align-items:center;border-bottom:1px solid #F5F1E6}
+.seg .id{font-family:var(--mono);color:var(--muted);font-size:11px}
+.seg .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.seg.sel{background:#FFF1E2}
+.seg.sel .tx{color:var(--ink);font-weight:600}
+.center{background:var(--cream);display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.ctb{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);background:#FBF9F3}
+.seg-tabs{display:flex;background:#EFEADD;border-radius:10px;padding:3px}
+.seg-tabs span{padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);border-radius:8px}
+.seg-tabs span.on{background:#fff;color:var(--ink);box-shadow:0 1px 0 var(--line2)}
+.stagewrap{flex:1;display:flex;align-items:center;justify-content:center;gap:34px;padding:12px 18px;min-height:0}
+.phone{width:310px;height:552px;border-radius:30px;background:#111;padding:8px;box-shadow:0 22px 40px -18px rgba(40,30,10,.5);position:relative;flex:none}
+.phone .scr{width:100%;height:100%;border-radius:23px;overflow:hidden;position:relative;background:#222}
+.phone img{width:100%;height:100%;object-fit:cover;display:block}
+.guide{position:absolute;left:0;right:0;border:1.5px dashed rgba(240,139,76,.9);pointer-events:none}
+.guide span{position:absolute;right:6px;top:-9px;background:var(--accent2);color:#fff;font:700 9px var(--mono);padding:1px 5px;border-radius:4px}
+.alts{display:flex;flex-direction:column;gap:12px;width:292px}
+.alts h4{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.alt{display:grid;grid-template-columns:82px 1fr;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px;align-items:center}
+.alt.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accentSoft)}
+.alt .w{width:82px;height:146px;border-radius:9px;background:#F3EFE5;border:1px solid var(--line2);position:relative;overflow:hidden}
+.alt .w i{position:absolute;display:block}
+.alt b{font-size:13px;display:block;margin-bottom:4px}
+.alt p{font-size:12px;color:var(--muted);line-height:1.35}
+.alt .v{margin-top:6px}
+.transport{display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--line);background:#FBF9F3}
+.transport .tc{font-family:var(--mono);font-size:13px;font-weight:700}
+.scrub{flex:1;height:8px;border-radius:4px;background:#E7E1D3;position:relative}
+.scrub i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent);width:31%}
+.scrub u{position:absolute;top:-4px;width:3px;height:16px;border-radius:2px;background:var(--ink);left:31%}
+.insp .tabs{display:flex;gap:2px;padding:8px 10px 0;border-bottom:1px solid var(--line)}
+.insp .tabs span{padding:8px 11px;font-size:13px;font-weight:700;color:var(--muted);border-radius:9px 9px 0 0}
+.insp .tabs span.on{color:var(--ink);background:#FFF8EF;box-shadow:inset 0 -2px 0 var(--accent)}
+.sec{padding:14px 16px;border-bottom:1px solid #F1EDE2}
+.sec h5{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:10px;display:flex;align-items:center}
+.sec h5 .r{margin-left:auto;font-weight:600;letter-spacing:0;text-transform:none}
+.row{display:flex;align-items:center;gap:10px;font-size:13px;margin:7px 0}
+.row label{width:96px;color:var(--ink2);font-weight:600;flex:none}
+.sel-box{flex:1;border:1px solid var(--line2);border-radius:9px;padding:7px 10px;font-size:13px;background:#fff;display:flex;justify-content:space-between}
+.seg3{display:flex;background:#EFEADD;border-radius:9px;padding:3px;flex:1}
+.seg3 span{flex:1;text-align:center;padding:5px 0;font-size:12px;font-weight:700;color:var(--muted);border-radius:7px}
+.seg3 span.on{background:#fff;color:var(--ink);box-shadow:0 1px 0 var(--line2)}
+.grid9{display:grid;grid-template-columns:repeat(3,18px);grid-template-rows:repeat(3,18px);gap:4px}
+.grid9 i{border-radius:4px;background:#E7E1D3}
+.grid9 i.on{background:var(--accent)}
+.slider{flex:1;height:6px;border-radius:3px;background:#E7E1D3;position:relative}
+.slider i{position:absolute;left:0;top:0;bottom:0;width:48%;background:var(--accent);border-radius:3px}
+.slider u{position:absolute;left:48%;top:-5px;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--accent);margin-left:-8px}
+.callout{border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.4;display:flex;gap:9px}
+.callout.ok{background:var(--greenFill);color:var(--greenText)}
+.callout.warn{background:var(--amberFill);color:var(--amberText)}
+.beat{display:grid;grid-template-columns:78px 1fr auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed #EDE7D8;font-size:12.5px}
+.beat .a{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.beat .a b{color:var(--ink);font-weight:700}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:7px;background:#EFEADD;color:var(--ink2);display:inline-block}
+.tag.m{background:#E8F0FB;color:#2B5A9B} .tag.s{background:#F4EAFB;color:#7A3E9B} .tag.c{background:var(--accentSoft);color:#9b3f13}
+/* timeline */
+.tl{grid-column:1 / span 3;background:#FBF9F3;border-top:1px solid var(--line2);display:grid;grid-template-columns:132px 1fr;position:relative;min-height:0}
+.tl .labs{border-right:1px solid var(--line)}
+.tl .lab{height:28px;display:flex;align-items:center;gap:6px;padding:0 12px;font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;border-bottom:1px solid #F1EDE2}
+.tl .lab.tall{height:44px}
+.lanes{position:relative;overflow:hidden}
+.lane{height:28px;border-bottom:1px solid #F1EDE2;position:relative}
+.lane.tall{height:44px}
+.lane .b{position:absolute;top:3px;bottom:3px;border-radius:6px;font-size:10.5px;font-weight:700;padding:0 6px;display:flex;align-items:center;overflow:hidden;white-space:nowrap}
+.ruler{height:26px;border-bottom:1px solid var(--line);position:relative;background:#F4F0E5}
+.ruler span{position:absolute;top:6px;font:600 10px var(--mono);color:var(--muted);transform:translateX(3px)}
+.ruler i{position:absolute;bottom:0;width:1px;height:8px;background:var(--faint)}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);z-index:5}
+.playhead:before{content:"";position:absolute;top:0;left:-6px;border:7px solid transparent;border-top:10px solid var(--ink);border-bottom:0}
+.wav{position:absolute;inset:0;display:flex;align-items:center;gap:1px;padding:0 3px}
+.wav i{width:2px;background:rgba(31,29,26,.55);border-radius:1px;flex:none}
+.stale{background-image:repeating-linear-gradient(135deg,rgba(240,160,48,.28) 0 5px,transparent 5px 10px)!important;outline:1.5px solid var(--amber);outline-offset:-1.5px}
+.flag{position:absolute;top:2px;width:16px;height:22px;font-size:13px;color:var(--rose)}
+/* ---------- other screens ---------- */
+.pad{padding:22px 26px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 0 #fff inset,0 10px 24px -16px rgba(74,58,30,.25)}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:800}
+.tbl td{padding:11px 12px;border-bottom:1px solid #F1EDE2;vertical-align:middle}
+.tbl tr.stale td{background:#FFFBF1}
+.tbl tr.run td{background:#FFF4EA}
+.mono{font-family:var(--mono)}
+.take{display:inline-flex;gap:4px}
+.take span{width:24px;height:24px;border-radius:7px;background:#EFEADD;display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--ink2)}
+.take span.on{background:var(--ink);color:#fff}
+.progress{height:8px;border-radius:4px;background:#F0D9C6;overflow:hidden;width:130px}
+.progress i{display:block;height:100%;background:var(--accent)}
+.note{display:grid;grid-template-columns:70px 1fr;gap:12px;padding:13px 16px;border-bottom:1px solid #F1EDE2}
+.note .tcb{font:700 12px var(--mono);background:#211F1C;color:#fff;border-radius:8px;padding:5px 0;text-align:center;height:26px}
+.note p{font-size:13.5px;line-height:1.4;margin-bottom:6px}
+.note .m{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted)}
+.note.res{opacity:.6}
+.map{position:relative;width:1560px;height:900px}
+.mb{position:absolute;background:#fff;border:1.5px solid var(--line2);border-radius:14px;padding:12px 14px;font-size:13px;box-shadow:0 6px 14px -10px rgba(74,58,30,.4)}
+.mb b{display:block;font-size:14px;margin-bottom:4px}
+.mb small{color:var(--muted);font-size:12px;line-height:1.35;display:block}
+.mb.dark{background:#211F1C;color:#fff;border-color:#211F1C} .mb.dark small{color:#CFC8B8}
+.mb.acc{border-color:var(--accent);background:#FFF8EF}
+.mb.grn{border-color:#BFE3CC;background:#F4FBF7}
+.mb.amb{border-color:#EDB25A;background:#FFFBF1}
+.mapsvg{position:absolute;inset:0;pointer-events:none}
+.banner{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:14px;font-size:13.5px}
+.banner.amber{background:var(--amberFill);color:var(--amberText);border:1px solid #EDB25A}
+.banner.acc{background:var(--accentSoft);color:#8f3a11;border:1px solid #F3B58F}
+.scr img.mas{position:absolute;left:3%;bottom:17%;width:30%;height:auto;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+.lane .b.cap{background:#E2DAC6!important;border:1px solid #CFC5AB}
+</style>
+</head>
+<body>
+<div class="deck">
+  <b>EXPLAINER STUDIO · UI MOCKUP</b>
+  <a data-s="editor" class="on">1 · Episode editor</a><a data-s="voice">2 · Voice &amp; takes</a><a data-s="review">3 · Review</a><a data-s="map">4 · Navigation map</a>
+  <span class="tag">PROPOSAL · NOT IMPLEMENTED · EPISODE DATA IS REAL (join-fanout)</span>
+</div>
+
+<!-- =============================== 1. EDITOR =============================== -->
+<section id="s-editor" class="screen on">
+<div class="shell">
+  <nav class="rail">
+    <div class="logo">E</div>
+    <div class="it on"><i>▤</i>Episodes</div>
+    <div class="it"><i>✦</i>Ideas</div>
+    <div class="it"><i>❏</i>Library</div>
+    <div class="it"><i>⚙</i>Jobs <span class="chip acc" style="padding:0 6px;font-size:10px">1</span></div>
+    <div class="sp"></div>
+    <div class="it"><i>☰</i>Settings</div>
+  </nav>
+  <header class="top">
+    <div><div class="crumb">Episodes ›  join-fanout</div><div class="ttl">Your pipeline succeeded. Why is the dashboard wrong?</div></div>
+    <span class="chip">Draft</span>
+    <span class="spacer"></span>
+    <span class="chip green"><span class="dot"></span>All changes saved · 3 s ago</span>
+    <span class="btn sm">r14 · autosaved ▾</span>
+    <span class="chip acc"><span class="spin"></span>Voice · block 5 · 41% <b style="margin-left:6px;cursor:pointer">✕</b></span>
+    <span class="btn">Approve…</span>
+    <span class="btn pri">Render preview ▸</span>
+  </header>
+  <div class="steps">
+    <div class="step done"><span class="n">✓</span><div>Idea<small>locked</small></div></div><span class="bar"></span>
+    <div class="step done"><span class="n">✓</span><div>Research<small>3 sources</small></div></div><span class="bar"></span>
+    <div class="step done"><span class="n">✓</span><div>Script<small>22 segments</small></div></div><span class="bar"></span>
+    <div class="step done"><span class="n">✓</span><div>Storyboard<small>5 scenes</small></div></div><span class="bar"></span>
+    <div class="step warn"><span class="n">!</span><div>Voice<small>2 blocks stale</small></div></div><span class="bar"></span>
+    <div class="step cur"><span class="n">6</span><div>Scenes<small>editing</small></div></div><span class="bar"></span>
+    <div class="step"><span class="n">7</span><div>Review<small>3 open notes</small></div></div><span class="bar"></span>
+    <div class="step"><span class="n">8</span><div>Render<small>preview r13 is stale</small></div></div><span class="bar"></span>
+    <div class="step"><span class="n">9</span><div>Export<small>not ready</small></div></div>
+  </div>
+
+  <div class="work">
+    <!-- outline -->
+    <aside class="pane outline">
+      <div class="ph">Outline <span class="r"><span class="btn sm">＋ Scene</span></span></div>
+      <div class="sc"><div class="thumb" style="background:linear-gradient(#2c3a52,#16202f)"></div><div><b>1 · Symptom</b><div class="meta"><span class="tag">kpi-mismatch</span> 0:00 – 0:22 <span class="dot"></span></div></div></div>
+      <div class="sc sel"><div class="thumb"><img src="img/episode-frame-s07.jpg" alt=""></div><div><b>2 · Lab</b><div class="meta"><span class="tag">tables-lab</span> 0:22 – 1:28 <span class="dot amber"></span> 2 stale</div></div></div>
+      <div class="segs" id="segs"></div>
+      <div class="sc"><div class="thumb" style="background:linear-gradient(#35405a,#1b2436)"></div><div><b>3 · Ever paid</b><div class="meta"><span class="tag">cards</span> 1:28 – 1:34 <span class="dot"></span></div></div></div>
+      <div class="sc"><div class="thumb" style="background:linear-gradient(#35405a,#1b2436)"></div><div><b>4 · Distinct</b><div class="meta"><span class="tag">cards</span> 1:34 – 1:45 <span class="dot"></span></div></div></div>
+      <div class="sc"><div class="thumb" style="background:linear-gradient(#35405a,#1b2436)"></div><div><b>5 · Recap</b><div class="meta"><span class="tag">cards</span> 1:45 – 1:51 <span class="dot"></span></div></div></div>
+    </aside>
+
+    <!-- centre -->
+    <main class="center">
+      <div class="ctb">
+        <div class="seg-tabs"><span class="on">Preview</span><span>Storyboard</span><span>Script</span></div>
+        <span class="chip">Layout · Split dense</span>
+        <span class="spacer"></span>
+        <span class="chip">☑ Safe areas</span><span class="chip">Phone size</span><span class="chip ink">Live preview · not rendered</span>
+      </div>
+      <div class="stagewrap">
+        <div class="phone"><div class="scr"><img src="img/episode-frame-s07.jpg" alt=""><img class="mas" src="img/pip-hero.png" alt="">
+          <div class="guide" style="top:5%;height:0;border-width:1.5px 0 0 0"><span>top safe</span></div>
+          <div class="guide" style="bottom:20%;height:0;border-width:1.5px 0 0 0"><span>caption zone</span></div>
+        </div></div>
+        <div class="alts">
+          <h4>Layout for this scene</h4>
+          <div class="alt">
+            <div class="w"><i style="left:6px;top:6px;right:6px;height:62px;background:#D8D2C2;border-radius:5px"></i><i style="left:6px;top:74px;right:6px;height:44px;background:#E7E1D3;border-radius:5px"></i><i style="left:28px;bottom:6px;width:34px;height:34px;background:var(--accent);border-radius:50%"></i></div>
+            <div><b>Stage + mascot (fixed)</b><p>Mascot owns the lower third. Content gets 58% of the height.</p><div class="v"><span class="chip rose">min text 31 px ✕</span></div></div>
+          </div>
+          <div class="alt sel">
+            <div class="w"><i style="left:6px;top:6px;right:6px;height:104px;background:#D8D2C2;border-radius:5px"></i><i style="left:6px;top:114px;right:6px;height:12px;background:#E7E1D3;border-radius:4px"></i><i style="left:6px;bottom:6px;width:24px;height:24px;background:var(--accent);border-radius:50%"></i></div>
+            <div><b>Split · dense</b><p>Mascot docks bottom-left at 55% and peeks on reactions.</p><div class="v"><span class="chip green">min text 42 px ✓</span></div></div>
+          </div>
+          <div class="alt">
+            <div class="w"><i style="left:6px;top:6px;right:6px;bottom:30px;background:#D8D2C2;border-radius:5px"></i><i style="right:6px;bottom:6px;width:16px;height:16px;border:2px dashed var(--accent);border-radius:50%"></i></div>
+            <div><b>Full stage + peek</b><p>Mascot hidden until a beat calls it in.</p><div class="v"><span class="chip green">min text 48 px ✓</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="transport"><span class="btn sm">⏮</span><span class="btn sm">▶</span><span class="btn sm">⏭</span><span class="tc">0:34.6 / 1:51.8</span><div class="scrub"><i></i><u></u></div><span class="chip">s07 · loop</span><span class="chip">1×</span></div>
+    </main>
+
+    <!-- inspector -->
+    <aside class="pane insp" style="border-right:0">
+      <div class="tabs"><span>Scene</span><span class="on">Layout</span><span>Mascot</span><span>Beats</span><span>Notes</span></div>
+      <div class="sec"><h5>Template <span class="r">changes animate at the next beat</span></h5>
+        <div class="row"><label>Layout</label><div class="sel-box"><span>Split · dense</span><span>▾</span></div></div>
+        <div class="row"><label>Caption zone</label><div class="seg3"><span class="on">Bottom</span><span>Lower third</span><span>Top</span><span>Off</span></div></div>
+      </div>
+      <div class="sec"><h5>Mascot <span class="r">a layout slot, not a fixed region</span></h5>
+        <div class="row"><label>Mode</label><div class="seg3"><span class="on">Docked</span><span>Floating</span><span>Peek</span><span>Hidden</span></div></div>
+        <div class="row"><label>Position</label><div class="grid9"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i></div><span style="font-size:12px;color:var(--muted)">bottom-left</span></div>
+        <div class="row"><label>Scale</label><div class="slider"><i></i><u></u></div><span class="mono" style="font-size:12px">0.55</span></div>
+        <div class="row"><label>Peeks on</label><span class="chip acc">reactions</span><span class="chip acc">pointing</span><span class="chip">＋</span></div>
+      </div>
+      <div class="sec"><h5>Fit check</h5>
+        <div class="callout ok"><b>✓</b><div><b>Content area 1080 × 1330 (69% height).</b> Smallest text is 42 px against a 36 px minimum. All 9 history rows stay visible.</div></div>
+        <div class="callout warn" style="margin-top:8px"><b>!</b><div>Beat 3 points at the SQL panel; the mascot will float over the table while it points, then return to its dock.</div></div>
+      </div>
+      <div class="sec" style="border-bottom:0"><h5>Beats <span class="r">anchored to words, not frames</span></h5><div class="beat"><div class="a"><b>s07</b> “₹1,800”</div><div>Mascot reacts: surprised</div><span class="tag m">behaviour</span></div><div style="font-size:12.5px;color:var(--muted);margin-top:8px">4 beats in this scene · open the Beats tab to edit</div></div>
+      </aside>
+
+    <!-- timeline -->
+    <section class="tl">
+      <div class="labs"><div style="height:26px;border-bottom:1px solid var(--line)"></div>
+        <div class="lab">Chapters</div><div class="lab">Scenes</div><div class="lab tall">Narration</div><div class="lab">Captions</div><div class="lab">Mascot</div><div class="lab">Sound</div></div>
+      <div class="lanes" id="lanes"></div>
+    </section>
+  </div>
+</div>
+</section>
+
+<!-- =============================== 2. VOICE =============================== -->
+<section id="s-voice" class="screen">
+<div class="shell">
+  <nav class="rail"><div class="logo">E</div><div class="it on"><i>▤</i>Episodes</div><div class="it"><i>✦</i>Ideas</div><div class="it"><i>❏</i>Library</div><div class="it"><i>⚙</i>Jobs <span class="chip acc" style="padding:0 6px;font-size:10px">1</span></div><div class="sp"></div><div class="it"><i>☰</i>Settings</div></nav>
+  <header class="top"><div><div class="crumb">Episodes › join-fanout</div><div class="ttl">Your pipeline succeeded. Why is the dashboard wrong?</div></div><span class="chip">Draft</span><span class="spacer"></span><span class="chip green"><span class="dot"></span>All changes saved · 3 s ago</span><span class="btn sm">r14 ▾</span><span class="chip acc"><span class="spin"></span>Voice · block 5 · 41% ✕</span><span class="btn pri">Render preview ▸</span></header>
+  <div class="steps">
+    <div class="step done"><span class="n">✓</span><div>Idea<small>locked</small></div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Research<small>3 sources</small></div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Script<small>22 segments</small></div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Storyboard<small>5 scenes</small></div></div><span class="bar"></span>
+    <div class="step cur"><span class="n">5</span><div>Voice<small>2 blocks stale</small></div></div><span class="bar"></span><div class="step"><span class="n">6</span><div>Scenes<small>2 stale</small></div></div><span class="bar"></span><div class="step"><span class="n">7</span><div>Review<small>3 open notes</small></div></div><span class="bar"></span><div class="step"><span class="n">8</span><div>Render<small>stale</small></div></div><span class="bar"></span><div class="step"><span class="n">9</span><div>Export<small>not ready</small></div></div>
+  </div>
+  <div class="pad" style="display:grid;grid-template-columns:1fr 430px;gap:22px;overflow:hidden;min-height:0">
+    <div style="min-height:0;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Voice · Pip voice v1</div><div style="font-size:13px;color:var(--muted);margin-top:3px">Qwen3-TTS Base 1.7B · approved reference B-US (r1, read-only) · English</div></div>
+        <span class="spacer"></span>
+        <span class="chip green"><span class="dot"></span>Memory pressure normal</span><span class="chip">Engine idle · model unloaded</span>
+      </div>
+      <div class="banner amber"><b>2 of 7 blocks are stale</b> after your script edits (s07, s12). Block 5 is regenerating; block 3 is waiting. The other 5 takes are re-used.
+        <span class="spacer"></span><span style="font-size:12.5px">estimate ≈ 10 s for block 3 · peak ≈ 8.6 GB · runs alone</span><span class="btn pri sm">Regenerate block 3</span></div>
+      <div class="card" style="overflow:hidden">
+        <table class="tbl"><thead><tr><th style="width:90px">Block</th><th>Text (caption text → spoken text)</th><th style="width:96px">Take</th><th style="width:78px">Length</th><th style="width:170px">Status</th><th style="width:150px"></th></tr></thead><tbody id="vrows"></tbody></table>
+      </div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.5">A block is one or more consecutive segments read in a single pass for natural prosody (default ≤ 20 s). Regenerating a block never touches its neighbours; gaps between blocks are explicit pacing controls and default to the model’s own pause.</div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;min-height:0;overflow:hidden">
+      <div class="ph">Block 3 · s07 <span class="r"><span class="chip amber">stale</span></span></div>
+      <div class="sec"><h5>Caption text</h5><div style="font-size:14px;line-height:1.45">Nine rows now. Sum them, and <b>₹600</b> becomes <b>₹1,800</b>.</div></div>
+      <div class="sec"><h5>Spoken text <span class="r">pronunciation override</span></h5><div style="font-size:14px;line-height:1.45;font-family:var(--mono);background:#F7F4EC;border-radius:10px;padding:10px">Nine rows now. Sum them, and <mark style="background:#FDEBDD">six hundred rupees</mark> becomes <mark style="background:#FDEBDD">eighteen hundred rupees</mark>.</div></div>
+      <div class="sec"><h5>Takes <span class="r">locked seed: 11 · re-roll uses a new seed</span></h5>
+        <div class="row" style="margin:5px 0"><span class="take"><span class="on">A</span></span><div class="wav" style="position:relative;height:30px;flex:1"></div><span class="mono" style="font-size:12px">4.6 s</span><span class="btn sm">▶</span></div>
+        <div class="row" style="margin:5px 0"><span class="take"><span>B</span></span><div class="wav" style="position:relative;height:30px;flex:1"></div><span class="mono" style="font-size:12px">4.4 s</span><span class="btn sm">▶</span></div>
+        <div class="row" style="margin:8px 0 0"><span class="btn sm">⟳ Re-roll</span><span class="btn sm">Use take B</span><span class="spacer"></span><span class="chip">outdated: text changed</span></div></div>
+      <div class="sec" style="border-bottom:0"><h5>What this will invalidate</h5>
+        <div style="font-size:13px;line-height:1.6"><span class="dot amber"></span> Timing for s07 and every later scene start<br><span class="dot amber"></span> Beats anchored inside s07 (3 anchors; words unchanged, so they stay valid)<br><span class="dot"></span> Voice takes for the other 5 blocks stay fresh<br><span class="dot amber"></span> Preview r13 and any final render</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- =============================== 3. REVIEW =============================== -->
+<section id="s-review" class="screen">
+<div class="shell">
+  <nav class="rail"><div class="logo">E</div><div class="it on"><i>▤</i>Episodes</div><div class="it"><i>✦</i>Ideas</div><div class="it"><i>❏</i>Library</div><div class="it"><i>⚙</i>Jobs</div><div class="sp"></div><div class="it"><i>☰</i>Settings</div></nav>
+  <header class="top"><div><div class="crumb">Episodes › join-fanout</div><div class="ttl">Your pipeline succeeded. Why is the dashboard wrong?</div></div><span class="chip">Draft</span><span class="spacer"></span><span class="chip green"><span class="dot"></span>All changes saved</span><span class="btn sm">r14 ▾</span><span class="btn">Approve…</span><span class="btn pri">Render final ▸</span></header>
+  <div class="steps">
+    <div class="step done"><span class="n">✓</span><div>Idea</div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Research</div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Script</div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Storyboard</div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Voice</div></div><span class="bar"></span><div class="step done"><span class="n">✓</span><div>Scenes</div></div><span class="bar"></span>
+    <div class="step cur"><span class="n">7</span><div>Review<small>round 2 · 3 open</small></div></div><span class="bar"></span><div class="step"><span class="n">8</span><div>Render</div></div><span class="bar"></span><div class="step"><span class="n">9</span><div>Export</div></div>
+  </div>
+  <div class="pad" style="display:grid;grid-template-columns:470px 1fr 400px;gap:22px;min-height:0;overflow:hidden">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div class="chip acc">Review round 2 · render r14 · 1:51 · reviewing the MP4, not the live preview</div>
+      <div class="phone" style="width:330px;height:586px"><div class="scr"><img src="img/episode-frame-s07.jpg" alt=""><img class="mas" src="img/pip-hero.png" alt=""></div></div>
+      <div style="width:100%"><div class="scrub" style="height:10px;position:relative"><i style="width:31%"></i><u style="left:31%;height:20px;top:-5px"></u>
+        <span style="position:absolute;left:12%;top:-18px;color:var(--rose);font-size:13px">⚑</span><span style="position:absolute;left:31%;top:-18px;color:var(--rose);font-size:13px">⚑</span><span style="position:absolute;left:57%;top:-18px;color:var(--rose);font-size:13px">⚑</span><span style="position:absolute;left:80%;top:-18px;color:var(--green);font-size:13px">⚑</span></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:14px"><span class="btn sm">▶</span><span class="tc mono" style="font-weight:700;font-size:13px">0:34.6 / 1:51.8</span><span class="spacer"></span><span class="btn pri sm">＋ Note at 0:34.6  <span class="mono">N</span></span></div></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;min-height:0;overflow:hidden">
+      <div class="ph">Notes <span class="r"><span class="chip ink">Open 3</span><span class="chip">Resolved 4</span><span class="chip">All rounds</span></span></div>
+      <div class="note"><div class="tcb">0:13.2</div><div><p>Pause after “Nothing crashed” feels too short before the definition of grain.</p><div class="m"><span class="tag m">Voice</span> anchor: s03 · word “grain” <span class="chip green" style="padding:1px 7px">anchor ok</span> <span>round 2</span></div></div></div>
+      <div class="note"><div class="tcb">0:34.6</div><div><p>₹1,800 lands before the table finishes summing. Hold the reveal until the last row is added.</p><div class="m"><span class="tag c">Visual</span> anchor: s07 · word “₹1,800” <span class="chip green" style="padding:1px 7px">anchor ok</span> <span>round 2</span></div></div></div>
+      <div class="note"><div class="tcb">1:03.0</div><div><p>Tie-breaker sentence is dense. Split it, or give the SQL panel more room.</p><div class="m"><span class="tag s">Copy</span> anchor: s12 · word “tie-breaker” <span class="chip amber" style="padding:1px 7px">anchor edited</span> <span>round 1</span></div></div></div>
+      <div class="note res"><div class="tcb" style="background:#8B8578">0:05.9</div><div><p>Say “six hundred rupees”, not “six hundred”.</p><div class="m"><span class="tag m">Voice</span> anchor: s02 <span class="chip green" style="padding:1px 7px">resolved in r12</span></div></div></div>
+      <div class="note res"><div class="tcb" style="background:#8B8578">1:29.0</div><div><p>Card text is too small on a phone.</p><div class="m"><span class="tag c">Visual</span> anchor: s15 <span class="chip green" style="padding:1px 7px">resolved in r13</span></div></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;min-height:0">
+      <div class="card"><div class="ph">Automated checks <span class="r"><span class="chip green">9 pass</span></span></div>
+        <div class="sec" style="font-size:13px;line-height:1.85;border-bottom:0"><span style="color:var(--green)">✓</span> 1080 × 1920 · 30 fps · H.264 + AAC<br><span style="color:var(--green)">✓</span> Audio present, not silent (peak 0.29)<br><span style="color:var(--green)">✓</span> Video length matches narration (±0.05 s)<br><span style="color:var(--green)">✓</span> Speech onsets vs timeline: worst drift 108 ms (limit 250 ms)<br><span style="color:var(--green)">✓</span> On-screen numbers match the SQL they display<br><span style="color:var(--green)">✓</span> Captions never overlap, none under 0.3 s<br><span style="color:var(--green)">✓</span> Render inputs match the current revision (r14)<br><span style="color:var(--amberText)">!</span> Smallest text 31 px on 2 frames <span class="chip amber" style="padding:1px 7px">lab · s13</span></div></div>
+      <div class="card"><div class="ph">Round history</div>
+        <div class="sec" style="font-size:13px;line-height:1.7;border-bottom:0">Round 2 · r14 · <b>3 open</b>, 1 resolved<br>Round 1 · r12 · 4 resolved, 0 open<br><span style="color:var(--muted)">Notes follow the script, not the clock: when a segment is edited its notes re-anchor to the new time, or flag “anchor edited”.</span></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- =============================== 4. MAP =============================== -->
+<section id="s-map" class="screen">
+<div class="pad" style="padding:26px 30px">
+  <div style="font-size:24px;font-weight:800;letter-spacing:-.02em">Navigation map</div>
+  <div style="font-size:14px;color:var(--muted);margin:4px 0 18px">Three levels: the workspace (left rail), one episode (journey stepper), and always-available drawers. Nothing is more than two clicks from the editor.</div>
+  <div class="map">
+    <svg class="mapsvg" viewBox="0 0 1560 900"><defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#B7B0A1"/></marker></defs>
+      <g stroke="#B7B0A1" stroke-width="2" fill="none" marker-end="url(#ar)"><path d="M722 145 H746"/><path d="M1142 145 H1166"/><path d="M1365 205 V232 H525 V256"/><path d="M722 305 H746"/><path d="M1142 305 H1166"/></g></svg>
+    <div class="mb dark" style="left:0;top:20px;width:250px"><b>Workspace · left rail</b><small>Always visible. Dark rail, one active item.</small></div>
+    <div class="mb" style="left:0;top:80px;width:250px"><b>Episodes</b><small>List, status per stage, last render, open notes. “New episode” starts at Idea.</small></div>
+    <div class="mb" style="left:0;top:160px;width:250px"><b>Ideas</b><small>Backlog of topics with a learning objective and a verdict (go, park, drop).</small></div>
+    <div class="mb" style="left:0;top:240px;width:250px"><b>Library</b><small>Sources, voice profiles, scene library, mascot kit, brand and sound kits.</small></div>
+    <div class="mb" style="left:0;top:320px;width:250px"><b>Jobs · Settings</b><small>Queue, history, logs, retry. Paths, memory policy, backups, licences.</small></div>
+
+    <div class="mb dark" style="left:330px;top:20px;width:1230px"><b>Inside an episode · journey stepper (9 stages, each reachable at any time; read in order, but never gated: the stepper shows state, it never blocks)</b><small>Every stage shows done, current, stale or blocked. A stale stage links to the exact items to refresh.</small></div>
+    <div class="mb grn" style="left:330px;top:100px;width:390px"><b>1 Idea · 2 Research</b><small>Objective, audience, hook. Sources with notes. Import ChatGPT research packets (paste or file). Items are Proposed until approved.</small></div>
+    <div class="mb grn" style="left:750px;top:100px;width:390px"><b>3 Script · 4 Storyboard</b><small>Segments with caption text and spoken text. Storyboard assigns scenes to segments and proposes layouts.</small></div>
+    <div class="mb acc" style="left:1170px;top:100px;width:390px"><b>5 Voice</b><small>Blocks, takes, pronunciation, pacing. Stale blocks regenerate selectively with a cost estimate. Approved voice reference is read-only.</small></div>
+    <div class="mb acc" style="left:330px;top:260px;width:390px"><b>6 Scenes (the editor)</b><small>Outline · live preview · inspector · timeline. Layouts, mascot behaviours, beats anchored to words.</small></div>
+    <div class="mb" style="left:750px;top:260px;width:390px"><b>7 Review</b><small>Rendered MP4 with timestamped notes, rounds, automated checks. Notes re-anchor when the script changes.</small></div>
+    <div class="mb" style="left:1170px;top:260px;width:390px"><b>8 Render · 9 Export</b><small>Preview ranges, final render, loudness master, captions, thumbnails, source package, checksums.</small></div>
+    <div class="mb amb" style="left:330px;top:430px;width:1110px"><b>Always-available drawers and shortcuts</b>
+      <small><b style="display:inline">Jobs tray</b> (top right): progress, cancel, retry.  <b style="display:inline">Revisions</b> (r14 menu): autosaves, milestones, diff, restore as a new revision.  <b style="display:inline">Notes</b>: press N anywhere there is a playhead.  <b style="display:inline">Command palette</b> (⌘K): jump to a segment, scene, job or note.  <b style="display:inline">Stale list</b>: click any amber badge to see what is out of date and what it costs to refresh.</small></div>
+    <div class="mb" style="left:330px;top:560px;width:540px"><b>What each stage owns (artifacts)</b><small>Idea → brief · Research → source packets · Script → segments · Storyboard → scene list + layouts · Voice → takes + timing · Scenes → scene params + beats · Review → notes + checks · Render → MP4 + frames · Export → package.</small></div>
+    <div class="mb" style="left:900px;top:560px;width:540px"><b>Design rules</b><small>1. One primary action per screen.  2. Status is always visible, never hidden in a log.  3. Anything slow is a job with progress and cancel.  4. Nothing is deleted by an edit; stale artifacts stay until replaced.  5. The preview is live; the review is of a real render.</small></div>
+  </div>
+</div>
+</section>
+
+<script>
+const T = {"duration": 111.816, "source": "kokoro", "segments": [{"id": "s01", "start": 0.5, "end": 5.35, "text": "Your pipeline succeeded. Every test is green. So why is the dashboard wrong?"}, {"id": "s02", "start": 5.65, "end": 11.38, "text": "Finance says paid revenue is ₹600. The dashboard says ₹1,800."}, {"id": "s03", "start": 11.68, "end": 16.23, "text": "Nothing crashed. The join changed the grain, meaning what one row represents."}, {"id": "s03b", "start": 16.54, "end": 22.36, "text": "The load job and the row-count test only prove the data arrived. Neither checks what one row means."}, {"id": "s04", "start": 22.66, "end": 26.85, "text": "Take three paid orders: ₹100, ₹200, and ₹300."}, {"id": "s05", "start": 27.15, "end": 30.48, "text": "Each order has three status changes in the history table."}, {"id": "s06", "start": 30.78, "end": 34.3, "text": "Join every history row, and each order is copied three times."}, {"id": "s07", "start": 34.6, "end": 39.16, "text": "Nine rows now. Sum them, and ₹600 becomes ₹1,800."}, {"id": "s08", "start": 39.76, "end": 43.86, "text": "That is a one-to-many join. The amount repeats for every history row."}, {"id": "s09", "start": 44.16, "end": 48.89, "text": "To catch it, compare counts. Nine joined rows, but only three distinct orders."}, {"id": "s10", "start": 49.19, "end": 54.55, "text": "Then inspect one order. Order 102 shows the same ₹200 three times."}, {"id": "s10b", "start": 54.85, "end": 60.09, "text": "Same order, same amount, three rows. Every extra history row adds the amount again."}, {"id": "s11", "start": 60.38, "end": 65.08, "text": "For a current-status report, pick one latest history row per order before joining."}, {"id": "s12", "start": 65.38, "end": 70.75, "text": "Sort each order's history by time, break ties with the history ID, and keep the first row."}, {"id": "s12b", "start": 71.05, "end": 76.43, "text": "Without that tie-breaker, two rows with the same timestamp could swap places between runs."}, {"id": "s13", "start": 76.73, "end": 80.83, "text": "Now each order matches exactly one row. Three orders, three rows."}, {"id": "s14", "start": 81.13, "end": 84.35, "text": "The total is ₹600 again, and the counts agree."}, {"id": "s14b", "start": 84.65, "end": 88.59, "text": "The fix did not change the data. It changed which rows reach the join."}, {"id": "s15", "start": 88.89, "end": 94.36, "text": "Need orders that were ever paid? That is different logic: check whether any history row says paid."}, {"id": "s16", "start": 94.66, "end": 100.23, "text": "And SUM(DISTINCT amount) is not a general fix. Two different orders can share the same amount."}, {"id": "s16b", "start": 100.53, "end": 105.53, "text": "DISTINCT removes repeated values, not duplicate rows. Those are different things."}, {"id": "s17", "start": 105.83, "end": 110.42, "text": "So when a total looks wrong, check the grain. Count the rows, then count the orders."}], "scenes": [{"id": "symptom", "type": "kpi-mismatch", "start": 0.0, "end": 22.41}, {"id": "lab", "type": "tables-lab", "start": 22.41, "end": 88.64}, {"id": "ever-paid", "type": "cards", "start": 88.64, "end": 94.41}, {"id": "distinct", "type": "cards", "start": 94.41, "end": 105.58}, {"id": "recap", "type": "cards", "start": 105.58, "end": 111.82}], "chapters": [{"label": "Symptom", "start": 0.0}, {"label": "Join", "start": 22.41}, {"label": "Diagnose", "start": 43.91}, {"label": "Repair", "start": 60.13}, {"label": "Edge cases", "start": 88.64}, {"label": "Recap", "start": 105.58}], "captions": [{"text": "Your pipeline succeeded.", "start": 0.5, "end": 2.05}, {"text": "Every test is green.", "start": 2.05, "end": 3.55}, {"text": "So why is", "start": 3.55, "end": 4.17}, {"text": "the dashboard wrong?", "start": 4.17, "end": 5.65}, {"text": "Finance says paid", "start": 5.65, "end": 6.59}, {"text": "revenue is ₹600.", "start": 6.59, "end": 8.85}, {"text": "The dashboard says ₹1,800.", "start": 8.85, "end": 11.72}, {"text": "Nothing crashed.", "start": 11.72, "end": 12.99}, {"text": "The join changed the grain,", "start": 12.99, "end": 14.54}, {"text": "meaning what one row represents.", "start": 14.54, "end": 16.54}, {"text": "The load job and", "start": 16.54, "end": 17.44}, {"text": "the row-count test only", "start": 17.44, "end": 18.83}, {"text": "prove the data arrived.", "start": 18.83, "end": 20.48}, {"text": "Neither checks what", "start": 20.48, "end": 21.38}, {"text": "one row means.", "start": 21.38, "end": 22.66}, {"text": "Take three paid orders:", "start": 22.66, "end": 24.18}, {"text": "₹100, ₹200, and ₹300.", "start": 24.18, "end": 27.15}, {"text": "Each order has three status", "start": 27.15, "end": 28.64}, {"text": "changes in the history table.", "start": 28.64, "end": 30.8}, {"text": "Join every history row,", "start": 30.8, "end": 32.3}, {"text": "and each order is", "start": 32.3, "end": 33.1}, {"text": "copied three times.", "start": 33.1, "end": 34.64}, {"text": "Nine rows now.", "start": 34.64, "end": 35.99}, {"text": "Sum them,", "start": 35.99, "end": 36.66}, {"text": "and ₹600 becomes ₹1,800.", "start": 36.66, "end": 39.76}, {"text": "That is a one-to-many join.", "start": 39.76, "end": 41.57}, {"text": "The amount repeats for", "start": 41.57, "end": 42.7}, {"text": "every history row.", "start": 42.7, "end": 44.17}, {"text": "To catch it,", "start": 44.17, "end": 44.7}, {"text": "compare counts.", "start": 44.7, "end": 45.97}, {"text": "Nine joined rows,", "start": 45.97, "end": 47.07}, {"text": "but only three distinct orders.", "start": 47.07, "end": 49.19}, {"text": "Then inspect one order.", "start": 49.19, "end": 50.79}, {"text": "Order 102 shows the", "start": 50.79, "end": 52.41}, {"text": "same ₹200 three times.", "start": 52.41, "end": 54.9}, {"text": "Same order,", "start": 54.9, "end": 55.71}, {"text": "same amount,", "start": 55.71, "end": 56.41}, {"text": "three rows.", "start": 56.41, "end": 57.53}, {"text": "Every extra history row", "start": 57.53, "end": 59.01}, {"text": "adds the amount again.", "start": 59.01, "end": 60.38}, {"text": "For a current-status report,", "start": 60.38, "end": 62.13}, {"text": "pick one latest history row", "start": 62.13, "end": 63.63}, {"text": "per order before joining.", "start": 63.63, "end": 65.43}, {"text": "Sort each order's", "start": 65.43, "end": 66.31}, {"text": "history by time,", "start": 66.31, "end": 67.52}, {"text": "break ties with", "start": 67.52, "end": 68.32}, {"text": "the history ID,", "start": 68.32, "end": 69.56}, {"text": "and keep the first row.", "start": 69.56, "end": 71.05}, {"text": "Without that tie-breaker,", "start": 71.05, "end": 72.54}, {"text": "two rows with the", "start": 72.54, "end": 73.34}, {"text": "same timestamp could swap", "start": 73.34, "end": 75.05}, {"text": "places between runs.", "start": 75.05, "end": 76.76}, {"text": "Now each order matches", "start": 76.76, "end": 77.77}, {"text": "exactly one row.", "start": 77.77, "end": 79.17}, {"text": "Three orders,", "start": 79.17, "end": 79.97}, {"text": "three rows.", "start": 79.97, "end": 81.13}, {"text": "The total is ₹600 again,", "start": 81.13, "end": 83.35}, {"text": "and the counts agree.", "start": 83.35, "end": 84.65}, {"text": "The fix did not", "start": 84.65, "end": 85.39}, {"text": "change the data.", "start": 85.39, "end": 86.54}, {"text": "It changed which rows", "start": 86.54, "end": 87.74}, {"text": "reach the join.", "start": 87.74, "end": 88.91}, {"text": "Need orders that", "start": 88.91, "end": 89.67}, {"text": "were ever paid?", "start": 89.67, "end": 90.85}, {"text": "That is different logic:", "start": 90.85, "end": 92.25}, {"text": "check whether any history", "start": 92.25, "end": 93.36}, {"text": "row says paid.", "start": 93.36, "end": 94.66}, {"text": "And SUM(DISTINCT amount) is", "start": 94.66, "end": 96.25}, {"text": "not a general fix.", "start": 96.25, "end": 97.87}, {"text": "Two different orders can", "start": 97.87, "end": 99.09}, {"text": "share the same amount.", "start": 99.09, "end": 100.53}, {"text": "DISTINCT removes repeated values,", "start": 100.53, "end": 102.73}, {"text": "not duplicate rows.", "start": 102.73, "end": 104.24}, {"text": "Those are different things.", "start": 104.24, "end": 105.86}, {"text": "So when a", "start": 105.86, "end": 106.14}, {"text": "total looks wrong,", "start": 106.14, "end": 107.22}, {"text": "check the grain.", "start": 107.22, "end": 108.4}, {"text": "Count the rows,", "start": 108.4, "end": 109.2}, {"text": "then count the orders.", "start": 109.2, "end": 111.02}], "events": [{"time": 0.42, "cue": "checks", "expression": null}, {"time": 0.42, "cue": null, "expression": "happy"}, {"time": 3.47, "cue": null, "expression": "thinking"}, {"time": 3.96, "cue": "dashboard", "expression": null}, {"time": 6.99, "cue": "expected", "expression": null}, {"time": 9.74, "cue": "mismatch", "expression": null}, {"time": 9.74, "cue": null, "expression": "surprised"}, {"time": 11.64, "cue": null, "expression": "concerned"}, {"time": 16.45, "cue": null, "expression": "thinking"}, {"time": 22.57, "cue": "show-orders", "expression": null}, {"time": 22.57, "cue": null, "expression": "pointing"}, {"time": 27.07, "cue": "show-history", "expression": null}, {"time": 27.07, "cue": null, "expression": "neutral"}, {"time": 30.72, "cue": "join-start", "expression": null}, {"time": 30.72, "cue": null, "expression": "thinking"}, {"time": 35.91, "cue": "sum-start", "expression": null}, {"time": 38.07, "cue": null, "expression": "surprised"}, {"time": 39.68, "cue": "grain-note", "expression": null}, {"time": 39.68, "cue": null, "expression": "pointing"}, {"time": 44.09, "cue": "counts", "expression": null}, {"time": 44.09, "cue": null, "expression": "thinking"}, {"time": 49.11, "cue": "inspect-order", "expression": null}, {"time": 49.11, "cue": null, "expression": "pointing"}, {"time": 54.82, "cue": null, "expression": "concerned"}, {"time": 60.3, "cue": "repair-start", "expression": null}, {"time": 60.3, "cue": null, "expression": "neutral"}, {"time": 65.35, "cue": "pick-latest", "expression": null}, {"time": 65.35, "cue": null, "expression": "thinking"}, {"time": 70.97, "cue": null, "expression": "pointing"}, {"time": 76.68, "cue": "rejoin", "expression": null}, {"time": 76.68, "cue": null, "expression": "pointing"}, {"time": 81.05, "cue": "fixed-sum", "expression": null}, {"time": 81.05, "cue": null, "expression": "happy"}, {"time": 84.57, "cue": null, "expression": "neutral"}, {"time": 88.83, "cue": "card-1", "expression": null}, {"time": 88.83, "cue": null, "expression": "thinking"}, {"time": 89.04, "cue": "card-2", "expression": null}, {"time": 94.58, "cue": "card-1", "expression": null}, {"time": 94.58, "cue": null, "expression": "concerned"}, {"time": 96.92, "cue": "card-2", "expression": null}, {"time": 100.45, "cue": null, "expression": "thinking"}, {"time": 105.78, "cue": "card-1", "expression": null}, {"time": 105.78, "cue": null, "expression": "happy"}]};
+const fmt = s => { const m = Math.floor(s/60), r = s - m*60; return m + ':' + r.toFixed(0).padStart(2,'0'); };
+function rnd(seed){ let x = seed; return () => (x = (x*16807) % 2147483647) / 2147483647; }
+const LEFT = 0, W = 1440, PX = W / T.duration;
+const staleSeg = new Set(['s07','s12']);
+// --- outline segments for the Lab scene
+(() => {
+  const el = document.getElementById('segs'); if(!el) return;
+  const rows = T.segments.filter(s => s.start >= 22 && s.end <= 89).slice(0, 12);
+  el.innerHTML = rows.map(s => `<div class="seg ${s.id==='s07'?'sel':''}"><span class="id">${s.id}</span><span class="tx">${s.text}</span><span>${staleSeg.has(s.id)?'<span class="dot amber"></span>':'<span class="dot"></span>'}</span></div>`).join('') +
+    `<div class="seg"><span class="id"></span><span class="tx" style="color:var(--muted)">… 6 more segments</span><span></span></div>`;
+})();
+// --- timeline lanes
+(() => {
+  const L = document.getElementById('lanes'); if(!L) return;
+  const px = t => (t * PX).toFixed(1);
+  let h = '<div class="ruler">';
+  for(let t=0;t<=T.duration;t+=10){ h += `<i style="left:${px(t)}px"></i><span style="left:${px(t)}px">${fmt(t)}</span>`; }
+  h += '</div>';
+  const colors = ['#E8F0FB','#FDEBDD','#E3F4EA','#F4EAFB','#FDF0D9','#E3F4EA'];
+  h += '<div class="lane">' + T.chapters.map((c,i)=>{ const n=T.chapters[i+1]; const e=n?n.start:T.duration; return `<div class="b" style="left:${px(c.start)}px;width:${(px(e)-px(c.start)-3)}px;background:#EFEADD;color:var(--ink2)">${c.label}</div>`;}).join('') + '</div>';
+  h += '<div class="lane">' + T.scenes.map((s,i)=>`<div class="b" style="left:${px(s.start)}px;width:${(px(s.end)-px(s.start)-3)}px;background:${colors[i]};color:var(--ink);${s.id==='lab'?'outline:2px solid var(--accent);outline-offset:-2px':''}">${i+1} · ${s.id} <span style="opacity:.5;margin-left:6px;font-weight:600">${s.type}</span></div>`).join('') + '</div>';
+  const r = rnd(7);
+  h += '<div class="lane tall">' + T.segments.map(s=>{ const w = px(s.end)-px(s.start); let bars=''; const n=Math.max(3,Math.floor(w/3)); for(let k=0;k<n;k++){ const a=0.25+0.75*Math.abs(Math.sin(k*0.7+r()*3))*r(); bars+=`<i style="height:${Math.round(6+a*26)}px"></i>`; }
+    return `<div class="b ${staleSeg.has(s.id)?'stale':''}" style="left:${px(s.start)}px;width:${w}px;top:4px;bottom:4px;background:${staleSeg.has(s.id)?'#fff':'#EFEADD'};padding:0"><div class="wav">${bars}</div></div>`; }).join('') + '</div>';
+  h += '<div class="lane">' + T.captions.map(c=>`<div class="b" style="left:${px(c.start)}px;width:${Math.max(4,px(c.end)-px(c.start)-2)}px;background:#E2DAC6;border:1px solid #CFC5AB;top:8px;bottom:8px;border-radius:4px"></div>`).join('') + '</div>';
+  h += '<div class="lane">' + T.events.filter(e=>e.expression||e.cue).map(e=>`<div class="b" style="left:${px(e.time)}px;width:${e.expression?26:10}px;background:${e.expression?'#E8F0FB':'#F4EAFB'};top:7px;bottom:7px;border-radius:4px;padding:0"></div>`).join('') + '</div>';
+  h += '<div class="lane">' + T.events.filter(e=>e.cue).map(e=>`<i style="position:absolute;left:${px(e.time)}px;top:8px;bottom:8px;width:2px;background:var(--accent2);opacity:.7"></i>`).join('') + [4.5,12,34.6,63,98].map(t=>`<span style="position:absolute;left:${px(t)-4}px;top:-34px;"></span>`).join('') + '</div>';
+  // flags on the chapters lane for notes
+  h += [13.2,34.6,63,89.7].map((t,i)=>`<div class="flag" style="left:${px(t)-6}px;top:30px;z-index:4;color:${i==3?'var(--green)':'var(--rose)'}">⚑</div>`).join('');
+  h += `<div class="playhead" style="left:${px(34.6)}px"></div>`;
+  L.innerHTML = h;
+})();
+// --- voice table
+(() => {
+  const el = document.getElementById('vrows'); if(!el) return;
+  const blocks = [
+    ['1','s01 – s03b','Your pipeline succeeded. Every test is green. So why is the dashboard wrong? …','fresh','1','21.9 s'],
+    ['2','s04 – s06','Take three paid orders: ₹100, ₹200, and ₹300 → “one hundred rupees, two hundred rupees, …”','fresh','1','11.6 s'],
+    ['3','s07','Nine rows now. Sum them, and ₹600 becomes ₹1,800.','stale','2','4.6 s'],
+    ['4','s08 – s10b','That is a one-to-many join. The amount repeats for every history row. …','fresh','1','20.3 s'],
+    ['5','s11 – s12b','For a current-status report, pick one latest history row per order … tie-breaker …','run','1','16.0 s'],
+    ['6','s13 – s14b','Now each order matches exactly one row. Three orders, three rows. …','fresh','1','11.9 s'],
+    ['7','s15 – s17','Need orders that were ever paid? That is different logic … SUM(DISTINCT amount) is not a general fix.','fresh','1','21.5 s'],
+  ];
+  const st = {fresh:'<span class="chip green"><span class="dot"></span>fresh</span>',stale:'<span class="chip amber"><span class="dot amber"></span>stale · text edited</span>',run:'<span class="chip amber"><span class="spin"></span>stale · generating 41%</span>'};
+  el.innerHTML = blocks.map(b=>`<tr class="${b[3]==='stale'?'stale':b[3]==='run'?'run':''}"><td class="mono"><b>${b[0]}</b> <span style="color:var(--muted)">${b[1]}</span></td><td style="color:var(--ink2)">${b[2]}</td><td><span class="take"><span class="on">A</span>${b[4]==='2'?'<span>B</span>':''}</span></td><td class="mono">${b[5]}</td><td>${st[b[3]]}</td><td style="text-align:right"><span class="btn sm">▶</span> <span class="btn sm">${b[3]==='run'?'Cancel':'Re-roll'}</span></td></tr>`).join('');
+  document.querySelectorAll('.wav').forEach((w,i)=>{ if(w.children.length) return; const r=rnd(11+i); let b=''; for(let k=0;k<70;k++){ b+=`<i style="height:${Math.round(5+r()*22)}px"></i>`;} w.innerHTML=b; });
+})();
+// --- tabs
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id==='s-'+id)); document.querySelectorAll('.deck a').forEach(a=>a.classList.toggle('on', a.dataset.s===id)); }
+document.querySelectorAll('.deck a').forEach(a=>a.onclick=()=>show(a.dataset.s));
+const h = location.hash.replace('#',''); if(h){ show(h); }
+if(new URLSearchParams(location.search).has('bare')) document.body.classList.add('bare');
+</script>
+</body>
+</html>

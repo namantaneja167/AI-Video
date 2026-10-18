@@ -1,0 +1,24 @@
+{
+  "name": "explainer-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local production system for faceless technical explainer videos",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "validate": "node scripts/validate.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.536",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.536",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "typescript": "7.0.2"
+  },
+  "type": "module"
+}

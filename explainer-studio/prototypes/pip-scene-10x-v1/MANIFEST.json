@@ -1,0 +1,227 @@
+{
+  "name": "pip-scene-10x-v1",
+  "status": "first integrated prototype; frozen. Live code stays in place and may evolve; this snapshot must not be edited.",
+  "preserved_on": "2026-10-18",
+  "what_it_is": "16.3 s narrated 1080x1920 scene: Pip voice v1 + layered Pip rig + Remotion scene + audio-derived timing + synthesised sound accents. A production-engine test, not the product.",
+  "video": {
+    "file": "video/pip_scene_10x_v1.mp4",
+    "duration_s": 16.3,
+    "frames": 489,
+    "fps": 30,
+    "size": "1080x1920",
+    "codec": "h264 + aac 48 kHz"
+  },
+  "composition_id": "pip-scene-10x",
+  "narration": {
+    "seed": 11,
+    "text": "Ten times faster. Sounds impressive. But faster at what? This test used tiny prompts. A long document is a different workload. Before trusting the headline, check what was measured.",
+    "alternate_take": "seed 7 (kept, not used)"
+  },
+  "voice": {
+    "name": "Pip voice v1",
+    "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+    "model_snapshot": "a6eb4f68e4b056f1215157bb696209bc82a6db48",
+    "method": "ref_audio + ref_text (no instruct)",
+    "reference": {
+      "path": "reference/pip-voice/approved-v1/pip_qwen_B-US_general_american.wav",
+      "sha256": "e6d84a9dd60eea5ac096582960df19db0c8e1f40ac6d12a13a226c84817be866",
+      "note": "stored once, read-only, in the approved reference folder"
+    }
+  },
+  "engine": {
+    "remotion": "4.0.536",
+    "mlx-audio": "0.5.9",
+    "python": "3.12 (.venv-qwen)",
+    "node": "v26.4.0"
+  },
+  "verification_at_snapshot": {
+    "typecheck": "tsc --noEmit exit 0",
+    "live_code_vs_mp4": "frame 170 re-rendered from live code vs MP4 frame 170: PSNR 39.18 dB (lossy H.264 vs fresh render; content identical)",
+    "sync": "MP4 audio vs planned voice track lag 0 ms (10 ms resolution); visual cue onsets within ~1 frame"
+  },
+  "reproduce": [
+    "cd explainer-studio",
+    ".venv-qwen/bin/python scripts/pip_scene_narration.py 11     # writes audio/pip-scene-10x/takes/narration_seed11.wav (needs the Base model cached)",
+    ".venv-qwen/bin/python scripts/pip_scene_timing.py 11        # derives timing.json, builds scene_mix.wav, copies to public/scenes/pip-10x/",
+    "npx remotion render src/index.ts pip-scene-10x out/pip_scene_10x_v1.mp4 --concurrency=2",
+    "TTS sampling is stochastic across hardware/library versions: re-generating narration may not be bit-identical. The preserved takes/ WAVs are the authoritative narration."
+  ],
+  "known_limits": [
+    "Timing is envelope-derived; one sentence split and all word times are syllable estimates.",
+    "Mouth is driven by audio loudness, not visemes.",
+    "Layout fixes the mascot under the card (the constraint the product spec removes).",
+    "Single bespoke scene: timings, beats and layout are hard-coded in TSX, not data."
+  ],
+  "files": {
+    "video/pip_scene_10x_v1.mp4": {
+      "sha256": "c57424ff6049c8b8b39629c630dd232f34348c51e836f0653af879433b5dffd9",
+      "bytes": 2035406,
+      "source": "out/pip_scene_10x_v1.mp4"
+    },
+    "audio/scene_mix.wav": {
+      "sha256": "34d89a0c6385ac780567c3bfc29b2c037b98322f0e0ea91d88ccdaaa2ff233ab",
+      "bytes": 1562924,
+      "source": "audio/pip-scene-10x/scene_mix.wav"
+    },
+    "audio/scene_voice_only.wav": {
+      "sha256": "70d94b919f1e1e4b5bf9e64d72b9c2a22b086901e529093c915014e0e68c6e16",
+      "bytes": 1562924,
+      "source": "audio/pip-scene-10x/scene_voice_only.wav"
+    },
+    "audio/scene_sfx_only.wav": {
+      "sha256": "a2f35b4c0fdfa0b19afe253ce1455b575c9d19e28f754af955b1d59fe4aba21a",
+      "bytes": 1562924,
+      "source": "audio/pip-scene-10x/scene_sfx_only.wav"
+    },
+    "audio/narration_mastered_voice_only.wav": {
+      "sha256": "56ddcab65cfe9fd2c2b0c4727f92d75e5178d84ad89fa0ebb28dbee843b0bfd9",
+      "bytes": 1121358,
+      "source": "audio/pip-scene-10x/narration_mastered_voice_only.wav"
+    },
+    "audio/timing.json": {
+      "sha256": "3d3638178fdf54ff4ee46c7d70e86d7a522409e7881a4c0bdfd5826fecea8415",
+      "bytes": 12523,
+      "source": "audio/pip-scene-10x/timing.json"
+    },
+    "audio/takes/narration_seed11.wav": {
+      "sha256": "e29d0d31a9ecaf0190124aff4fd7c729b8fcb1aaf1e5b83e7bbca8095bc0afd9",
+      "bytes": 560684,
+      "source": "audio/pip-scene-10x/takes/narration_seed11.wav"
+    },
+    "audio/takes/narration_seed11.json": {
+      "sha256": "e7c88dda2313775da9e57765521eb1bcef768d39546f448186117f9ab5c8b880",
+      "bytes": 1231,
+      "source": "audio/pip-scene-10x/takes/narration_seed11.json"
+    },
+    "audio/takes/narration_seed7.wav": {
+      "sha256": "6e1f70a6011ad1ac17dac4f1622d30cc2f606916fe836faf75894bc9cfd7977e",
+      "bytes": 541486,
+      "source": "audio/pip-scene-10x/takes/narration_seed7.wav"
+    },
+    "audio/takes/narration_seed7.json": {
+      "sha256": "9d32f2574c9673b12521cb1d50762c2cbb5735dc632d8e5f0758759b1efbe96b",
+      "bytes": 1231,
+      "source": "audio/pip-scene-10x/takes/narration_seed7.json"
+    },
+    "scripts/pip_scene_narration.py": {
+      "sha256": "09418d97b445076150d1f8283b08902d39b1ae2bcb3752c8f972bd6f000b6636",
+      "bytes": 3203,
+      "source": "scripts/pip_scene_narration.py"
+    },
+    "scripts/pip_scene_timing.py": {
+      "sha256": "33bf1447b8c215ed2d9ce577e64fb220a1d33801a8df7cae7efa6204f4e831e7",
+      "bytes": 12803,
+      "source": "scripts/pip_scene_timing.py"
+    },
+    "scripts/qwen_mem_monitor.sh": {
+      "sha256": "65dca550115d0a89c5ab8c1313fae036610235f87e3094385c38e21017d6feaa",
+      "bytes": 1358,
+      "source": "scripts/qwen_mem_monitor.sh"
+    },
+    "src/Root.tsx": {
+      "sha256": "2d0f67b3bb72112b71a41d451b51a8eefb346607b1fa6cccf0377ed4d1447751",
+      "bytes": 5044,
+      "source": "src/Root.tsx"
+    },
+    "src/anim.ts": {
+      "sha256": "c78f4e347bc7ed9eb34c6999c74d10ffcb1979ddb16277e12583fee72d8f84dd",
+      "bytes": 1859,
+      "source": "src/anim.ts"
+    },
+    "src/theme.ts": {
+      "sha256": "5e464f18786fd4e42ef021b390980f04a635b8a59d2ebfe6a16659f642e90081",
+      "bytes": 795,
+      "source": "src/theme.ts"
+    },
+    "package.json": {
+      "sha256": "bba70ea6a373598b597fae3635f4f6af9114cb80ad041e946ba980081b2ab67a",
+      "bytes": 586,
+      "source": "package.json"
+    },
+    "package-lock.json": {
+      "sha256": "7e938ae9cfe6596b8c77fed3a25af9c6aad9af628bd25dd38fb04903055e8b6e",
+      "bytes": 152672,
+      "source": "package-lock.json"
+    },
+    "tsconfig.json": {
+      "sha256": "890d7b565ddfeea0fad936121e1c104f542b348468613ea443616ce07f10e7f3",
+      "bytes": 392,
+      "source": "tsconfig.json"
+    },
+    "remotion.config.ts": {
+      "sha256": "1fcdbc4e04c2de426d18528f478cdc9698ac948240432152de8f065cbdf8be7b",
+      "bytes": 140,
+      "source": "remotion.config.ts"
+    },
+    "env/qwen-venv.freeze.txt": {
+      "sha256": "ca82e130f0305c75de825d84528d2a328f2083df71302ac8dd52503175fafa40",
+      "bytes": 573,
+      "source": "(generated at snapshot time)"
+    },
+    "env/main-venv.freeze.txt": {
+      "sha256": "715f0b6a65d149ddc6b8c572a55c70a1822d6bc64d527d52834a3caef4c673df",
+      "bytes": 1842,
+      "source": "(generated at snapshot time)"
+    },
+    "src/art/pip-scene/PipScene10x.tsx": {
+      "sha256": "2515954016803e80e23ea633c5ef8c2a16f008d11f9391498bf20adafff51029",
+      "bytes": 18347,
+      "source": "src/art/pip-scene/PipScene10x.tsx"
+    },
+    "src/art/pip-scene/rig.ts": {
+      "sha256": "8d3b5ac9be3908c0883784a563e844e7e949a65ef7f9a3f4eb7a4930bfca55b9",
+      "bytes": 11842,
+      "source": "src/art/pip-scene/rig.ts"
+    },
+    "src/art/pip-layers/Hand.tsx": {
+      "sha256": "d3669d665d1446acf9a2260200ab03bfae24a73f1428e464b1982420a7cf9fac",
+      "bytes": 4888,
+      "source": "src/art/pip-layers/Hand.tsx"
+    },
+    "src/art/pip-layers/PipFigure.tsx": {
+      "sha256": "17f45f4a1ea087e2785559e5a9b6cd190609e23b0708ae1b067734fbd1df41a2",
+      "bytes": 7407,
+      "source": "src/art/pip-layers/PipFigure.tsx"
+    },
+    "src/art/pip-layers/PipLayersScene.tsx": {
+      "sha256": "4e2c25f2645defa51fc06a2fdaace58c68b8a4b76e8c150230e9a6c85e97ea1a",
+      "bytes": 3068,
+      "source": "src/art/pip-layers/PipLayersScene.tsx"
+    },
+    "src/art/pip-layers/PipLayersSheet.tsx": {
+      "sha256": "e70d844cf8a4337653242ed927be5531db7f252d9aa9ab7b69d89b10d5f5e3c1",
+      "bytes": 4540,
+      "source": "src/art/pip-layers/PipLayersSheet.tsx"
+    },
+    "src/art/pip-layers/PipRecon.tsx": {
+      "sha256": "934ef1f4156da8b1f13c8243153cb476bbe5bda07e3586cf96a4d2104bd77f7d",
+      "bytes": 959,
+      "source": "src/art/pip-layers/PipRecon.tsx"
+    },
+    "src/art/pip-layers/geometry.ts": {
+      "sha256": "4c820842968fbec727ac83de3de65a8771b2209252e8cbce61bce09e2a598369",
+      "bytes": 2837,
+      "source": "src/art/pip-layers/geometry.ts"
+    },
+    "src/art/pip-layers/notes.tsx": {
+      "sha256": "524ded2ba04a79900e6c514e71547c922b4ebab1991196f638de738ddd2588b8",
+      "bytes": 1752,
+      "source": "src/art/pip-layers/notes.tsx"
+    },
+    "src/art/pip-layers/views.ts": {
+      "sha256": "61957a580f52c8d9cf0e348a2dacf467773aa6a9dd88c414aad275eac62959c7",
+      "bytes": 5358,
+      "source": "src/art/pip-layers/views.ts"
+    },
+    "src/art/palette.ts": {
+      "sha256": "28f75be976c8113e7388139ac916605eabdb3b0dc9bf5c95c303cee499c406b7",
+      "bytes": 949,
+      "source": "src/art/palette.ts"
+    },
+    "src/art/parts.tsx": {
+      "sha256": "5a97ad1171d6708ce4eed26705df0ddb91aa367da47ea88e955c82405b2f1af1",
+      "bytes": 7071,
+      "source": "src/art/parts.tsx"
+    }
+  }
+}

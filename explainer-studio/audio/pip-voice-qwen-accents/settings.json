@@ -1,0 +1,49 @@
+{
+  "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-bf16",
+  "mlx_load_seconds": 2.7,
+  "rss_after_load_gb": 2.26,
+  "mlx_active_after_load_gb": 4.27,
+  "script": "Ten times faster. Sounds impressive. But faster at what? Give an AI a short question and it might respond instantly. Give it a long document, and the story can change. Let’s see what that headline actually means.",
+  "seed": 7,
+  "sampling_defaults": {
+    "temperature": 0.9,
+    "top_k": 50,
+    "top_p": 1.0,
+    "repetition_penalty": 1.05,
+    "max_tokens": 4096
+  },
+  "auditions": {
+    "B-US": {
+      "name": "general_american",
+      "requested_accent": "General American English",
+      "instruct": "Speaks General American English, with natural American stress and intonation, clear consonants and conversational phrasing. A confident adult voice with a medium pitch and a slightly mischievous, dry sense of humor. Natural conversational rhythm, like an engaging tech presenter. Inquisitive, rising emphasis on the question 'faster at what?'. Understated, not sarcastic, not breathy, not an announcer, no cartoon quality.",
+      "segments_returned": 1,
+      "sample_rate": 24000,
+      "duration_s": 14.96,
+      "generation_seconds": 12.4,
+      "real_time_factor": 0.83,
+      "mlx_peak_memory_gb": 8.53,
+      "process_peak_rss_gb": 2.26,
+      "files": {
+        "wav": "pip_qwen_B-US_general_american.wav",
+        "mp3": "pip_qwen_B-US_general_american.mp3"
+      }
+    },
+    "B-IN": {
+      "name": "urban_indian",
+      "requested_accent": "clear urban Indian English",
+      "instruct": "Speaks clear, natural urban Indian English, as an educated professional from an Indian city would, with natural English stress and intonation, clear consonants and conversational phrasing. A confident adult voice with a medium pitch and a slightly mischievous, dry sense of humor. Natural conversational rhythm, like an engaging tech presenter. Inquisitive, rising emphasis on the question 'faster at what?'. Understated, not sarcastic, not breathy, not an announcer, no cartoon quality.",
+      "segments_returned": 1,
+      "sample_rate": 24000,
+      "duration_s": 14.56,
+      "generation_seconds": 11.1,
+      "real_time_factor": 0.76,
+      "mlx_peak_memory_gb": 8.42,
+      "process_peak_rss_gb": 2.26,
+      "files": {
+        "wav": "pip_qwen_B-IN_urban_indian.wav",
+        "mp3": "pip_qwen_B-IN_urban_indian.mp3"
+      }
+    }
+  }
+}

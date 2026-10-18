@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Explainer Studio: local architecture",
+    "output": "architecture.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    {
+      "id": "import",
+      "type": "external",
+      "label": "Approved research",
+      "sublabel": "ChatGPT output, no API",
+      "pos": [
+        40,
+        90
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "Studio UI",
+      "sublabel": "React on localhost",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "server",
+      "type": "backend",
+      "label": "Studio server",
+      "sublabel": "Node 26: HTTP + SSE",
+      "pos": [
+        270,
+        300
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Project store",
+      "sublabel": "JSON docs + SQLite",
+      "pos": [
+        270,
+        140
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "schema",
+      "type": "backend",
+      "label": "Shared schema",
+      "sublabel": "Zod: validate + timeline",
+      "pos": [
+        270,
+        460
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "runner",
+      "type": "backend",
+      "label": "Job runner",
+      "sublabel": "queue, cancel, retry",
+      "pos": [
+        500,
+        300
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "tts",
+      "type": "backend",
+      "label": "TTS worker",
+      "sublabel": "Qwen3-TTS Base, MLX",
+      "pos": [
+        730,
+        220
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "render",
+      "type": "backend",
+      "label": "Render worker",
+      "sublabel": "Remotion renderer",
+      "pos": [
+        730,
+        380
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "scenes",
+      "type": "frontend",
+      "label": "Scene library",
+      "sublabel": "Remotion compositions",
+      "pos": [
+        730,
+        520
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "cache",
+      "type": "database",
+      "label": "Artifact cache",
+      "sublabel": "audio, timing, MP4",
+      "pos": [
+        960,
+        300
+      ],
+      "size": [
+        150,
+        60
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Your Mac: offline while running",
+      "wraps": [
+        "ui",
+        "server",
+        "store",
+        "schema",
+        "runner",
+        "tts",
+        "render",
+        "scenes",
+        "cache"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Heavy lane: one job at a time",
+      "wraps": [
+        "tts",
+        "render"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "import-to-ui",
+      "from": "import",
+      "to": "ui",
+      "label": "paste",
+      "labelAt": [
+        115,
+        190
+      ]
+    },
+    {
+      "id": "ui-to-server",
+      "from": "ui",
+      "to": "server",
+      "label": "HTTP + SSE",
+      "variant": "emphasis"
+    },
+    {
+      "id": "server-to-store",
+      "from": "server",
+      "to": "store",
+      "label": "read, write"
+    },
+    {
+      "id": "schema-to-server",
+      "from": "schema",
+      "to": "server",
+      "label": "validate",
+      "variant": "dashed"
+    },
+    {
+      "id": "server-to-runner",
+      "from": "server",
+      "to": "runner",
+      "label": "enqueue",
+      "variant": "emphasis"
+    },
+    {
+      "id": "runner-to-tts",
+      "from": "runner",
+      "to": "tts",
+      "label": "stdio JSON"
+    },
+    {
+      "id": "runner-to-render",
+      "from": "runner",
+      "to": "render",
+      "label": "spawn, progress"
+    },
+    {
+      "id": "scenes-to-render",
+      "from": "scenes",
+      "to": "render",
+      "label": "bundle",
+      "variant": "dashed"
+    },
+    {
+      "id": "tts-to-cache",
+      "from": "tts",
+      "to": "cache",
+      "label": "audio, timing"
+    },
+    {
+      "id": "render-to-cache",
+      "from": "render",
+      "to": "cache",
+      "label": "MP4, frames"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Authoring",
+      "items": [
+        "UI edits go to the server as small patches",
+        "Every patch is journaled before it is acknowledged"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Execution",
+      "items": [
+        "The runner owns every long job",
+        "TTS and render never overlap on this 16 GB machine"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Trust",
+      "items": [
+        "One schema validates edits, timing and render input",
+        "Artifacts are keyed by content hash, so stale output cannot be shown as current"
+      ]
+    }
+  ]
+}

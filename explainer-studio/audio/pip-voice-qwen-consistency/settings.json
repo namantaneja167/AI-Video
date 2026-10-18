@@ -1,0 +1,76 @@
+{
+  "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+  "reference_wav": "reference/pip-voice/approved-v1/pip_qwen_B-US_general_american.wav",
+  "reference_sha256": "e6d84a9dd60eea5ac096582960df19db0c8e1f40ac6d12a13a226c84817be866",
+  "reference_text": "Ten times faster. Sounds impressive. But faster at what? Give an AI a short question and it might respond instantly. Give it a long document, and the story can change. Let’s see what that headline actually means.",
+  "method": "model.generate(text, ref_audio=<approved WAV>, ref_text=<its exact script>, lang_code='english'); no instruct, no voice preset",
+  "seed_per_passage": 7,
+  "temperature": 0.9,
+  "top_k": 50,
+  "top_p": 1.0,
+  "repetition_penalty": "library default 1.05, raised to 1.5 by mlx-audio in reference mode",
+  "max_tokens_cap": 500,
+  "load_seconds": 2.6,
+  "mlx_active_after_load_gb": 4.29,
+  "rss_after_load_gb": 2.0,
+  "passages": {
+    "1": {
+      "name": "launch",
+      "text": "A new notes app just launched with an interesting promise: it can turn your scattered ideas into a searchable workspace. Sounds useful. Let’s see what it actually does.",
+      "words": 28,
+      "segments": 1,
+      "sample_rate": 24000,
+      "duration_s": 8.72,
+      "words_per_minute": 193,
+      "generation_seconds": 11.0,
+      "real_time_factor": 1.27,
+      "first_audio_seconds": 11.0,
+      "mlx_peak_memory_gb": 7.96,
+      "mlx_active_after_gb": 4.31,
+      "process_peak_rss_gb": 2.0,
+      "files": {
+        "wav": "pip_consistency_1_launch.wav",
+        "mp3": "pip_consistency_1_launch.mp3"
+      }
+    },
+    "2": {
+      "name": "technical",
+      "text": "Before generating an answer, a language model processes the input it receives. Longer inputs generally mean more work, although caching can reduce repeated processing.",
+      "words": 24,
+      "segments": 1,
+      "sample_rate": 24000,
+      "duration_s": 10.08,
+      "words_per_minute": 143,
+      "generation_seconds": 10.4,
+      "real_time_factor": 1.03,
+      "first_audio_seconds": 10.4,
+      "mlx_peak_memory_gb": 8.38,
+      "mlx_active_after_gb": 4.31,
+      "process_peak_rss_gb": 2.0,
+      "files": {
+        "wav": "pip_consistency_2_technical.wav",
+        "mp3": "pip_consistency_2_technical.mp3"
+      }
+    },
+    "3": {
+      "name": "skeptical",
+      "text": "Ten times faster. Really? Compared to what, exactly? That number needs context: the task, the hardware, and how speed was measured.",
+      "words": 21,
+      "segments": 1,
+      "sample_rate": 24000,
+      "duration_s": 8.64,
+      "words_per_minute": 146,
+      "generation_seconds": 7.6,
+      "real_time_factor": 0.88,
+      "first_audio_seconds": 7.6,
+      "mlx_peak_memory_gb": 8.15,
+      "mlx_active_after_gb": 4.31,
+      "process_peak_rss_gb": 2.0,
+      "files": {
+        "wav": "pip_consistency_3_skeptical.wav",
+        "mp3": "pip_consistency_3_skeptical.mp3"
+      }
+    }
+  },
+  "reference_unchanged_after": true
+}
