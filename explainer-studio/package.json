@@ -11,7 +11,7 @@
     "test": "npm run test:ts && npm run test:py",
     "test:ts": "node --test \"tests/**/*.test.ts\"",
     "test:py": ".venv/bin/python -m unittest discover -s tests/py -v",
-    "test:slow": "STUDIO_SLOW=1 node --test tests/prototype.test.ts",
+    "test:slow": "STUDIO_SLOW=1 node --test tests/prototype.test.ts tests/library/render.slow.test.ts",
     "project": "node scripts/project.ts"
   },
   "dependencies": {

@@ -51,6 +51,17 @@ export function getComponentHashes(p: Project, episodeId: string): ComponentHash
   return out;
 }
 
+/** Plain-value components (not file sets) as they are now; a job snapshot freezes these at enqueue. */
+export function getComponentValues(p: Project, episodeId: string): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  const q = p.db.prepare('SELECT value_json, blob_hash FROM components WHERE scope=? AND name=?');
+  for (const name of COMPONENT_NAMES) {
+    const r = get<{value_json: string; blob_hash: string | null}>(q, episodeId, name) ?? get<{value_json: string; blob_hash: string | null}>(q, '*', name);
+    if (r && r.blob_hash === null) out[name] = JSON.parse(r.value_json);
+  }
+  return out;
+}
+
 export function getComponentValue<T = unknown>(p: Project, name: ComponentName, episodeId?: string): T | undefined {
   const q = p.db.prepare('SELECT value_json FROM components WHERE scope=? AND name=?');
   const r = (episodeId ? get<{value_json: string}>(q, episodeId, name) : undefined) ?? get<{value_json: string}>(q, '*', name);

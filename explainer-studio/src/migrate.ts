@@ -128,6 +128,12 @@ function buildV1(v2: EpisodeV2): {v1: {reviewNotes: {text: string; resolved: boo
   const customGaps = v2.narration.blocks.filter((b) => b.gapAfterSec !== undefined).length;
   if (customGaps) warnings.push(`${customGaps} block gap(s) dropped (v1 has no block gaps)`);
 
+  if (v2.style !== 'legacy-dark') warnings.push(`style "${v2.style}" dropped (v1 has only the legacy look)`);
+  const v1Scenes = ['kpi-mismatch', 'tables-lab', 'cards'];
+  v2.scenes.filter((s) => !v1Scenes.includes(s.type)).forEach((s) => warnings.push(`scene "${s.id}" (${s.type}) has no v1 form`));
+  const emph = v2.narration.segments.filter((x) => x.emphasis?.length).length;
+  if (emph) warnings.push(`caption emphasis on ${emph} segment(s) dropped (v1 has none)`);
+
   v2.scenes.forEach((s) => {
     if (stableStringify(s.layout) !== stableStringify(DEFAULT_LAYOUT)) warnings.push(`scene "${s.id}": layout "${s.layout.template}" and mascot settings dropped (v1 uses the fixed legacy stage)`);
   });
@@ -221,7 +227,10 @@ export function validateEpisodeV2(input: unknown): V2Result {
     if (n.anchor && !known.has(n.anchor.segment)) add(`reviewNotes.${i}.anchor.segment`, `note anchors to unknown segment "${n.anchor.segment}"`);
   });
 
-  if (!issues.length) {
+  // The v1 rules apply to episodes made only of v1 scenes. Scenes of the Pip library have no v1 form (their own
+  // parameter schemas and the rules above apply), so an episode containing one is not downgraded for checking.
+  const v1Only = ep.scenes.every((s) => ['kpi-mismatch', 'tables-lab', 'cards'].includes(s.type));
+  if (!issues.length && v1Only) {
     const legacy = EpisodeSchema.safeParse(buildV1(ep).v1);
     if (!legacy.success) for (const i of legacy.error.issues) add(fmt(i.path).replace(/^events/, 'beats'), i.message);
   }

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "id": "dense-pip-fixture",
+  "title": "Dense Pip-style layout fixture (24 cards)",
+  "learningObjective": "Layout fixture: many small cards in Pip's style; fictional numbers.",
+  "status": "draft",
+  "style": "pip-paper-bundled",
+  "voice": {
+    "engine": "qwen3-tts",
+    "profile": "pip-voice-v1"
+  },
+  "pacing": {
+    "leadInSec": 0.5,
+    "tailSec": 1.5,
+    "segmentGapSec": 0.3
+  },
+  "narration": {
+    "segments": [
+      {
+        "id": "s1",
+        "text": "Twenty-four fictional checks, all at a glance.",
+        "captions": [
+          "Twenty-four fictional checks,",
+          "all at a glance."
+        ],
+        "emphasis": [
+          {
+            "from": 1,
+            "to": 3,
+            "text": "fictional checks,"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "id": "b1",
+        "segments": [
+          "s1"
+        ]
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "id": "dense",
+      "type": "pip-dense-fixture",
+      "segments": [
+        "s1"
+      ],
+      "layout": {
+        "template": "dense-pip",
+        "captionZone": "bottom",
+        "mascot": {
+          "mode": "floating",
+          "position": "bottom-right",
+          "scale": 0.28
+        }
+      },
+      "params": {
+        "title": "Build health (fictional)",
+        "columns": 4,
+        "cards": [
+          {
+            "label": "builds",
+            "value": "128"
+          },
+          {
+            "label": "tests",
+            "value": "4.2k"
+          },
+          {
+            "label": "deploys",
+            "value": "31"
+          },
+          {
+            "label": "errors",
+            "value": "0.4%"
+          },
+          {
+            "label": "p50 ms",
+            "value": "42"
+          },
+          {
+            "label": "p95 ms",
+            "value": "180"
+          },
+          {
+            "label": "cache",
+            "value": "93%"
+          },
+          {
+            "label": "queue",
+            "value": "7"
+          },
+          {
+            "label": "uptime",
+            "value": "99.9%"
+          },
+          {
+            "label": "retries",
+            "value": "12"
+          },
+          {
+            "label": "alerts",
+            "value": "3"
+          },
+          {
+            "label": "pages",
+            "value": "1"
+          },
+          {
+            "label": "owners",
+            "value": "9"
+          },
+          {
+            "label": "reviews",
+            "value": "24"
+          },
+          {
+            "label": "merges",
+            "value": "57"
+          },
+          {
+            "label": "rollbacks",
+            "value": "2"
+          },
+          {
+            "label": "flaky",
+            "value": "6"
+          },
+          {
+            "label": "lint",
+            "value": "0"
+          },
+          {
+            "label": "bundle",
+            "value": "1.8 MB"
+          },
+          {
+            "label": "coverage",
+            "value": "87%"
+          },
+          {
+            "label": "latency",
+            "value": "210"
+          },
+          {
+            "label": "5xx",
+            "value": "14"
+          },
+          {
+            "label": "tickets",
+            "value": "41"
+          },
+          {
+            "label": "docs",
+            "value": "12"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -190,9 +190,13 @@ export const TimelineSchema = z.object({
   audio: z.string(),
   durationSec: z.number().positive(),
   segments: z.array(z.object({id, start: z.number(), end: z.number(), words: z.array(WordSchema)})),
-  captions: z.array(z.object({segment: id, text: z.string(), start: z.number(), end: z.number(), words: z.array(WordSchema)})),
+  captions: z.array(z.object({segment: id, text: z.string(), start: z.number(), end: z.number(), words: z.array(WordSchema), /** Word ranges within this phrase to emphasise ([from, to), end exclusive). */ emphasis: z.array(z.tuple([z.number().int(), z.number().int()])).optional()})),
   events: z.array(z.object({segment: id, time: z.number(), cue: z.string().optional(), expression: z.enum(EXPRESSIONS).optional()})),
   scenes: z.array(z.object({id, type: z.string(), start: z.number(), end: z.number()})),
   chapters: z.array(z.object({label: z.string(), start: z.number()})),
+  /** Named cue times per scene id, resolved from the scene's cue rules and these word times. */
+  cues: z.record(z.string(), z.record(z.string(), z.number())).optional(),
+  /** Mouth opening (0..1) per video frame, from the narration audio. */
+  mouth: z.array(z.number()).optional(),
 });
 export type Timeline = z.infer<typeof TimelineSchema>;

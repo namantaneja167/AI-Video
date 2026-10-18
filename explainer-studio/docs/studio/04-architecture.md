@@ -115,7 +115,7 @@ Two steps. `planCleanup` changes nothing: it chooses the revisions that thinning
 
 ## Jobs
 
-Persisted in the same database. Two lanes: heavy (concurrency 1: TTS, alignment, mastering, renders) and light. The lifecycle is in [02](02-product-spec.md#81-lifecycle). Every job is bound to an immutable input snapshot ([02](02-product-spec.md#42-immutable-input-snapshots)); outputs are stored by snapshot hash; the current and approved pointers are updated by compare-and-set inside a transaction.
+Persisted in the same database. Two lanes: heavy (concurrency 1: TTS, alignment, mastering, renders) and light. The lifecycle is in [02](02-product-spec.md#81-lifecycle). Every job is bound to an immutable input snapshot ([02](02-product-spec.md#42-immutable-input-snapshots)), which since the Phase 2 closeout includes the plain-value settings as recorded at enqueue, so a job never reads newer settings; files executed from the working checkout are verified against recorded hashes instead of copied ([06](06-phase2-acceptance.md#reproducibility-what-is-guaranteed-and-what-is-not)); outputs are stored by snapshot hash; the current and approved pointers are updated by compare-and-set inside a transaction.
 
 ### Voice to render transition
 

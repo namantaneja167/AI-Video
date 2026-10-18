@@ -2,7 +2,8 @@
 """Audio worker: one process, ONE model at a time, JSON-lines protocol (see core/worker.ts). Run with .venv-qwen.
 
   load      {model: "tts" | "aligner"}        refuses while another model is loaded; offline, pinned revisions only
-  generate  {text, ref_wav, ref_sha256, ref_text, seed, out_wav, max_tokens?}   Qwen3-TTS Base, approved reference
+  generate  {text, ref_wav, ref_sha256, ref_text, seed, out_wav, max_tokens, expect?}   Qwen3-TTS Base, approved reference
+  check     {model, expect: {model_revision?, mlx_audio?, mlx?}}                  refuses on a mismatch with the recorded settings
   align     {wav, segments: [{id, text}], language?}                             forced alignment (aligner loaded)
   estimate  {wav, segments: [{id, text}]}                                        envelope + word-length estimate, no model
   unload    {}                                 releases the model and the MLX cache, reports what MLX still holds
@@ -46,6 +47,19 @@ def local_snapshot(repo: str, rev: str) -> str:
     return snapshot_download(repo, revision=rev, local_files_only=True)
 
 
+def check_expect(p: dict, revision: str) -> None:
+    """The caller states which model revision and library version its recorded settings assume; a mismatch refuses the job."""
+    from importlib.metadata import version
+
+    e = p.get("expect") or {}
+    if e.get("model_revision") not in (None, revision):
+        raise RuntimeError(f"recorded model revision {e['model_revision']} does not match the pinned revision {revision} this worker loads")
+    if e.get("mlx_audio") not in (None, version("mlx-audio")):
+        raise RuntimeError(f"recorded mlx-audio {e['mlx_audio']} does not match installed {version('mlx-audio')}")
+    if e.get("mlx") not in (None, version("mlx")):
+        raise RuntimeError(f"recorded mlx {e['mlx']} does not match installed {version('mlx')}")
+
+
 def mem() -> dict:
     import mlx.core as mx
 
@@ -83,13 +97,14 @@ def cmd_generate(i: int, p: dict) -> None:
 
     if state["name"] != "tts":
         raise RuntimeError("the TTS model is not loaded")
+    check_expect(p, TTS_REV)
     if sha256(p["ref_wav"]) != p["ref_sha256"]:
         raise RuntimeError("the reference audio does not match its recorded checksum; refusing to generate")
     mx.random.seed(int(p["seed"]))
     mx.reset_peak_memory()
     t0 = time.time()
     chunks, sr, n, got = [], None, 0, 0.0
-    for r in state["model"].generate(text=p["text"], ref_audio=p["ref_wav"], ref_text=p["ref_text"], lang_code="english", max_tokens=int(p.get("max_tokens", 600))):
+    for r in state["model"].generate(text=p["text"], ref_audio=p["ref_wav"], ref_text=p["ref_text"], lang_code="english", max_tokens=int(p["max_tokens"])):
         a = np.array(r.audio, dtype=np.float32)
         chunks.append(a)
         sr = r.sample_rate
@@ -220,6 +235,9 @@ def main() -> None:
                 cmd_load(i, p)
             elif cmd == "generate":
                 cmd_generate(i, p)
+            elif cmd == "check":  # does this worker match the model revision and versions the caller recorded?
+                check_expect(p, ALIGN_REV if p.get("model") == "aligner" else TTS_REV)
+                send({"id": i, "event": "result", "data": {}})
             elif cmd == "align":
                 cmd_align(i, p)
             elif cmd == "estimate":

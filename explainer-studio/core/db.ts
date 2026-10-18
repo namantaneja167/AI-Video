@@ -3,6 +3,8 @@ import {DatabaseSync, type StatementSync} from 'node:sqlite';
 
 /** Job states that hold a snapshot and, for the heavy lane, the single heavy slot. */
 export const ACTIVE_STATES = ['queued', 'preparing', 'running', 'cancelling'] as const;
+/** Jobs whose snapshot must stay recoverable: running ones, and failed or cancelled ones that can still be retried. */
+export const RETAINED_SQL = `(${[...ACTIVE_STATES, 'failed', 'cancelled'].map((s) => `'${s}'`).join(',')})`;
 export const ACTIVE_SQL = `(${ACTIVE_STATES.map((s) => `'${s}'`).join(',')})`;
 
 const DDL_V1 = `

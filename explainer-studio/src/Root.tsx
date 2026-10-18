@@ -1,6 +1,8 @@
 import React from 'react';
 import {Composition, staticFile, type CalculateMetadataFunction} from 'remotion';
 import {EpisodeVideo, type EpisodeProps} from './Episode';
+import {LibraryEpisode, type LibraryProps} from './library/LibraryEpisode';
+import {FontCompare} from './library/FontCompare';
 import {EpisodeSchema, TimelineSchema} from './schema';
 import {FPS, H, W} from './theme';
 import {JoinFrame} from './art/JoinFrame';
@@ -54,17 +56,18 @@ export const RemotionRoot: React.FC = () => (
     {/* Studio render jobs: everything arrives as input props and a job-specific public dir; nothing is read from the repo's generated folders. */}
     <Composition
       id="studio-episode"
-      component={EpisodeVideo}
+      component={LibraryEpisode}
       width={W}
       height={H}
       fps={FPS}
       durationInFrames={FPS * 10}
-      defaultProps={{episode: '', variant: '', data: null} satisfies EpisodeProps}
+      defaultProps={{episode: '', variant: '', data: null} satisfies LibraryProps}
       calculateMetadata={({props}) => {
         if (!props.data) throw new Error('studio-episode needs {episode, variant, data} input props');
         return {durationInFrames: Math.ceil(props.data.timeline.durationSec * FPS)};
       }}
     />
+    <Composition id="library-fonts-compare" component={FontCompare} width={1760} height={1000} fps={FPS} durationInFrames={1} />
     <Composition id="art-join-frame-concept" component={JoinFrame} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{assets: false}} />
     <Composition id="art-join-frame" component={JoinFrame} width={W} height={H} fps={FPS} durationInFrames={1} defaultProps={{assets: true}} />
     <Composition id="art-join-motion" component={JoinMotion} width={W} height={H} fps={FPS} durationInFrames={MOTION_FRAMES} />

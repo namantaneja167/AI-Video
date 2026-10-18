@@ -1,0 +1,158 @@
+{
+  "soundEvents": [
+    {
+      "accent": "pop",
+      "cue": "window_in",
+      "gainDb": -6,
+      "params": {
+        "f": 430,
+        "dur": 0.14
+      }
+    },
+    {
+      "accent": "tick",
+      "cue": "label",
+      "gainDb": -5,
+      "dt": 0.05,
+      "params": {
+        "f": 1700
+      }
+    },
+    {
+      "accent": "swish",
+      "cue": "split",
+      "gainDb": -8.4,
+      "params": {
+        "dur": 0.4
+      }
+    },
+    {
+      "accent": "pop",
+      "cue": "tokens_fly",
+      "gainDb": -9,
+      "dt": 0.45,
+      "params": {
+        "f": 520,
+        "dur": 0.1
+      }
+    },
+    {
+      "accent": "pop",
+      "cue": "tokens_fly",
+      "gainDb": -9,
+      "dt": 0.61,
+      "params": {
+        "f": 550,
+        "dur": 0.1
+      }
+    },
+    {
+      "accent": "pop",
+      "cue": "tokens_fly",
+      "gainDb": -9,
+      "dt": 0.77,
+      "params": {
+        "f": 580,
+        "dur": 0.1
+      }
+    },
+    {
+      "accent": "pop",
+      "cue": "tokens_fly",
+      "gainDb": -9,
+      "dt": 0.93,
+      "params": {
+        "f": 610,
+        "dur": 0.1
+      }
+    },
+    {
+      "accent": "swish",
+      "cue": "history",
+      "gainDb": -9,
+      "params": {
+        "dur": 0.55
+      }
+    },
+    {
+      "accent": "pop",
+      "cue": "reply_start",
+      "gainDb": -6,
+      "params": {
+        "f": 470,
+        "dur": 0.12
+      }
+    },
+    {
+      "accent": "ding",
+      "cue": "share",
+      "gainDb": -8,
+      "dt": 0.2,
+      "params": {
+        "f": 988,
+        "dur": 0.7
+      }
+    },
+    {
+      "accent": "thump",
+      "cue": "full",
+      "gainDb": -4.4,
+      "params": {
+        "dur": 0.3
+      }
+    },
+    {
+      "accent": "whoosh",
+      "cue": "leave",
+      "gainDb": -7.5,
+      "dt": 0.1,
+      "params": {
+        "dur": 0.34,
+        "up": true
+      }
+    },
+    {
+      "accent": "thump",
+      "cue": "stop",
+      "gainDb": -8,
+      "params": {
+        "dur": 0.2
+      }
+    },
+    {
+      "accent": "swish",
+      "cue": "drop",
+      "gainDb": -9,
+      "dt": 0.2,
+      "params": {
+        "dur": 0.5
+      }
+    },
+    {
+      "accent": "whoosh",
+      "cue": "back",
+      "gainDb": -8,
+      "params": {
+        "dur": 0.3,
+        "up": false,
+        "seed": 4
+      }
+    },
+    {
+      "accent": "chime",
+      "cue": "settled",
+      "gainDb": -6.9,
+      "params": {
+        "freqs": [
+          587.0,
+          740.0
+        ],
+        "dur": 1.0
+      }
+    }
+  ],
+  "mixParams": {
+    "accentBusDb": -12,
+    "accentDuck": 0.55
+  }
+}

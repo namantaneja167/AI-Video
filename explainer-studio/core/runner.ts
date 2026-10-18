@@ -12,6 +12,8 @@ import {join} from 'node:path';
 import type {EpisodeV2} from '../src/schema2.ts';
 import {createJob, finishJob, getSnapshot, type JobKind, type NewJob, type SnapshotManifest} from './artifacts.ts';
 import {readBlob} from './blobs.ts';
+import {getEpisode} from './episodes.ts';
+import {getComponentValues} from './state.ts';
 import {all, get} from './db.ts';
 import type {Project} from './project.ts';
 import {killOwned, OwnerRegistry, ownedRssBytes, spawnOwned, systemMemory, type MemoryProbe} from './proc.ts';
@@ -65,6 +67,8 @@ export type RunnerOptions = {
   /** Kinds that must not start while an audio model is loaded. */
   releaseBefore?: (kind: JobKind) => boolean;
   killGraceMs?: number;
+  /** Reasons the episode and settings cannot be produced; checked before a job is even queued. */
+  preflight?: (doc: EpisodeV2, values: Record<string, unknown>) => string[];
 };
 
 type Active = {
@@ -94,6 +98,8 @@ export class JobRunner {
 
   // ---- queue -----------------------------------------------------------------------------------------------
   enqueue(spec: NewJob): number {
+    const problems = this.o.preflight?.(getEpisode(this.p, spec.episodeId), getComponentValues(this.p, spec.episodeId)) ?? [];
+    if (problems.length) throw new PreflightError(`${spec.jobKind} was not queued:\n- ${problems.join('\n- ')}`);
     const {jobId} = createJob(this.p, spec, 'queued');
     this.event(jobId, null, 'queued', {kind: spec.jobKind, subject: spec.subject ?? null});
     this.kick();
@@ -213,8 +219,11 @@ export class JobRunner {
         this.event(job.id, act.attemptId, 'running', {});
       });
       timer = setInterval(() => this.sample(act), this.o.pollMs);
-      const snapshot = getSnapshot(this.p, job.snapshot_id);
-      const doc = JSON.parse(readBlob(this.p, snapshot.docBlob).toString()) as EpisodeV2;
+      let snapshot: SnapshotManifest, doc: EpisodeV2;
+      try {
+        snapshot = getSnapshot(this.p, job.snapshot_id);
+        doc = JSON.parse(readBlob(this.p, snapshot.docBlob).toString()) as EpisodeV2;
+      } catch (e) { throw new PreflightError(`the inputs recorded for this job cannot be recovered (${(e as Error).message}); it will not run on anything else`); }
       const ctx: JobCtx = {
         p: this.p, jobId: job.id, kind: job.kind, subject: job.subject, episodeId: job.episode_id, attempt: job.attempts, owner: act.owner, ws, doc, snapshot,
         params: JSON.parse(job.params_json), signal: act.ctl.signal, reg: this.reg, host: this.host,

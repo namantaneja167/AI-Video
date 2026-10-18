@@ -108,7 +108,7 @@ Plan changes from this phase:
 
 ## Phase 2 · Job runner, audio worker, render worker (L)
 
-**Status: implemented and verified with fake workers and one real narration, timing and render run. Results, resource use and limits: [06 Phase 2 acceptance](06-phase2-acceptance.md).** The criteria below are the original ones; the result document maps each to its evidence.
+**Status: implemented and closed out. Reliability gaps found after the first report (settings read at run time, silently ignored inputs, no real final path) are fixed; the real final mix and render were measured. Results, limits and what still needs your listening and viewing: [06 Phase 2 acceptance](06-phase2-acceptance.md).** The criteria below are the original ones; the result document maps each to its evidence.
 
 Deliver: runner with two lanes, audio worker with block cache, timeline wrapper around the Python code, render job with progress and cancel, memory guard, alignment spike.
 
@@ -130,12 +130,36 @@ Acceptance:
 
 Deliver: scene registry and `SceneDefinition`; generic Episode composition; layout templates; mascot slot; existing scenes ported; fonts loaded from tracked files; `pip-scene-10x` recreated as a Tier 3 scene.
 
-Acceptance:
+Acceptance (revised after the Phase 3 approval; the table-lab visual criterion is replaced, see `07-phase3-acceptance.md` for the results):
 
-* **Prototype parity:** re-render from data matches the preserved MP4 at sampled frames above a stated PSNR threshold, and speech-to-visual sync is within one frame.
-* join-fanout renders through the generic composition with an unchanged timeline.
-* A dense scene (table lab) renders in split-dense with all rows visible and text at or above the minimum; the fit check flags the fixed-mascot layout.
-* Fonts load from tracked files; removing a font file makes the font check fail.
+* **Prototype parity, in two stages.** (a) The frozen prototype scene, registered unchanged as a custom scene and rendered with its original timing, audio and authored performance, matches a live render of the prototype and, against the preserved MP4, sits inside the PSNR distribution that the prototype's own live-code-versus-MP4 comparison produces over representative frames (no threshold derived from a single frame). (b) The same scene produced by the pipeline (aligned timing, mastered mix with accents) with the differences caused by alignment identified and measured. Speech-to-visual sync is within one frame of the timeline; a visual review of both is recorded as the author's, not as a check.
+* **Performance as data:** for every frame of the prototype the data-driven pose equals the original `perform` output within a stated numeric tolerance.
+* join-fanout (legacy dark style) renders through the generic composition with an unchanged timeline: a regression check only.
+* **A dense Pip-style layout fixture** renders with every card visible and text at or above the minimum size; the fit check passes for the dense layout and flags the same content in the fixed-mascot layout.
+* Fonts load from tracked files with their licences; removing or altering a font file makes the font check fail. The prototype's own system-font render stays as the comparison reference.
+* Sound accents are mixed through the real mix path, recorded in job snapshots and dependency hashes, and measured in the final mix; unsupported sound features still fail explicitly.
+
+### Creative baseline and how Phase 3 carries it (approved with refinements; delivered, see the acceptance document)
+
+**Decision recorded:** the creative baseline is `prototypes/pip-scene-10x-v1/` (Pip's character, expressive performance and warm-paper direction). The table-lab output of Phase 2 is a technical pipeline test only: its visual style was rejected, it is not a baseline, and no further table-lab samples are made. Mascot and voice design are not reopened.
+
+**What the prototype is, in code** (live code behind the frozen MP4, in `src/art/`): `pip-layers/` (the layered figure, hands, views), `pip-scene/rig.ts` (`perform(t, timing, anchor, target)` returns Pip's pose from keyframe tracks keyed to named cues: gaze, brows, lids, smile, smirk, tilt, hands, point), `pip-scene/PipScene10x.tsx` (the scene: card, claim, callout, lanes, caption pill, floor shadow), `palette.ts` and `parts.tsx` (warm paper, slab, tag, backdrop). It is driven by `timing.json`: segment and phrase times, named cue times, a per-frame mouth-opening track from the voice loudness, and a sound-accent list. Everything the author approved lives in those tracks and that geometry.
+
+**How the scene library carries it, in three steps, each gated by a test:**
+
+1. **Adopt unchanged.** Register `pip-scene-10x` as a Tier 3 `SceneDefinition` whose component is the existing `PipScene10x`, not a rewrite. The generic composition supplies its `Timing` from the pipeline: segments and phrases from the aligned timeline, cue times from the episode's beats, the mouth track from the voice audio, accents from the sound-event list. Gate: re-render from data with the prototype's own timing and audio, and compare with the preserved MP4 at one sampled frame per cue plus the start and end, with the PSNR threshold fixed before the run (the prototype's own live-code-versus-MP4 comparison measured 39.2 dB at frame 170, so the threshold will sit just below what that comparison achieves) and speech-to-visual sync within one frame. A second render with aligned timing shows the visual difference caused by timing alone.
+2. **Make the performance data without changing it.** Copy `perform` into the library with its keyframe tracks expressed as a score (track, cue name plus offset, value, easing). Gate: for every frame of the prototype, the data-driven pose equals the original `perform` output exactly (a numeric test, stronger than PSNR). The score stays authoritative: named expressions (`neutral`, `thinking`, `surprised`, `happy`, `concerned`, `pointing`) are optional presets layered on top, never a replacement for the authored continuous tracks, so the expressiveness is not flattened.
+3. **Build new Pip scenes from the same parts.** The library exposes what the prototype already has as reusable pieces: Pip performer (figure, score, mouth, shadow), mascot slot (the prototype geometry is the first template, `card-over-pip`: card above, Pip anchored lower left at about 0.68 scale, caption zone at the bottom), Pip caption pill with emphasis, slab/tag/backdrop parts, scene-supplied anchors Pip can look or point at, and `SceneDefinition` (params schema, cue vocabulary, anchors, layout needs, optional checks). The next representative sample is a new Pip scene built this way, with narration in the approved voice. It is not a table-lab scene.
+
+**Decisions as taken (from the original proposal):**
+
+* **Editing `src/art`.** The repository rules protect it. The plan above does not edit it: new code goes in a new folder and imports the art modules unchanged. Say if you want otherwise.
+* **Sound accents.** The prototype mixes seven synthesized accents (pop, ding, chime, thump, tick, whoosh, swish; `scripts/pip_scene_timing.py`). Phase 2 rejects sound events. Parity of the performance includes them, so the recommendation is a narrow accent mixer limited to those synthesizers, with no new assets. Otherwise audio parity excludes accents and says so.
+* **Caption style and emphasis.** The prototype's caption is a dark pill with orange emphasis on marked words; the generic caption is different. Carrying it needs a way to mark emphasis in caption phrases (a schema addition that the "captions spell the segment text" check must strip).
+* **Fonts.** The prototype uses the system stack starting with SF Pro, which cannot be redistributed. Parity on this machine uses it as is. Bundling a licensed font changes the approved typography, so it should be compared side by side before you choose.
+* **Theme.** Two looks exist: warm paper (Pip) and the dark theme the generic scenes use. Proposal: warm paper becomes the production theme; the dark theme stays only for legacy episodes and technical tests.
+* **Sample content.** Candidates for the new sample, none yet written: a short Pip scene on the "compare counts" idea in `join-fanout` (segments s09 to s11), or another script you supply. Narration would be generated in the approved voice and needs your listening.
+* **Acceptance changes (done).** Replaced "a dense scene (table lab) renders in split-dense" with a dense Pip-style layout fixture, and keep "join-fanout renders through the generic composition with an unchanged timeline" as a regression test only.
 
 ## Phase 4 · App shell and editor (L)
 

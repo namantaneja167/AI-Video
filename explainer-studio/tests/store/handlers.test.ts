@@ -1,23 +1,17 @@
 // The real handlers against FAKE workers: real SQLite project, real timeline wrapper and real mix script, a fake audio worker
 // and a fake render worker (no models, no browser). Proves scheduling, caching, labels, progress, cancellation and isolation.
 import assert from 'node:assert/strict';
-import {existsSync, readdirSync, readFileSync, writeFileSync} from 'node:fs';
-import {join} from 'node:path';
+import {existsSync, readdirSync, readFileSync} from 'node:fs';
 import {afterEach, describe, test} from 'node:test';
-import {adoptEpisode, getEpisode, saveEpisode} from '../../core/episodes.ts';
-import {addReference, statusReport} from '../../core/artifacts.ts';
+import {getEpisode, saveEpisode} from '../../core/episodes.ts';
+import {statusReport} from '../../core/artifacts.ts';
 import {blobPath} from '../../core/blobs.ts';
-import {makeHandlers} from '../../core/handlers.ts';
-import {descendantsOf, OwnerRegistry, snapshotProcs} from '../../core/proc.ts';
-import {JobRunner} from '../../core/runner.ts';
-import {setComponent} from '../../core/state.ts';
+import {descendantsOf, snapshotProcs} from '../../core/proc.ts';
+import type {JobRunner} from '../../core/runner.ts';
 import {wavDuration} from '../../core/timeline.ts';
-import {ModelHost} from '../../core/worker.ts';
-import {newProject, setAllComponents, type Clock, type TestProject} from './helpers.ts';
+import {EP, fixture} from './handler-fixture.ts';
+import type {TestProject} from './helpers.ts';
 
-const realClock = (): Clock => ({t: 0, now: () => Date.now(), advance: () => {}});
-const py = process.env.PYTHON ?? 'python3';
-const EP = 'join-fanout';
 let t: TestProject | undefined;
 const runners: JobRunner[] = [];
 afterEach(async () => {
@@ -35,24 +29,10 @@ try { snapshotProcs(); } catch { inspectable = false; }
 const alive = (pid: number) => { try { process.kill(pid, 0); return true; } catch { return false; } };
 
 function setup(aligner: 'estimated' | 'aligned' = 'estimated') {
-  t = newProject({clock: realClock()});
-  adoptEpisode(t.p, `episodes/${EP}/episode.json`);
-  setAllComponents(t.p, t.root);
-  const ref = join(t.root, 'ref.wav');
-  writeFileSync(ref, readFileSync('tests/fixtures/silence-ref.wav', {flag: 'r'}));
-  addReference(t.p, 'pip-voice-v1', ref, {script: 'Ten times faster.'});
-  const doc = getEpisode(t.p, EP);
-  saveEpisode(t.p, EP, {...doc, voice: {engine: 'qwen3-tts', profile: 'pip-voice-v1'}});
-  setComponent(t.p, 'voiceRuntime', {engine: 'qwen3-tts', model: 'fake', referenceSha: 'x'});
-  setComponent(t.p, 'masteringParams', {lufs: -16, true_peak_db: -1.5, lra: 11});
-  setComponent(t.p, 'aligner', aligner === 'aligned' ? {id: 'qwen3-forced-aligner', revision: 'fake'} : {id: 'estimated'});
-  const host = new ModelHost(new OwnerRegistry(t.p.db, t.p.now), {cmd: py, args: [join(process.cwd(), 'tests/store/fake-worker.py')], rssThresholdBytes: 800 * 2 ** 20, killGraceMs: 600});
-  const r = new JobRunner(t.p, {
-    pollMs: 80, killGraceMs: 600, host, reg: host['reg'], releaseBefore: (k) => k.startsWith('render.'),
-    handlers: makeHandlers({root: process.cwd(), qwenPython: '.venv-qwen/bin/python', python: '.venv/bin/python', renderWorker: join(process.cwd(), 'tests/store/fake-render-worker.ts')}),
-  });
-  runners.push(r);
-  return {r, t: t!, host};
+  const f = fixture({aligner});
+  t = f.t;
+  runners.push(f.r);
+  return {r: f.r, t: f.t, host: f.host};
 }
 const blocksOf = (tp: TestProject) => getEpisode(tp.p, EP).narration.blocks.map((b) => b.id);
 const events = (tp: TestProject, jobId: number, kind: string) => tp.p.db.prepare('SELECT data_json FROM job_events WHERE job_id=? AND kind=? ORDER BY id').all(jobId, kind).map((r: any) => JSON.parse(r.data_json));

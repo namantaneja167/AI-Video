@@ -42,6 +42,9 @@ for line in sys.stdin:
             loaded = p["model"]
             send({"id": i, "event": "result", "data": {"model": loaded, "load_s": 0.01, "active_bytes": len(held)}})
         elif cmd == "generate":
+            if os.environ.get("FAKE_LOG"):  # what the caller actually sent, for tests that check recorded inputs
+                with open(os.environ["FAKE_LOG"], "a") as lf:
+                    lf.write(json.dumps({k: p.get(k) for k in ("ref_sha256", "ref_text", "max_tokens", "expect", "seed")}) + "\n")
             if p.get("crash"):
                 os._exit(1)
             for _ in range(int(p.get("children", 0))):
@@ -58,7 +61,17 @@ for line in sys.stdin:
                 send({"id": i, "event": "progress", "step": "generating", "audio_s": round((s + 1) * secs / steps, 3), "elapsed_s": 0.1 * (s + 1)})
             write_tone(p["out_wav"], secs)
             send({"id": i, "event": "result", "data": {"duration_s": secs, "sample_rate": 24000, "seed": p.get("seed"), "peak_bytes": len(held) if held else 0, "gen_s": 0.1, "rtf": 0.1}})
+        elif cmd == "check":
+            if os.environ.get("FAKE_LOG"):
+                with open(os.environ["FAKE_LOG"], "a") as lf:
+                    lf.write(json.dumps({"cmd": "check", "expect": p.get("expect")}) + "\n")
+            if os.environ.get("FAKE_CHECK_FAIL"):
+                send({"id": i, "event": "error", "message": os.environ["FAKE_CHECK_FAIL"]}); continue
+            send({"id": i, "event": "result", "data": {}})
         elif cmd in ("align", "estimate"):
+            if os.environ.get("FAKE_LOG"):
+                with open(os.environ["FAKE_LOG"], "a") as lf:
+                    lf.write(json.dumps({"cmd": cmd, "expect": p.get("expect")}) + "\n")
             if cmd == "align" and loaded != "aligner":
                 send({"id": i, "event": "error", "message": "the aligner is not loaded"}); continue
             if "segments" in p:  # real-handler form: spread each segment's words over the wav length

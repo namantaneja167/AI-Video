@@ -44,10 +44,17 @@ export type Expected = {
 
 const spoken = (s: EpisodeV2['narration']['segments'][number]): string => s.speech ?? s.text;
 
+/** Silence after each block: its own gap, and the pause of its last segment (a pause inside a block is not supported). */
+export const blockGaps = (doc: EpisodeV2) => {
+  const seg = new Map(doc.narration.segments.map((s) => [s.id, s]));
+  return doc.narration.blocks.map((b) => ({gap: b.gapAfterSec ?? null, pause: seg.get(b.segments[b.segments.length - 1])?.pauseAfter ?? null}));
+};
+
 /** The part of the document a render consumes. Titles, sources, notes and previews are not in it. */
 export function renderContent(doc: EpisodeV2): unknown {
   return {
-    segments: doc.narration.segments.map((s) => ({id: s.id, text: s.text, captions: s.captions ?? null})),
+    style: doc.style ?? 'legacy-dark',
+    segments: doc.narration.segments.map((s) => ({id: s.id, text: s.text, captions: s.captions ?? null, emphasis: s.emphasis ?? null})),
     scenes: doc.scenes,
     beats: doc.beats,
     chapters: doc.chapters,
@@ -72,18 +79,21 @@ export function computeExpected(doc: EpisodeV2, c: ComponentHashes, up: Upstream
     kind: 'timing',
     takes,
     pacing: doc.pacing,
-    gaps: doc.narration.blocks.map((b) => b.gapAfterSec ?? null),
+    gaps: blockGaps(doc),
     segments: doc.narration.segments.map((s) => ({id: s.id, spoken: spoken(s), text: s.text, captions: s.captions ?? null, pauseAfter: s.pauseAfter ?? null})),
     aligner: c.aligner,
     manual: c.manualTiming,
     logic: c.timelineLogic,
   });
 
+  // Accents are placed on scene cues, which come from the timing: with any accent the mix depends on the timing output.
+  const accents = c.soundEvents !== UNSET && c.soundEvents !== hashJson([]);
   const mixBase = {
     kind: 'mix',
+    cueTiming: accents ? hashJson({expected: timing, blob: up.timing}) : null,
     takes,
     pacing: doc.pacing,
-    gaps: doc.narration.blocks.map((b) => b.gapAfterSec ?? null),
+    gaps: blockGaps(doc),
     events: c.soundEvents,
     assets: c.soundAssets,
     params: c.mixParams,

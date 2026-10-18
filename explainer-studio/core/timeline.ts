@@ -4,22 +4,26 @@
 // cannot disagree about durations. It depends only on take durations, pacing and block gaps: not on the aligner.
 import {readFileSync} from 'node:fs';
 import type {EpisodeV2} from '../src/schema2.ts';
+import {resolveCues} from '../src/library/cues.ts';
+import {SCENE_CUES} from '../src/library/sceneSpecs.ts';
 
 export type Layout = {leadInSec: number; blocks: {id: string; offsetSec: number; durationSec: number; gapAfterSec: number}[]; tailSec: number; totalSec: number};
 
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
 
 /**
- * lead-in, then each take, then the block's gap (its own `gapAfterSec`, else the pacing default), and after the last
- * take the tail. A segment's `pauseAfter` inside a block is NOT applied: the take is one continuous recording.
+ * lead-in, then each take, then the silence after the block: its own `gapAfterSec` (the last block: the pacing tail),
+ * else the pacing default, plus the `pauseAfter` of its last segment. A pause on a segment inside a block is rejected
+ * earlier (core/support.ts): the take is one continuous recording.
  */
 export function planLayout(doc: EpisodeV2, durations: Record<string, number>): Layout {
+  const seg = new Map(doc.narration.segments.map((s) => [s.id, s]));
   let t = doc.pacing.leadInSec;
   const blocks = doc.narration.blocks.map((b, i) => {
     const d = durations[b.id];
     if (!(d > 0)) throw new Error(`no take duration for block "${b.id}"`);
     const last = i === doc.narration.blocks.length - 1;
-    const gap = last ? doc.pacing.tailSec : (b.gapAfterSec ?? doc.pacing.segmentGapSec);
+    const gap = r3((b.gapAfterSec ?? (last ? doc.pacing.tailSec : doc.pacing.segmentGapSec)) + (seg.get(b.segments[b.segments.length - 1])?.pauseAfter ?? 0));
     const out = {id: b.id, offsetSec: r3(t), durationSec: r3(d), gapAfterSec: gap};
     t += d + gap;
     return out;
@@ -74,13 +78,41 @@ export function timelineEpisode(doc: EpisodeV2) {
     scenes: doc.scenes.map((s) => ({id: s.id, type: s.type, segments: s.segments})),
     events: doc.beats.map((b) => ({segment: b.segment, at: b.at, ...(b.cue !== undefined ? {cue: b.cue} : {}), ...(b.expression !== undefined ? {expression: b.expression} : {})})),
     chapters: doc.chapters,
+    previews: doc.previews,
   };
 }
 
-export type TimelineRequest = {episode: unknown; segTimings: unknown; source: string; variant: string; audioDuration: number; timingSources?: Record<string, TimingSource>};
+export type TimelineRequest = {episode: unknown; segTimings: unknown; source: string; variant: string; audioDuration: number; timingSources?: Record<string, TimingSource>; /** Name of a preview: the Python logic narrows the episode to it before building. */ preview?: string};
 /** Runs a command with stdin text and returns stdout; the job handler supplies one that registers the process as owned. */
 export type RunText = (cmd: string, args: string[], stdin: string) => Promise<string>;
 
 export async function buildTimelineViaPython(run: RunText, python: string, cli: string, req: TimelineRequest): Promise<any> {
   return JSON.parse(await run(python, [cli], JSON.stringify(req)));
+}
+
+/**
+ * What the library needs on top of the Python timeline: caption emphasis as word ranges inside each caption phrase, the
+ * named cue times of each scene (from the scene's cue rules), and the mouth track. The Python logic is not touched.
+ */
+export function annotateTimeline(timeline: any, doc: EpisodeV2, mouth?: number[]): any {
+  const used: Record<string, number> = {};
+  for (const cap of timeline.captions) {
+    const o = used[cap.segment] ?? 0;
+    const n = cap.words.length;
+    used[cap.segment] = o + n;
+    const ranges = (doc.narration.segments.find((s) => s.id === cap.segment)?.emphasis ?? [])
+      .filter((r) => r.to > o && r.from < o + n)
+      .map((r) => [Math.max(r.from, o) - o, Math.min(r.to, o + n) - o]);
+    if (ranges.length) cap.emphasis = ranges;
+  }
+  const cues: Record<string, Record<string, number>> = {};
+  for (const scene of doc.scenes) {
+    const spec = SCENE_CUES[scene.type];
+    if (!spec) continue;
+    const segs = scene.segments.map((id) => timeline.segments.find((x: any) => x.id === id));
+    cues[scene.id] = resolveCues(spec, segs);
+  }
+  if (Object.keys(cues).length) timeline.cues = cues;
+  if (mouth) timeline.mouth = mouth;
+  return timeline;
 }

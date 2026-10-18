@@ -9,7 +9,7 @@ import {
 import {createRevision, getEpisode} from './episodes.ts';
 import {hashJson, sha256File, stableStringify} from './hash.ts';
 import type {Project} from './project.ts';
-import {collectRefs, currentRows, getComponentHashes, upstreamBlobs} from './state.ts';
+import {collectRefs, currentRows, getComponentHashes, getComponentValues, upstreamBlobs} from './state.ts';
 
 export class JobError extends Error {}
 export class ApprovalError extends Error {
@@ -62,7 +62,8 @@ export function expectedNow(p: Project, episodeId: string): {doc: EpisodeV2; exp
 
 // ---- jobs ------------------------------------------------------------------------------------------------------
 
-export type SnapshotManifest = {episodeId: string; revision: number; docHash: string; docBlob: string; components: ComponentHashes; blobs: UpstreamBlobs; expected: Expected};
+/** `componentValues` are the plain-value settings as they were at enqueue (absent in snapshots made by older builds). */
+export type SnapshotManifest = {episodeId: string; revision: number; docHash: string; docBlob: string; components: ComponentHashes; componentValues?: Record<string, unknown>; blobs: UpstreamBlobs; expected: Expected};
 
 /** Freeze the episode and its inputs for one job. The job reads only from this snapshot. */
 export type NewJob = {episodeId: string; jobKind: JobKind; subject?: string; lane?: 'heavy' | 'light'; params?: Record<string, unknown>};
@@ -75,7 +76,7 @@ export function createJob(p: Project, opts: NewJob, state: 'queued' | 'running')
     if (target.kind === 'take' && !doc.narration.blocks.some((b) => b.id === target.subject)) throw new JobError(`block "${target.subject}" does not exist`);
     const revision = createRevision(p, opts.episodeId, {kind: 'job', reuseByDoc: true});
     const docBlob = putBytes(p, JSON.stringify(doc)).hash;
-    const manifest: SnapshotManifest = {episodeId: opts.episodeId, revision, docHash: hashJson(doc), docBlob, components, blobs: up, expected};
+    const manifest: SnapshotManifest = {episodeId: opts.episodeId, revision, docHash: hashJson(doc), docBlob, components, componentValues: getComponentValues(p, opts.episodeId), blobs: up, expected};
     const snapshotId = hashJson(manifest);
     if (!get(p.db.prepare('SELECT 1 FROM snapshots WHERE id=?'), snapshotId)) {
       p.db.prepare('INSERT INTO snapshots(id,episode_id,revision_number,manifest_json,created_at) VALUES(?,?,?,?,?)').run(snapshotId, opts.episodeId, revision, stableStringify(manifest), p.now());
@@ -222,10 +223,11 @@ export function statusReport(p: Project, episodeId: string): Status {
   for (const b of doc.narration.blocks) takes[b.id] = entry('take', b.id, expected.take[b.id]);
   const takeDeps = Object.entries(takes).map(([id, e]) => [`take ${id}`, e] as [string, StatusEntry]);
   const timing = upstream(entry('timing', 'timeline', expected.timing), takeDeps);
+  const accents = components.soundEvents !== UNSET && components.soundEvents !== hashJson([]);
   const mix = {} as Status['mix'];
   const render = {} as Status['render'];
   for (const k of ['draft', 'final'] as const) {
-    mix[k] = upstream(entry('mix', k, expected.mix[k]), takeDeps);
+    mix[k] = upstream(entry('mix', k, expected.mix[k]), accents ? [...takeDeps, ['timing', timing] as [string, StatusEntry]] : takeDeps);
     render[k] = upstream(entry('render', k, expected.render[k].hash), [['timing', timing], [`mix ${k}`, mix[k]]]);
   }
   const notFresh = [

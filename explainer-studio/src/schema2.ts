@@ -4,10 +4,11 @@
 // because Node scripts and tests load this file directly.
 import {z} from 'zod';
 import {AtSchema, CardsParams, EXPRESSIONS, KpiMismatchParams, TablesLabParams} from './schema.ts';
+import {ContextWindowParams, DenseFixtureParams, Pip10xParams} from './library/params.ts';
 
 const id = z.string().regex(/^[a-z0-9][a-z0-9_-]*$/, 'use lowercase letters, digits, - or _');
 
-export const LAYOUT_TEMPLATES = ['legacy-stage', 'split-dense', 'full-stage-peek', 'mascot-focus', 'two-up', 'stack'] as const;
+export const LAYOUT_TEMPLATES = ['legacy-stage', 'split-dense', 'full-stage-peek', 'mascot-focus', 'two-up', 'stack', 'card-over-pip', 'content-led', 'dense-pip'] as const;
 export const CAPTION_ZONES = ['bottom', 'lower-third', 'top', 'off'] as const;
 export const MASCOT_MODES = ['docked', 'floating', 'peek', 'hidden'] as const;
 export const MASCOT_POSITIONS = [
@@ -37,6 +38,10 @@ export const SceneSchemaV2 = z.discriminatedUnion('type', [
   z.object({...sceneBase, type: z.literal('kpi-mismatch'), params: KpiMismatchParams}),
   z.object({...sceneBase, type: z.literal('tables-lab'), params: TablesLabParams}),
   z.object({...sceneBase, type: z.literal('cards'), params: CardsParams}),
+  // Pip scenes (warm paper). `pip-scene-10x` is the prototype's own component, adopted unchanged.
+  z.object({...sceneBase, type: z.literal('pip-scene-10x'), params: Pip10xParams.prefault({})}),
+  z.object({...sceneBase, type: z.literal('context-window'), params: ContextWindowParams}),
+  z.object({...sceneBase, type: z.literal('pip-dense-fixture'), params: DenseFixtureParams}),
 ]);
 
 export const VoiceSchemaV2 = z.discriminatedUnion('engine', [
@@ -51,6 +56,12 @@ export const SegmentSchemaV2 = z.object({
   speech: z.string().optional(),
   captions: z.array(z.string().min(1)).optional(),
   pauseAfter: z.number().min(0).max(5).optional(),
+  /**
+   * Caption emphasis as word ranges over the displayed words of `text` (split on spaces), end exclusive. `text` repeats the
+   * emphasised words so that an edit to the sentence is noticed instead of silently emphasising other words. Styling is
+   * the renderer's; the spoken text is never marked up.
+   */
+  emphasis: z.array(z.object({from: z.number().int().min(0), to: z.number().int().min(1), text: z.string().min(1)})).optional(),
 });
 
 /** A generation unit: consecutive segments narrated in one pass. */
@@ -91,6 +102,12 @@ export const EpisodeSchemaV2 = z.object({
   learningObjective: z.string(),
   // Mirror of the v1 field. Approval is a project record; this value is not evidence of approval.
   status: z.enum(['draft', 'approved']).default('draft'),
+  /**
+   * Visual style of the whole episode: the dark legacy look; Pip's warm paper with the system font stack (the prototype's
+   * typography, the reference for comparisons); or Pip's warm paper with the bundled, redistributable fonts. Pip styles
+   * use the dark caption pill with orange emphasis.
+   */
+  style: z.enum(['legacy-dark', 'pip-paper', 'pip-paper-bundled']).default('legacy-dark'),
   voice: VoiceSchemaV2,
   pacing: z
     .object({
@@ -107,5 +124,18 @@ export const EpisodeSchemaV2 = z.object({
   reviewNotes: z.array(NoteSchema).default([]),
   previews: z.record(id, z.object({segments: z.array(id).min(1)})).prefault({}),
   migration: z.object({from: z.literal(1), tool: z.string(), sourceSha256: z.string()}).optional(),
+}).superRefine((ep, ctx) => {
+  ep.narration.segments.forEach((seg, si) => {
+    if (!seg.emphasis) return;
+    const words = seg.text.split(/\s+/).filter(Boolean);
+    let prevEnd = 0;
+    seg.emphasis.forEach((r, ri) => {
+      const path = ['narration', 'segments', si, 'emphasis', ri];
+      if (r.to > words.length || r.from >= r.to) ctx.addIssue({code: 'custom', path, message: `emphasis ${r.from}-${r.to} is outside the ${words.length} words of "${seg.id}"`});
+      else if (r.from < prevEnd) ctx.addIssue({code: 'custom', path, message: 'emphasis ranges must be in order and must not overlap'});
+      else if (words.slice(r.from, r.to).join(' ') !== r.text) ctx.addIssue({code: 'custom', path: [...path, 'text'], message: `the emphasised words are now "${words.slice(r.from, r.to).join(' ')}", not "${r.text}"; update the range`});
+      prevEnd = Math.max(prevEnd, r.to);
+    });
+  });
 });
 export type EpisodeV2 = z.infer<typeof EpisodeSchemaV2>;

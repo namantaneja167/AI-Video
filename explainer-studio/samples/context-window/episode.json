@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "id": "context-window",
+  "title": "What is a context window? (simplified)",
+  "learningObjective": "A model can only take in so much text at once; your text and its reply share that limit, and what happens at the limit depends on the product.",
+  "status": "draft",
+  "style": "pip-paper-bundled",
+  "voice": {
+    "engine": "qwen3-tts",
+    "profile": "pip-voice-v1"
+  },
+  "pacing": {
+    "leadInSec": 0.8,
+    "tailSec": 2.5,
+    "segmentGapSec": 0.3
+  },
+  "narration": {
+    "segments": [
+      {
+        "id": "s1",
+        "text": "A model can only read so much at once.",
+        "captions": [
+          "A model can only read",
+          "so much at once."
+        ],
+        "emphasis": [
+          {
+            "from": 5,
+            "to": 7,
+            "text": "so much"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "text": "That limit is its context window.",
+        "captions": [
+          "That limit is its",
+          "context window."
+        ],
+        "emphasis": [
+          {
+            "from": 4,
+            "to": 6,
+            "text": "context window."
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "text": "Your text is cut into small pieces called tokens.",
+        "captions": [
+          "Your text is cut into",
+          "small pieces called tokens."
+        ],
+        "emphasis": [
+          {
+            "from": 8,
+            "to": 9,
+            "text": "tokens."
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "text": "Each token uses up some room.",
+        "emphasis": [
+          {
+            "from": 5,
+            "to": 6,
+            "text": "room."
+          }
+        ]
+      },
+      {
+        "id": "s5",
+        "text": "The reply uses room too.",
+        "emphasis": [
+          {
+            "from": 3,
+            "to": 5,
+            "text": "room too."
+          }
+        ]
+      },
+      {
+        "id": "s6",
+        "text": "In many models, input and output share one budget.",
+        "captions": [
+          "In many models, input and",
+          "output share one budget."
+        ],
+        "emphasis": [
+          {
+            "from": 6,
+            "to": 9,
+            "text": "share one budget."
+          }
+        ]
+      },
+      {
+        "id": "s7",
+        "text": "When it fills, what happens depends on the product.",
+        "captions": [
+          "When it fills, what happens",
+          "depends on the product."
+        ],
+        "emphasis": [
+          {
+            "from": 5,
+            "to": 9,
+            "text": "depends on the product."
+          }
+        ]
+      },
+      {
+        "id": "s8",
+        "text": "Some stop. Others drop older text.",
+        "captions": [
+          "Some stop.",
+          "Others drop older text."
+        ],
+        "emphasis": [
+          {
+            "from": 1,
+            "to": 2,
+            "text": "stop."
+          },
+          {
+            "from": 3,
+            "to": 6,
+            "text": "drop older text."
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "id": "b1",
+        "segments": [
+          "s1",
+          "s2",
+          "s3",
+          "s4"
+        ],
+        "gapAfterSec": 0.4
+      },
+      {
+        "id": "b2",
+        "segments": [
+          "s5",
+          "s6",
+          "s7",
+          "s8"
+        ]
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "id": "cw",
+      "type": "context-window",
+      "segments": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "s8"
+      ],
+      "layout": {
+        "template": "content-led",
+        "captionZone": "bottom",
+        "mascot": {
+          "mode": "floating",
+          "position": "bottom-left",
+          "scale": 0.5
+        }
+      },
+      "params": {
+        "prompt": "Why is the sky blue today?",
+        "pieces": [
+          "Why",
+          " is",
+          " the",
+          " sky",
+          " blue",
+          " to",
+          "day",
+          "?"
+        ],
+        "capacity": 60,
+        "inputTokens": 24,
+        "outputTokens": 36,
+        "note": "Simplified. Token pieces are illustrative, not from a real tokenizer."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "title": "Anthropic: Context windows (API docs)",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
+      "note": "the window includes the model's response; overflow behaviour differs by model and product"
+    },
+    {
+      "title": "Google: Gemini API long context",
+      "url": "https://ai.google.dev/gemini-api/docs/long-context",
+      "note": "some models share the window across input and output; earlier models use separate input and output limits"
+    }
+  ]
+}

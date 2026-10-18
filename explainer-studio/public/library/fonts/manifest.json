@@ -1,0 +1,29 @@
+{
+  "note": "Redistributable fonts for the pip-paper-bundled style. Both are SIL Open Font License 1.1 (see the licence files here). SF Pro, the prototype's font, is a system font and is never copied.",
+  "files": [
+    {
+      "family": "Inter",
+      "file": "InterVariable.woff2",
+      "weight": "100 900",
+      "sha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+      "license": "OFL-1.1",
+      "licenseFile": "Inter-OFL.txt",
+      "licenseSha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a",
+      "source": "https://github.com/rsms/inter/blob/master/docs/font-files/InterVariable.woff2",
+      "sourceCommit": "e3a3d4c57d5ecc01453a575621882a384c1995a3",
+      "version": "4.66"
+    },
+    {
+      "family": "JetBrains Mono",
+      "file": "JetBrainsMono-Variable.woff2",
+      "weight": "100 800",
+      "sha256": "31ec365b93e4bad6f202ce23352a56d01ca4462b2afc782ed2cf6fa42ca9ac0e",
+      "license": "OFL-1.1",
+      "licenseFile": "JetBrainsMono-OFL.txt",
+      "licenseSha256": "a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697",
+      "source": "https://github.com/JetBrains/JetBrainsMono/blob/master/fonts/webfonts/JetBrainsMono%5Bwght%5D.woff2",
+      "sourceCommit": "19371302b95d218af43299bce79ddbddd0bc364d",
+      "version": "2.19988 (file header)"
+    }
+  ]
+}

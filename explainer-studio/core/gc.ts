@@ -6,7 +6,7 @@
 import {existsSync, readdirSync, rmSync, statSync} from 'node:fs';
 import {join} from 'node:path';
 import {blobPath, listBlobFiles} from './blobs.ts';
-import {ACTIVE_SQL, all, get} from './db.ts';
+import {all, get, RETAINED_SQL} from './db.ts';
 import {isPermanentRevision, listEpisodes} from './episodes.ts';
 import {hashJson} from './hash.ts';
 import type {Project} from './project.ts';
@@ -19,7 +19,7 @@ export class StalePlanError extends Error {}
  * Every blob reachable from retained state:
  *  - all remaining revisions' references (selected takes, outputs, component file sets);
  *  - current outputs, approved files, approved references, pinned outputs, component file sets;
- *  - the snapshots of running jobs.
+ *  - the snapshots of running jobs and of failed or cancelled jobs (they can be retried on the same inputs).
  * Component manifests pull in the files they list. `includeDrafts: false` leaves out draft renders (for backups).
  * `excludeRevisionIds` answers "what would be reachable if these revisions were gone?" for cleanup planning.
  */
@@ -38,7 +38,7 @@ export function reachableBlobs(p: Project, opts: {includeDrafts?: boolean; exclu
   q('SELECT blob_hash FROM refs');
   q(`SELECT a.blob_hash FROM artifacts a WHERE a.pinned=1${notDraftArt}`);
   q('SELECT blob_hash FROM components WHERE blob_hash IS NOT NULL');
-  q(`SELECT blob_hash FROM snapshot_refs WHERE snapshot_id IN (SELECT snapshot_id FROM jobs WHERE state IN ${ACTIVE_SQL})${notDraftRole}`);
+  q(`SELECT blob_hash FROM snapshot_refs WHERE snapshot_id IN (SELECT snapshot_id FROM jobs WHERE state IN ${RETAINED_SQL})${notDraftRole}`);
   const children = p.db.prepare('SELECT blob_hash FROM fileset_files WHERE manifest_hash=?');
   for (const h of [...keep]) add(all<{blob_hash: string}>(children, h));
   return keep;
@@ -118,7 +118,7 @@ function fingerprintOf(p: Project, params: unknown): string {
     filesets: q('SELECT manifest_hash, path, blob_hash FROM fileset_files ORDER BY manifest_hash, path'),
     blobs: q('SELECT hash, bytes, created_at FROM blobs ORDER BY hash'),
     jobs: q('SELECT id, state, snapshot_id FROM jobs ORDER BY id'),
-    snapshotRefs: q(`SELECT snapshot_id, role, blob_hash FROM snapshot_refs WHERE snapshot_id IN (SELECT snapshot_id FROM jobs WHERE state IN ${ACTIVE_SQL}) ORDER BY snapshot_id, role`),
+    snapshotRefs: q(`SELECT snapshot_id, role, blob_hash FROM snapshot_refs WHERE snapshot_id IN (SELECT snapshot_id FROM jobs WHERE state IN ${RETAINED_SQL}) ORDER BY snapshot_id, role`),
     orphanFiles: l.orphans,
     tmp: l.tmp,
   });

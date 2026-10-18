@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "pip-10x-pipeline",
+  "title": "Pip prototype (10x faster) through the new pipeline",
+  "learningObjective": "Technical reproduction: the frozen Pip prototype scene produced by the studio pipeline (aligned timing, mastered mix, accents), not new content.",
+  "status": "draft",
+  "style": "pip-paper",
+  "voice": {"engine": "qwen3-tts", "profile": "pip-voice-v1"},
+  "pacing": {"leadInSec": 1.0, "tailSec": 3.6, "segmentGapSec": 0.3},
+  "narration": {
+    "segments": [
+      {"id": "s1", "text": "Ten times faster."},
+      {"id": "s2", "text": "Sounds impressive."},
+      {"id": "s3", "text": "But faster at what?"},
+      {"id": "s4", "text": "This test used tiny prompts."},
+      {"id": "s5", "text": "A long document is a different workload.", "captions": ["A long document", "is a different workload."]},
+      {"id": "s6a", "text": "Before trusting the headline,"},
+      {"id": "s6b", "text": "check what was measured."}
+    ],
+    "blocks": [{"id": "b1", "segments": ["s1", "s2", "s3", "s4", "s5", "s6a", "s6b"]}]
+  },
+  "scenes": [
+    {"id": "pip", "type": "pip-scene-10x", "params": {}, "layout": {"template": "card-over-pip", "captionZone": "off", "mascot": {"mode": "docked"}}, "segments": ["s1", "s2", "s3", "s4", "s5", "s6a", "s6b"]}
+  ]
+}

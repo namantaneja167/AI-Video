@@ -15,4 +15,4 @@ for (let f = 1; f <= frames; f++) {
   send({event: 'progress', step: 'rendering', fraction: f / frames, renderedFrames: f, encodedFrames: f, totalFrames: frames});
 }
 writeFileSync(job.out, `fake mp4 for ${job.composition} ${JSON.stringify(job.inputProps.data.timeline.durationSec)}`);
-send({event: 'result', data: {out: job.out, bytes: 10, frames, fps: 30, width: 1080, height: 1920, bundleMs: 1, totalMs: frames * stepMs}});
+send({event: 'result', data: {crf: job.crf, out: job.out, bytes: 10, frames, fps: 30, width: 1080, height: 1920, bundleMs: 1, totalMs: frames * stepMs}});

@@ -12,3 +12,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Recovery backups (archives and checksums); never committed
+backups/
