@@ -4,8 +4,9 @@ import {createHash} from 'node:crypto';
 import {existsSync, mkdtempSync, readFileSync, statSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {describe, test} from 'node:test';
+import {after, before, describe, test} from 'node:test';
 import {ROOT, readJson, mkTmp} from './helpers.ts';
+import {acquireHeavy} from './heavy-lock.ts';
 
 const PROTO = join(ROOT, 'prototypes', 'pip-scene-10x-v1');
 const manifest = existsSync(join(PROTO, 'MANIFEST.json')) ? readJson('prototypes', 'pip-scene-10x-v1', 'MANIFEST.json') : null;
@@ -46,6 +47,10 @@ describe('preserved prototype pip-scene-10x-v1 (frozen)', {skip}, () => {
 // preserved MP4. Opt in with STUDIO_SLOW=1. Threshold chosen below the 39.18 dB measured when the prototype was frozen.
 const PSNR_MIN_DB = 35;
 describe('prototype render parity (slow, opt-in)', {skip: !manifest ? skip : process.env.STUDIO_SLOW ? false : 'set STUDIO_SLOW=1 to run'}, () => {
+  // A Remotion render is heavy: it takes its turn with the other heavy suites (see tests/heavy-lock.ts).
+  let release = () => {};
+  before(async () => { release = await acquireHeavy('prototype parity render'); }, {timeout: 40 * 60_000});
+  after(() => release());
   test(`frame 170 re-rendered from live code is at least ${PSNR_MIN_DB} dB PSNR against the preserved MP4`, (t) => {
     const dir = mkTmp('studio-parity-');
     const still = join(dir, 'live.png');

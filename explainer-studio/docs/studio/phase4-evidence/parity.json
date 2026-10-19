@@ -1,0 +1,25 @@
+{
+  "method": "Remotion Player in headless Chrome (3 device pixels per CSS pixel) against a Remotion still of the same frame from the same timeline; SSIM compared at the preview size in CSS pixels",
+  "framesAt30fps": [
+    72,
+    285,
+    510
+  ],
+  "seconds": [
+    2.4,
+    9.5,
+    17
+  ],
+  "previewSizeCssPx": [
+    194,
+    344
+  ],
+  "ssimSameFrame": [
+    0.955,
+    0.95,
+    0.945
+  ],
+  "ssimPreviewVsRenderHalfSecondLater": 0.937,
+  "ssimPreviewVsRenderThreeSecondsLater": 0.889,
+  "byEye": "not judged: the author looks at parity-sheet.png"
+}

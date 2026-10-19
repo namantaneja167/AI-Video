@@ -4,7 +4,7 @@
 // because Node scripts and tests load this file directly.
 import {z} from 'zod';
 import {AtSchema, CardsParams, EXPRESSIONS, KpiMismatchParams, TablesLabParams} from './schema.ts';
-import {ContextWindowParams, DenseFixtureParams, Pip10xParams} from './library/params.ts';
+import {ContextWindowParams, DenseFixtureParams, Pip10xParams, PipCardsParams} from './library/params.ts';
 
 const id = z.string().regex(/^[a-z0-9][a-z0-9_-]*$/, 'use lowercase letters, digits, - or _');
 
@@ -42,6 +42,8 @@ export const SceneSchemaV2 = z.discriminatedUnion('type', [
   z.object({...sceneBase, type: z.literal('pip-scene-10x'), params: Pip10xParams.prefault({})}),
   z.object({...sceneBase, type: z.literal('context-window'), params: ContextWindowParams}),
   z.object({...sceneBase, type: z.literal('pip-dense-fixture'), params: DenseFixtureParams}),
+  // The reusable Pip scene: cards of the author's own text, with Pip's actions listed explicitly.
+  z.object({...sceneBase, type: z.literal('pip-cards'), params: PipCardsParams}),
 ]);
 
 export const VoiceSchemaV2 = z.discriminatedUnion('engine', [
@@ -84,6 +86,8 @@ export const BeatSchema = z
   })
   .refine((b) => b.cue !== undefined || b.expression !== undefined, 'beat needs a cue or an expression');
 
+export const NOTE_EVENTS = ['created', 'edited', 'resolved', 'wont-fix', 'reopened', 'reassessed'] as const;
+
 export const NoteSchema = z.object({
   id,
   text: z.string(),
@@ -91,7 +95,18 @@ export const NoteSchema = z.object({
   status: z.enum(NOTE_STATUSES).default('open'),
   anchor: z.object({segment: id, word: z.number().int().min(0).optional()}).optional(),
   timeSec: z.number().min(0).optional(),
-  render: z.object({id: z.string(), kind: z.enum(['draft', 'final'])}).optional(),
+  /** The video the note was written against: its artifact id and kind, the build it belongs to, and the file's SHA-256. */
+  render: z.object({id: z.string(), kind: z.enum(['draft', 'final']), build: z.string().optional(), sha256: z.string().optional()}).optional(),
+  /** The review round it was written in (a round belongs to one video). */
+  round: z.number().int().min(1).optional(),
+  /** What the note was written about, kept exactly as it was then, so a later edit never rewrites it. */
+  context: z.object({
+    segmentText: z.string(), speech: z.string().optional(), segmentHash: z.string(), sceneId: z.string().optional(), sceneHash: z.string().optional(), at: z.number(),
+  }).optional(),
+  /** The author looked at the note again after the content changed and said it still applies (the hashes it now stands against). */
+  reassessed: z.object({at: z.number(), segmentHash: z.string(), sceneHash: z.string().optional()}).optional(),
+  createdAt: z.number().optional(),
+  events: z.array(z.object({at: z.number(), kind: z.enum(NOTE_EVENTS), text: z.string().optional()})).optional(),
 });
 export type Note = z.infer<typeof NoteSchema>;
 

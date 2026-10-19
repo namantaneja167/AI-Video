@@ -11,7 +11,7 @@
     "test": "npm run test:ts && npm run test:py",
     "test:ts": "node --test \"tests/**/*.test.ts\"",
     "test:py": ".venv/bin/python -m unittest discover -s tests/py -v",
-    "test:slow": "STUDIO_SLOW=1 node --test tests/prototype.test.ts tests/library/render.slow.test.ts",
+    "test:slow": "STUDIO_SLOW=1 node --test tests/prototype.test.ts tests/library/render.slow.test.ts tests/app/browser.slow.test.ts tests/app/rebuild.slow.test.ts tests/app/planner.slow.test.ts tests/app/voice.slow.test.ts tests/app/review.slow.test.ts tests/library/probe.slow.test.ts tests/app/hardening.slow.test.ts",
     "project": "node scripts/project.ts"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
+    "esbuild": "0.28.1",
     "typescript": "7.0.2"
   },
   "type": "module",

@@ -1,0 +1,302 @@
+{
+  "ranAt": "2026-10-19T08:11:34.809Z",
+  "findings": [
+    {
+      "id": "empty-list",
+      "area": "empty states",
+      "observed": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode"
+    },
+    {
+      "id": "tab-order-list",
+      "area": "keyboard",
+      "observed": [
+        "button[rail-episodes] \"Episodes\"",
+        "button[new-episode] \"New episode\"",
+        "button[empty-new-episode] \"Start the first episode\"",
+        "body \"E Episodes Ideas Library Jobs Settings A\"",
+        "button[rail-episodes] \"Episodes\"",
+        "button[new-episode] \"New episode\"",
+        "button[empty-new-episode] \"Start the first episode\"",
+        "body \"E Episodes Ideas Library Jobs Settings A\""
+      ]
+    },
+    {
+      "id": "dialog-focus",
+      "area": "keyboard",
+      "observed": "input[new-title] \"\""
+    },
+    {
+      "id": "dialog-tab-order",
+      "area": "keyboard",
+      "observed": [
+        "input[new-audience] \"\"",
+        "textarea[new-objective] \"\"",
+        "input[new-duration] \"\"",
+        "button[new-create] \"Create draft\"",
+        "button \"Cancel\"",
+        "input[new-title] \"\"",
+        "input[new-audience] \"\""
+      ]
+    },
+    {
+      "id": "after-escape",
+      "area": "keyboard",
+      "observed": {
+        "dialogOpen": false,
+        "focus": "button[new-episode] \"New episode\""
+      }
+    },
+    {
+      "id": "empty-title",
+      "area": "invalid input",
+      "observed": "Give the episode a title."
+    },
+    {
+      "id": "bad-duration",
+      "area": "invalid input",
+      "observed": "The approximate length is in minutes, between 0.25 and 30."
+    },
+    {
+      "id": "long-title",
+      "area": "invalid input",
+      "observed": {
+        "error": "title: Too big: expected string to have <=200 characters",
+        "url": ""
+      }
+    },
+    {
+      "id": "route-episode=nope",
+      "area": "unknown routes",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode There is no episode \"nope\" in this project, so the list is shown instead. This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode",
+        "links": [
+          "Episodes",
+          "New episode",
+          "Start the first episode"
+        ]
+      }
+    },
+    {
+      "id": "route-plan=nope",
+      "area": "unknown routes",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode There is no episode \"nope\" in this project, so the list is shown instead. This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode",
+        "links": [
+          "Episodes",
+          "New episode",
+          "Start the first episode"
+        ]
+      }
+    },
+    {
+      "id": "route-voice=nope",
+      "area": "unknown routes",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode There is no episode \"nope\" in this project, so the list is shown instead. This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode",
+        "links": [
+          "Episodes",
+          "New episode",
+          "Start the first episode"
+        ]
+      }
+    },
+    {
+      "id": "route-review=nope",
+      "area": "unknown routes",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode There is no episode \"nope\" in this project, so the list is shown instead. This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode",
+        "links": [
+          "Episodes",
+          "New episode",
+          "Start the first episode"
+        ]
+      }
+    },
+    {
+      "id": "route-plan=nope&tab=storyboard",
+      "area": "unknown routes",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode There is no episode \"nope\" in this project, so the list is shown instead. This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode",
+        "links": [
+          "Episodes",
+          "New episode",
+          "Start the first episode"
+        ]
+      }
+    },
+    {
+      "id": "route-foo=bar",
+      "area": "unknown routes",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project Episodes New episode This project has no episodes yet An episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it. Start with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste. Start the first episode",
+        "links": [
+          "Episodes",
+          "New episode",
+          "Start the first episode"
+        ]
+      }
+    },
+    {
+      "id": "new-episode-style",
+      "area": "fonts",
+      "observed": "pip-paper-bundled"
+    },
+    {
+      "id": "voice-before-any-take",
+      "area": "empty states",
+      "observed": "E Episodes Ideas Library Jobs Settings Audit project · voice Audit episode Engine: Not running Script editor All episodes 1 Idea open 2 Research open 3 Script open 4 Storyboard open 5 Voice not made 6 Scenes open 7 Review open 8 Render later 9 Export later Pip's voice Approved reference pip-voice-v1 (e6d84a9dd60e) · mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16 Narration uses the approved Pip voice and reference exactly as recorded; this screen never changes either. A take is only ever added: nothing is overwritten, and every take stays saved. Generate 1 block that needs narration Time: not meas"
+    },
+    {
+      "id": "review-before-any-video",
+      "area": "empty states",
+      "observed": "E Episodes Ideas Library Jobs Settings Audit project · Review Audit episode Script editor Voice Make a draft video… Make the final video… 1 Idea later 2 Research later 3 Script open 4 Storyboard later 5 Voice open 6 Scenes later 7 Review 1 to do 8 Render later 9 Export later Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can. Videos Each video is reviewed in its own round. A draft is the unmastered audio and can never be approved. The final vide"
+    },
+    {
+      "id": "tab-order-planner",
+      "area": "keyboard",
+      "observed": [
+        "button[rail-episodes] \"Episodes\"",
+        "button[open-editor] \"Script editor\"",
+        "button[all-episodes] \"All episodes\"",
+        "button[stage-1] \"1 Idea brief set\"",
+        "button[stage-2] \"2 Research 1 sources · 1 claims\"",
+        "button[stage-3] \"3 Script 5 segments\"",
+        "button[stage-5] \"5 Voice open\"",
+        "button[stage-6] \"6 Scenes applied\"",
+        "button[stage-7] \"7 Review open\"",
+        "button[apply-preview] \"Preview what would change\""
+      ]
+    },
+    {
+      "id": "lost-planner",
+      "area": "connection loss",
+      "observed": {
+        "text": "Lost connection to the app. Nothing you have saved is lost, but changes made now cannot be saved until it returns. Work that was running may have stopped. E Episodes Ideas Library Jobs Settings Audit project · planning Audit episode Has a script Script editor All episodes 1 Idea brief set 2 Research 1 sources · 1 claims 3 Script 5 segments 4 Storyboard 3 planned 5 Voice open 6 Scenes applied 7 Review open 8 Render later 9 Export later The idea Title Who is it for? What should the viewer understand by the end? Approximate length, in minutes Notes for yourself, and for the briefs you copy into C",
+        "alerts": [
+          "Lost connection to the app. Nothing you have saved is lost, but changes made now cannot be saved until it returns. Work that was running may have stopped."
+        ]
+      }
+    },
+    {
+      "id": "recovered-planner",
+      "area": "connection loss",
+      "observed": {
+        "alerts": [
+          "The app was restarted. Everything that had been saved is still here; any work that was running was stopped and can be started again. Reload this screen"
+        ]
+      }
+    },
+    {
+      "id": "lost-voice",
+      "area": "connection loss",
+      "observed": {
+        "text": "Lost connection to the app. Nothing you have saved is lost, but changes made now cannot be saved until it returns. Work that was running may have stopped. E Episodes Ideas Library Jobs Settings Audit project · voice Audit episode Engine: Not running Script editor All episodes 1 Idea open 2 Research open 3 Script open 4 Storyboard open 5 Voice not made 6 Scenes open 7 Review open 8 Render later 9 Export later Pip's voice Approved reference pip-voice-v1 (e6d84a9dd60e) · mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16 Narration uses the approved Pip voice and reference exactly as recorded; this scree",
+        "alerts": [
+          "Lost connection to the app. Nothing you have saved is lost, but changes made now cannot be saved until it returns. Work that was running may have stopped."
+        ]
+      }
+    },
+    {
+      "id": "recovered-voice",
+      "area": "connection loss",
+      "observed": {
+        "alerts": [
+          "The app was restarted. Everything that had been saved is still here; any work that was running was stopped and can be started again. Reload this screen"
+        ]
+      }
+    },
+    {
+      "id": "lost-review",
+      "area": "connection loss",
+      "observed": {
+        "text": "Lost connection to the app. Nothing you have saved is lost, but changes made now cannot be saved until it returns. Work that was running may have stopped. E Episodes Ideas Library Jobs Settings Audit project · Review Audit episode Script editor Voice Make a draft video… Make the final video… 1 Idea later 2 Research later 3 Script open 4 Storyboard later 5 Voice open 6 Scenes later 7 Review 1 to do 8 Render later 9 Export later Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the v",
+        "alerts": [
+          "Lost connection to the app. Nothing you have saved is lost, but changes made now cannot be saved until it returns. Work that was running may have stopped.",
+          "Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can.",
+          "Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can.",
+          "Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can.",
+          "record that you did it"
+        ]
+      }
+    },
+    {
+      "id": "recovered-review",
+      "area": "connection loss",
+      "observed": {
+        "alerts": [
+          "The app was restarted. Everything that had been saved is still here; any work that was running was stopped and can be started again. Reload this screen",
+          "Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can.",
+          "Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can.",
+          "Playing the video and ticking a box record that you did it. They do not show that you paid attention, or that the content is correct. The checks cannot find a word the voice dropped; only listening can.",
+          "record that you did it"
+        ]
+      }
+    },
+    {
+      "id": "lost-editor",
+      "area": "connection loss",
+      "observed": {
+        "text": "E Episodes Ideas Library Jobs Settings Audit project · Pip voice (pip-voice-v1) · Pip, warm paper Audit episode Nothing built Saved History Jobs Rebuild… 1 Idea open 2 Research open 3 Script editing 4 Storyboard open 5 Voice not built 6 Scenes open 7 Review open 8 Render later 9 Export later Lost connection to the app. Edits are kept in this browser and saved when the connection returns. OUTLINE ‹ 1 · pip-cards not built · Content led s1 A model reads text in small pieces. s2 Those pieces are called tokens. 2 · pip-cards not built · Content led s3 A token is not always a whole word. s4 Sometim",
+        "alerts": [
+          "Saved",
+          "Lost connection to the app. Edits are kept in this browser and saved when the connection returns.",
+          "Lost connection to the app. Edits are kept in this browser and saved when the connection returns."
+        ]
+      }
+    },
+    {
+      "id": "recovered-editor",
+      "area": "connection loss",
+      "observed": {
+        "alerts": [
+          "Saved",
+          "The app was restarted. Everything that had been saved is still here.\nOK",
+          "The app was restarted. Everything that had been saved is still here.",
+          "OK",
+          "OK"
+        ]
+      }
+    },
+    {
+      "id": "viewport-1280x800",
+      "area": "viewport",
+      "observed": {
+        "scrollW": 1280,
+        "scrollH": 800,
+        "w": 1280,
+        "h": 800
+      }
+    },
+    {
+      "id": "viewport-1024x700",
+      "area": "viewport",
+      "observed": {
+        "scrollW": 1024,
+        "scrollH": 700,
+        "w": 1024,
+        "h": 700
+      }
+    },
+    {
+      "id": "viewport-900x700",
+      "area": "viewport",
+      "observed": {
+        "scrollW": 900,
+        "scrollH": 700,
+        "w": 900,
+        "h": 700
+      }
+    },
+    {
+      "id": "console",
+      "area": "errors",
+      "observed": {
+        "consoleErrors": [],
+        "failedRequests": [
+          "422 http://127.0.0.1:4413/api/plans",
+          "422 http://127.0.0.1:4413/api/plans/audit-episode/imports"
+        ]
+      }
+    }
+  ]
+}

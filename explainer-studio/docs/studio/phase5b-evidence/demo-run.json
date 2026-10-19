@@ -1,0 +1,135 @@
+{
+  "ranAt": "2026-10-18T19:27:08.148Z",
+  "planId": "tokens-in-pieces",
+  "scriptRows": [
+    "A model reads text in small pieces.",
+    "Those pieces are called tokens.",
+    "A token is not always a whole word.",
+    "Sometimes it is only part of one.",
+    "Every model can only hold so many tokens at once."
+  ],
+  "requestsOutsideThisApp": [],
+  "consoleErrors": [],
+  "failedRequests": [
+    "422 http://127.0.0.1:4317/api/plans/tokens-in-pieces/imports"
+  ],
+  "applyPreview": [
+    "New sb1 Pip cards · lines s1 to s2 · 2 cards (\"Text\", \"Tokens\") · 3 Pip actions · layout content-led",
+    "New sb2 Pip cards · lines s3 to s4 · 2 cards (\"Not always a word\", \"Sometimes a part\") · 2 Pip actions · layout content-led",
+    "New sb3 Pip cards · lines s5 · 1 card (\"A limit\") · 2 Pip actions · layout content-led"
+  ],
+  "appliedChip": "Applied Oct 19, 2026, 12:57 AM",
+  "compositionPreviewLabel": "Estimated timing · no audio · not a build",
+  "sceneKinds": [
+    "Reusable",
+    "Reusable",
+    "Reusable"
+  ],
+  "savedMessage": "Saved scene sb1. Only the outputs that depend on it are out of date; the list below says which.",
+  "narrationUnchangedByApply": true,
+  "scenesNow": [
+    {
+      "id": "sb1",
+      "type": "pip-cards",
+      "segments": [
+        "s1",
+        "s2"
+      ],
+      "layout": "content-led",
+      "cards": [
+        "The text",
+        "Tokens"
+      ],
+      "actions": [
+        "point",
+        "point",
+        "nod"
+      ]
+    },
+    {
+      "id": "sb2",
+      "type": "pip-cards",
+      "segments": [
+        "s3",
+        "s4"
+      ],
+      "layout": "content-led",
+      "cards": [
+        "Not always a word",
+        "Sometimes a part"
+      ],
+      "actions": [
+        "look",
+        "hop"
+      ]
+    },
+    {
+      "id": "sb3",
+      "type": "pip-cards",
+      "segments": [
+        "s5"
+      ],
+      "layout": "content-led",
+      "cards": [
+        "A limit"
+      ],
+      "actions": [
+        "look",
+        "smile"
+      ]
+    }
+  ],
+  "revisions": [
+    {
+      "number": 2,
+      "kind": "scenes-apply",
+      "label": "Scenes applied from the storyboard (3 scenes)"
+    },
+    {
+      "number": 1,
+      "kind": "create",
+      "label": "Imported from pasted text (#5, 26e8151e91c9)"
+    }
+  ],
+  "productionPreflight": {
+    "blockers": [],
+    "steps": [
+      "Narration, block b1 (s1, s2, s3, s4, s5): run",
+      "Timing and captions: run",
+      "Final audio mix: run",
+      "Final video: run"
+    ],
+    "notes": [
+      "16 of the workspace's sound events are on cues of other scene types this episode does not use; this episode's mix leaves them out.",
+      "The render sources recorded for this workspace differ from the working copy. Starting the rebuild records the current ones; the final video is rebuilt because of it.",
+      "Narration uses the approved Pip voice on the models already installed on this computer. Nothing is downloaded.",
+      "Later steps are checked again as earlier ones finish; one whose inputs turn out unchanged is skipped.",
+      "This version rebuilds the final video (mastered mix). Draft builds are not part of it."
+    ]
+  },
+  "jobsForThisDraft": 0,
+  "plan": {
+    "producible": true,
+    "applied": {
+      "at": 1792351627591,
+      "episodeSeq": 18,
+      "sceneIds": [
+        "sb1",
+        "sb2",
+        "sb3"
+      ]
+    }
+  },
+  "baseline": {
+    "before": {
+      "seq": 15,
+      "docHash": "59396c69a98ceeee3f4ec20650864d54f212cdd9f3e21d023585b542129d101b"
+    },
+    "after": {
+      "seq": 15,
+      "docHash": "59396c69a98ceeee3f4ec20650864d54f212cdd9f3e21d023585b542129d101b"
+    },
+    "unchanged": true
+  },
+  "otherDemoEpisodeUnchanged": true
+}

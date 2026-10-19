@@ -133,7 +133,7 @@ try {
   copyFileSync(blobPath(p, cur('mix', 'final').h), wav);
   copyFileSync(blobPath(p, cur('timing', 'timeline').h), tlf);
   const measuredFile = join(OUT, 'measurements.json');
-  const stdout = execFileSync(join(root, '.venv-qwen/bin/python'), [join(root, 'scripts/phase2_measure.py'), mp4, wav, tlf, measuredFile, String(MASTER.lufs), String(MASTER.true_peak_db)], {encoding: 'utf8'});
+  const stdout = execFileSync(join(root, '.venv-qwen/bin/python'), [join(root, 'scripts/phase2_measure.py'), mp4, wav, tlf, measuredFile, String(MASTER.lufs), String(MASTER.true_peak_db)], {encoding: 'utf8', env: {...process.env, MIX_HAS_ACCENTS: '0'}}); // soundEvents are empty above, so the MP4 audio is speech alone
   log(`measurements:\n${stdout}`);
   const meas = JSON.parse(readFileSync(measuredFile, 'utf8'));
   const meta = (kind: string, subject: string) => JSON.parse(cur(kind, subject).m);

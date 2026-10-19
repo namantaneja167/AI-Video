@@ -23,6 +23,7 @@
     "scripts",
     "core",
     "workers",
-    "tests"
+    "tests",
+    "app"
   ]
 }

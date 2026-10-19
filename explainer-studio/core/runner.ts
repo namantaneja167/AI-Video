@@ -16,7 +16,7 @@ import {getEpisode} from './episodes.ts';
 import {getComponentValues} from './state.ts';
 import {all, get} from './db.ts';
 import type {Project} from './project.ts';
-import {killOwned, OwnerRegistry, ownedRssBytes, spawnOwned, systemMemory, type MemoryProbe} from './proc.ts';
+import {killOwned, OwnerRegistry, ownedRssBytes, releaseLeased, spawnOwned, systemMemory, type MemoryProbe} from './proc.ts';
 import {WorkerCrashError, type Handover, type ModelHost} from './worker.ts';
 
 export class PreflightError extends Error {}
@@ -73,7 +73,7 @@ export type RunnerOptions = {
 
 type Active = {
   job: JobRow; ctl: AbortController; attemptId: number; owner: string; reason: 'cancel' | 'memory' | null; memoryMessage?: string;
-  done: Promise<void>; lastStep: string | null; lastWrite: number; peakRss: number; pressureMax: number; critical: number; cancelKill?: {confirmed: boolean; reason?: string};
+  done: Promise<void>; lastStep: string | null; lastWrite: number; peakRss: number; pressureMax: number; critical: number; cancelKill?: {confirmed: boolean; reason?: string}; stopping?: Promise<unknown>;
 };
 
 export class JobRunner {
@@ -201,7 +201,7 @@ export class JobRunner {
     const handler = this.handlers[job.kind];
     const ws = join(this.p.tmpDir, `${job.id}-${job.attempts}`);
     let timer: NodeJS.Timeout | undefined;
-    let outcome: {state: 'failed' | 'cancelled' | 'queued'; error?: string} | null = null;
+    let outcome: {state: 'failed' | 'cancelled' | 'queued'; error?: string; diagnostics?: unknown} | null = null;
     try {
       if (!handler) throw new Error(`no handler for ${job.kind}`);
       const mem = this.o.memory?.();
@@ -245,14 +245,18 @@ export class JobRunner {
         outcome = act.cancelKill && !act.cancelKill.confirmed
           ? {state: 'failed', error: `cancelled, but could not confirm that every process stopped: ${act.cancelKill.reason ?? 'unknown'}`}
           : {state: 'cancelled'};
-      } else if (err instanceof WorkerCrashError && job.attempts <= this.o.autoRetries) outcome = {state: 'queued', error: err.message};
-      else outcome = {state: 'failed', error: err.message};
+      } else if (err instanceof WorkerCrashError) {
+        // What is known about the death, so a kill can be attributed to the studio, to memory, or to something outside.
+        const diagnostics = {worker: err.detail ?? null, memory: this.safeMemory(), pressureMaxThisAttempt: act.pressureMax || null};
+        outcome = {state: job.attempts <= this.o.autoRetries ? 'queued' : 'failed', error: err.message, diagnostics};
+      } else outcome = {state: 'failed', error: err.message};
     } finally {
       if (timer) clearInterval(timer);
       this.sample(act);
-      if (act.reason) await killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs}).catch(() => undefined); // includes the leased worker
-      else this.reg.release(act.owner, 'host-lease'); // a worker that is still healthy keeps running for the next job
-      await killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs}).catch(() => undefined); // leftovers (ffmpeg, browsers)
+      await act.stopping;
+      if (act.reason) await killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs, why: `job ${job.id} ${act.reason === 'memory' ? 'stopped by the memory guard' : 'cancelled'}`}).catch(() => undefined); // includes the leased worker
+      else releaseLeased(this.reg, act.owner); // a worker that is still healthy keeps running for the next job, and so do its helper processes
+      await killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs, why: `job ${job.id} finished: stopping its leftovers`}).catch(() => undefined); // leftovers (ffmpeg, browsers)
       this.reg.release(act.owner);
       rmSync(ws, {recursive: true, force: true});
     }
@@ -262,7 +266,7 @@ export class JobRunner {
         if (TERMINAL.has(cur.state) && cur.state !== 'failed') return;
         this.p.db.prepare('UPDATE jobs SET state=?, error=?, finished_at=? WHERE id=?').run(outcome!.state, outcome!.error ?? null, outcome!.state === 'queued' ? null : this.p.now(), job.id);
         this.setAttempt(act, outcome!.state === 'queued' ? 'failed' : outcome!.state, outcome!.error);
-        this.event(job.id, act.attemptId, outcome!.state === 'queued' ? 'auto-retry' : outcome!.state, {error: outcome!.error ?? null});
+        this.event(job.id, act.attemptId, outcome!.state === 'queued' ? 'auto-retry' : outcome!.state, {error: outcome!.error ?? null, ...(outcome!.diagnostics ? {diagnostics: outcome!.diagnostics} : {})});
       });
     }
   }
@@ -277,6 +281,10 @@ export class JobRunner {
     this.event(act.job.id, act.attemptId, 'progress', {step: u.step, fraction: u.fraction ?? null, detail: u.detail ?? null});
   }
 
+  private safeMemory(): {pressure: number; swapUsedMb: number | null} | null {
+    try { return this.o.memory?.() ?? null; } catch { return null; }
+  }
+
   /** Record owned processes and their memory; stop the job if pressure stays critical. */
   private sample(act: Active): void {
     try { act.peakRss = Math.max(act.peakRss, ownedRssBytes(this.reg, act.owner)); } catch { /* inspection unavailable: peak simply not updated */ }
@@ -288,7 +296,7 @@ export class JobRunner {
       act.reason = 'memory';
       act.memoryMessage = `memory pressure stayed critical for ${act.critical} consecutive samples; the job was stopped`;
       act.ctl.abort();
-      void killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs});
+      act.stopping = killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs, why: `job ${act.job.id} stopped by the memory guard`}).catch(() => undefined); // awaited when the attempt ends, so nothing outlives it
     }
   }
 
@@ -315,7 +323,7 @@ export class JobRunner {
       this.event(jobId, act.attemptId, 'cancelling', {});
     });
     act.ctl.abort();
-    act.cancelKill = await killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs, handles: []});
+    act.cancelKill = await killOwned(this.reg, act.owner, {graceMs: this.o.killGraceMs, handles: [], why: `job ${jobId} cancelled`});
     await act.done;
     return this.row(jobId);
   }

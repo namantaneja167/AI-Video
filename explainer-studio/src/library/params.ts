@@ -27,4 +27,46 @@ export const DenseFixtureParams = z.object({
   cards: z.array(z.object({label: z.string().min(1).max(24), value: z.string().min(1).max(16)})).min(4).max(24),
 });
 
-export const PIP_SCENE_TYPES = ['pip-scene-10x', 'context-window', 'pip-dense-fixture'] as const;
+// ---- pip-cards: the reusable Pip scene. Content is the author's (cards of text); everything Pip does is a listed action. ----
+/** Where in the scene something happens: a line of the scene (position, from 0) and optionally a spoken word in it. */
+export const PipAt = z.object({
+  segment: z.number().int().min(0).max(40),
+  word: z.union([z.string().min(1).max(40), z.number().int().min(0).max(80)]).optional(),
+  edge: z.enum(['start', 'end']).optional(),
+}).strict();
+export const PIP_ACTIONS = ['point', 'look', 'nod', 'hop', 'smile'] as const;
+export type PipAction = (typeof PIP_ACTIONS)[number];
+/** What each action needs and does, in the words the controls and the checks use. */
+export const PIP_ACTION_INFO: Record<PipAction, {label: string; needsCard: boolean; help: string}> = {
+  point: {label: 'Point at a card', needsCard: true, help: 'Raises his hand and points at the card; he looks at it too'},
+  look: {label: 'Look at a card', needsCard: true, help: 'Turns his gaze to the card and keeps it there'},
+  nod: {label: 'Nod', needsCard: false, help: 'A small nod'},
+  hop: {label: 'Hop', needsCard: false, help: 'A small hop of excitement'},
+  smile: {label: 'Smile', needsCard: false, help: 'A broader smile for a moment'},
+};
+
+export const PipCardsParams = z.object({
+  title: z.string().min(1).max(60).optional(),
+  cards: z.array(z.object({
+    heading: z.string().min(1).max(36),
+    body: z.string().max(110).default(''),
+    /** When the card appears; absent = at the start of the scene line with the card's own position. */
+    at: PipAt.optional(),
+  }).strict()).min(1).max(4),
+  actions: z.array(z.object({
+    do: z.enum(PIP_ACTIONS),
+    at: PipAt,
+    /** The card pointed or looked at (position, from 0). */
+    card: z.number().int().min(0).max(3).optional(),
+  }).strict()).max(8).default([]),
+  /** Pip breathes and sways a little while nothing else happens. */
+  idle: z.boolean().default(true),
+}).strict().superRefine((p, ctx) => {
+  p.actions.forEach((a, i) => {
+    if (PIP_ACTION_INFO[a.do].needsCard && a.card === undefined) ctx.addIssue({code: 'custom', path: ['actions', i, 'card'], message: `"${a.do}" needs the card it is aimed at`});
+    if (a.card !== undefined && a.card >= p.cards.length) ctx.addIssue({code: 'custom', path: ['actions', i, 'card'], message: `there is no card ${a.card + 1}; the scene has ${p.cards.length}`});
+    if (!PIP_ACTION_INFO[a.do].needsCard && a.card !== undefined) ctx.addIssue({code: 'custom', path: ['actions', i, 'card'], message: `"${a.do}" is not aimed at a card`});
+  });
+});
+
+export const PIP_SCENE_TYPES = ['pip-scene-10x', 'context-window', 'pip-dense-fixture', 'pip-cards'] as const;

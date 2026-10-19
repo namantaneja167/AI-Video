@@ -182,6 +182,24 @@ Acceptance:
 * Imported items stay Proposed until approved; provenance (source, date, hash) is stored.
 * No network request is made during import (checked with networking blocked).
 
+## Phase 5B · Scenes: from an accepted storyboard to scenes in the episode (S-M, scheduled before Phase 6)
+
+Why it is scheduled here: the original journey is Idea, Research, Script, Storyboard, Voice, **Scenes**, Review, Render, Export. Phase 5 stopped at the storyboard and Phase 6 starts with voice, so nothing yet carried an accepted storyboard into the episode's own scenes. This phase closes that link and stops there; it adds no voice, review, render or export work.
+
+Deliver: a previewed, conflict-checked "apply storyboard" (`episodeScenesFromPlan` through the normal validated save and revision path); a Scenes step with validated controls for registered scene types and raw JSON as an advanced option; one bounded reusable Pip scene (`pip-cards`, built from the approved Pip parts) so a genuinely reusable Pip scene exists; a composition preview clearly labelled as an estimate; the production preflight reading the episode's own scenes.
+
+Acceptance:
+
+* Applying shows a preview of what would change; only a complete, valid plan applies; missing narration, invalid parameters, unsupported or custom types and missing cue words are each reported by scene.
+* The apply is one revision on the normal save path with the sequence check; a stale plan or episode refuses it and changes nothing; existing scene work is replaced only after an explicit yes, and the earlier version is a revision of its own.
+* Pip-action and "what is shown" prose stays a labelled planning note; Pip does only the supported actions the author sets as parameters; cues must name words that are spoken.
+* The rejected table-lab look is not the default for new Pip episodes (the dark legacy scene types are unsupported in a Pip-style episode).
+* Applying invalidates only the outputs that depend on what changed (a card's text or layout: the video; a cue that moves: timing, and with sound events the mix, and the video); narration is kept where its inputs are unchanged.
+* With no narration or timing the preview is an estimate on a made-up clock, says so, has no audio and is never offered as a build.
+* A separate draft goes from accepted script to valid storyboard to applied scenes to a clean production preflight, with no narration or render made; the approved baseline is unchanged and recoverable.
+
+Out of scope and deferred: optimizing the render-source hash (it stays conservative, so any `src/**` or `package.json` change marks the baseline's final video as needing a rebuild); per-episode sound events (done at the start of Phase 6); new scene types beyond `pip-cards`; any 3D work.
+
 ## Phase 6 · Voice stage (M)
 
 Acceptance:
@@ -191,6 +209,10 @@ Acceptance:
 * The displayed estimate is within 30% of the measured time on a test block.
 * The voice screen's engine state always matches the job state (a job cannot show "generating" while the engine shows "unloaded"); tested against the job table.
 * Listening check on a real multi-block episode for seams, recorded as a judgement.
+
+### Phase 6 result
+
+Implemented; the automated checks and one bounded real narration run are reported in [12 Phase 6: Voice](12-phase6-voice.md). **Your review is pending**; no listening judgement or approval is recorded. Added to this phase as its first step, because Phase 5B left it open: sound settings (sound events and mix settings) now belong to each episode, so a new episode starts without the context-window accents and changing one episode's sound cannot change another's. Not done, and not part of this phase: Phase 7 work, publishing, packaging, any 3D work, any change to Pip's character or voice reference.
 
 ## Phase 7 · Review, final render, approval, export (L)
 
@@ -206,9 +228,49 @@ Acceptance (each check has a fixture that must fail and one that must pass):
 * **Manual review:** approval cannot be recorded until the four manual items are ticked and the final file's playback ranges cover the whole file; the UI states these are recorded actions, not verification.
 * **Custom scenes:** a Tier 3 scene without its own checks is reported as generic-checks-only.
 
+### Phase 7 result
+
+Implemented; the automated checks (698 fast tests, 54 slow tests, see [13 Phase 7](13-phase7-review.md)) and one real draft-to-final
+demonstration are reported there. **Your review and approval are pending**: the demonstration's final video was checked by the app
+(22 pass, 2 warnings, 0 fail, 2 not examined; loudness measured at -16.1 LUFS) and left unreviewed, with no sign-off ticked, no playback
+recorded, no approval and no export. Approval and export were exercised only in isolated test projects with simulated sign-offs. One real
+defect was found and fixed on the way (a spoken-text edit kept the old caption line breaks). Not done, and not part of this phase: Phase 8,
+packaging, publishing, 3D work, external tools.
+
 ## Phase 8 · Hardening (M)
 
 Acceptance: full regression suite passes from a clean checkout; backup then restore on a fresh machine path reproduces a project; performance targets set from the first real measurements; empty states and shortcuts; Remotion licence position recorded.
+
+### Phase 8 result
+
+Implemented and technically verified as recorded in [14 Phase 8](14-phase8-hardening.md); **nothing in it is human-approved**. A separate persistent
+project route replaced the demo-only restriction (`./studio-app new` and `open`; the checkout is refused); a whole journey was run on a new project
+with the real tools and again from a clean source snapshot with freshly installed dependencies; backup and restore were verified on both real
+projects and in isolated projects; bundled fonts are the default for new episodes; the production checks, recovery and the app were hardened where the
+journey and the audit found real faults (listed in the document, including two checks that failed a correct video and a backup that dropped saved
+narration takes). The Remotion licence position is recorded from the official text without deciding it. Acceptance items: "full regression suite
+passes from a clean checkout" (see the document's final regression), "backup then restore on a fresh machine path reproduces a project"
+(verified), "performance targets set from the first real measurements" (measured and stated as expectations, not promises), "empty states and
+shortcuts" (done and tested), "Remotion licence position recorded" (recorded). Not done, by instruction: packaging, publishing, 3D, external
+tools, adoption of the real checkout.
+
+## Future milestone: more than one production tool (not started, planning only)
+
+Direction recorded in Phase 6 and nothing built for it: one Pip studio, one channel identity, with more than one production tool available per episode or per scene. "Multiple tools" means the choices of how a scene is produced; it does not mean running several heavy jobs at once. Narration, alignment, mastering, generation and rendering stay one at a time on the Mac.
+
+Order, once the core workflow (Phases 7 and 8) is done and not before:
+
+1. **Remotion stays the default** production tool for every episode and scene.
+2. **Evaluate HyperFrames first.** Then evaluate selected Lemo-Opuscar workflows. Any other tool is a candidate only. Each tool is judged on licence, cost and compatibility (with the Mac, with the pinned dependencies, with the Pip assets) before anything is installed. No tool is installed, no renderer is migrated and no framework is designed ahead of that evaluation.
+
+Requirements to carry into that evaluation:
+
+* **Shared identity.** Every tool uses the same Pip assets, the same approved narration, the same palette and typography, the same captions and the same sound identity. A tool that cannot honour them does not qualify for a Pip episode.
+* **Handoff brief.** Each scene given to a tool carries its objective, its narration, its duration and its visual beats, so the tool is given a brief and not the whole project.
+* **Imported clips.** A clip a tool makes is imported with its provenance (tool, version, settings, who made it, when) and the hashes of the inputs it depends on. Freshness is tracked the same way as for built outputs: when the narration, duration or brief it was made from changes, the clip is out of date and says so.
+* **One owner per layer.** Narration, captions and sound each have exactly one owner in a given scene, so nothing is duplicated (for example captions burned into a clip and drawn again by the studio, or narration inside a clip and laid under it again).
+* **Common review and export.** The review checks and the export step are the same whichever tool made a scene. A scene a tool cannot be checked on is reported as only partly checked, as custom scenes are now.
+* **Visible provenance.** The studio shows which tool produced each scene and which parts remain editable in the studio and which can only be changed by making the clip again.
 
 ## Dependencies
 

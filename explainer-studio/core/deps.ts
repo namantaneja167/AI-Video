@@ -8,6 +8,7 @@
 // force a remix. Upstream blob hashes are included so that swapping a take, or regenerating timing, stales
 // everything built on the old output even when the text is unchanged.
 import type {EpisodeV2} from '../src/schema2.ts';
+import {hasDynamicCues, sceneCueSpec} from '../src/library/dynamicCues.ts';
 import {hashJson} from './hash.ts';
 
 export const COMPONENT_NAMES = [
@@ -84,6 +85,9 @@ export function computeExpected(doc: EpisodeV2, c: ComponentHashes, up: Upstream
     aligner: c.aligner,
     manual: c.manualTiming,
     logic: c.timelineLogic,
+    // Scene boundaries and cue times come out of the timing job. For scenes whose cues come from their own parameters that is
+    // a function of the document, so it is hashed (added only then: recorded timings of fixed-cue episodes keep their hashes).
+    ...(hasDynamicCues(doc.scenes) ? {sceneTiming: doc.scenes.map((s) => ({id: s.id, type: s.type, segments: s.segments, cues: sceneCueSpec(s) ?? null}))} : {}),
   });
 
   // Accents are placed on scene cues, which come from the timing: with any accent the mix depends on the timing output.

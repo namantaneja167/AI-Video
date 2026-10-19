@@ -1,0 +1,254 @@
+{
+  "ranAt": "2026-10-19T09:05:51.262Z",
+  "project": "(real project, path not recorded)",
+  "steps": [
+    {
+      "what": "a backup was made by the running app and verified",
+      "ok": true,
+      "detail": {
+        "seconds": 0.128,
+        "files": 4,
+        "blobs": 163,
+        "bytes": 35373389
+      }
+    },
+    {
+      "what": "restored into a fresh path",
+      "ok": true,
+      "detail": {
+        "seconds": 0.117,
+        "missingBlobs": [],
+        "interruptedJobs": []
+      }
+    },
+    {
+      "what": "the same episodes are listed",
+      "ok": true,
+      "detail": [
+        "voice-demo-prompts",
+        "tokens-in-pieces",
+        "what-is-a-token",
+        "context-window"
+      ]
+    },
+    {
+      "what": "every episode compares equal between the original and the restored copy",
+      "ok": true,
+      "detail": [
+        {
+          "id": "voice-demo-prompts",
+          "document": true,
+          "revisions": 4,
+          "videos": 6,
+          "notes": true,
+          "approval": true,
+          "videoBytesMatchTheirHash": true,
+          "selectedTakes": [
+            [
+              "b1",
+              "fresh",
+              [
+                2
+              ]
+            ],
+            [
+              "b2",
+              "fresh",
+              [
+                1
+              ]
+            ]
+          ],
+          "takeAudioBytesEqual": true
+        },
+        {
+          "id": "tokens-in-pieces",
+          "document": true,
+          "revisions": 2,
+          "videos": 0,
+          "notes": true,
+          "approval": true,
+          "videoBytesMatchTheirHash": "no videos",
+          "selectedTakes": [
+            [
+              "b1",
+              "none",
+              []
+            ]
+          ],
+          "takeAudioBytesEqual": "no takes"
+        },
+        {
+          "id": "what-is-a-token",
+          "document": true,
+          "revisions": 1,
+          "videos": 0,
+          "notes": true,
+          "approval": true,
+          "videoBytesMatchTheirHash": "no videos",
+          "selectedTakes": [
+            [
+              "b1",
+              "none",
+              []
+            ]
+          ],
+          "takeAudioBytesEqual": "no takes"
+        },
+        {
+          "id": "context-window",
+          "document": true,
+          "revisions": 6,
+          "videos": 4,
+          "notes": true,
+          "approval": true,
+          "videoBytesMatchTheirHash": true,
+          "selectedTakes": [
+            [
+              "b1",
+              "fresh",
+              [
+                3
+              ]
+            ],
+            [
+              "b2",
+              "fresh",
+              [
+                1
+              ]
+            ]
+          ],
+          "takeAudioBytesEqual": true
+        }
+      ]
+    },
+    {
+      "what": "the restored app reports its own new location, not the original",
+      "ok": true
+    },
+    {
+      "what": "every damaged copy of the backup is refused and leaves nothing behind",
+      "ok": true,
+      "detail": {
+        "one-changed-byte": "refused: backup is damaged or incomplete:",
+        "a-missing-file": "refused: backup is damaged or incomplete:",
+        "no-manifest": "refused: backup is damaged or incomplete:",
+        "truncated-database": "refused: backup is damaged or incomplete:"
+      }
+    },
+    {
+      "what": "restoring into a folder that has files in it is refused",
+      "ok": true,
+      "detail": "refused: /var/folders/lz/slwgcy0j36186s3p540p9j340000gn/T/studio-relocated-hqZr1O/busy is"
+    },
+    {
+      "what": "the original backup is still intact",
+      "ok": true
+    }
+  ],
+  "backup": {
+    "name": "backup-2026-10-19T09-05-51",
+    "bytes": 35373389,
+    "blobs": 163
+  },
+  "restoreReport": {
+    "missingBlobs": [],
+    "interruptedJobs": []
+  },
+  "episodes": [
+    {
+      "id": "voice-demo-prompts",
+      "document": true,
+      "revisions": 4,
+      "videos": 6,
+      "notes": true,
+      "approval": true,
+      "videoBytesMatchTheirHash": true,
+      "selectedTakes": [
+        [
+          "b1",
+          "fresh",
+          [
+            2
+          ]
+        ],
+        [
+          "b2",
+          "fresh",
+          [
+            1
+          ]
+        ]
+      ],
+      "takeAudioBytesEqual": true
+    },
+    {
+      "id": "tokens-in-pieces",
+      "document": true,
+      "revisions": 2,
+      "videos": 0,
+      "notes": true,
+      "approval": true,
+      "videoBytesMatchTheirHash": "no videos",
+      "selectedTakes": [
+        [
+          "b1",
+          "none",
+          []
+        ]
+      ],
+      "takeAudioBytesEqual": "no takes"
+    },
+    {
+      "id": "what-is-a-token",
+      "document": true,
+      "revisions": 1,
+      "videos": 0,
+      "notes": true,
+      "approval": true,
+      "videoBytesMatchTheirHash": "no videos",
+      "selectedTakes": [
+        [
+          "b1",
+          "none",
+          []
+        ]
+      ],
+      "takeAudioBytesEqual": "no takes"
+    },
+    {
+      "id": "context-window",
+      "document": true,
+      "revisions": 6,
+      "videos": 4,
+      "notes": true,
+      "approval": true,
+      "videoBytesMatchTheirHash": true,
+      "selectedTakes": [
+        [
+          "b1",
+          "fresh",
+          [
+            3
+          ]
+        ],
+        [
+          "b2",
+          "fresh",
+          [
+            1
+          ]
+        ]
+      ],
+      "takeAudioBytesEqual": true
+    }
+  ],
+  "restoredWorksAsAProject": true,
+  "damagedBackups": {
+    "one-changed-byte": "refused: backup is damaged or incomplete:",
+    "a-missing-file": "refused: backup is damaged or incomplete:",
+    "no-manifest": "refused: backup is damaged or incomplete:",
+    "truncated-database": "refused: backup is damaged or incomplete:"
+  }
+}

@@ -88,8 +88,46 @@ CREATE TABLE job_events(
 CREATE INDEX job_events_job ON job_events(job_id, id);
 `;
 
+// Phase 5: the planning workspace (brief, research, storyboard) and the record of every ChatGPT result pasted or opened.
+// None of it is part of an episode document, so planning edits never change what the build depends on.
+const DDL_V3 = `
+CREATE TABLE plans(
+  id TEXT PRIMARY KEY, doc_json TEXT NOT NULL, doc_hash TEXT NOT NULL, seq INTEGER NOT NULL,
+  created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);
+CREATE TABLE plan_revisions(
+  plan_id TEXT NOT NULL REFERENCES plans(id), number INTEGER NOT NULL, kind TEXT NOT NULL, label TEXT,
+  doc_hash TEXT NOT NULL, doc_json TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(plan_id, number));
+CREATE TABLE imports(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, plan_id TEXT NOT NULL REFERENCES plans(id), created_at INTEGER NOT NULL,
+  via TEXT NOT NULL, source_name TEXT, shape TEXT NOT NULL, sha256 TEXT NOT NULL, content TEXT NOT NULL,
+  proposal_json TEXT NOT NULL, state TEXT NOT NULL DEFAULT 'proposed', resolved_at INTEGER, result_json TEXT);
+CREATE INDEX imports_plan ON imports(plan_id, id);
+`;
+
+// Phase 7: review rounds (one per video that is reviewed), what was played and ticked against that exact file, the author's
+// confirmation of intentional caption/speech differences, what approval rested on, and exports. Review notes stay in the episode document.
+const DDL_V4 = `
+CREATE TABLE review_rounds(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, episode_id TEXT NOT NULL, number INTEGER NOT NULL,
+  render_artifact_id INTEGER NOT NULL REFERENCES artifacts(id), kind TEXT NOT NULL, file_sha256 TEXT NOT NULL,
+  opened_at INTEGER NOT NULL, closed_at INTEGER, UNIQUE(episode_id, number), UNIQUE(render_artifact_id));
+CREATE TABLE review_playback(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, round_id INTEGER NOT NULL REFERENCES review_rounds(id), from_ms INTEGER NOT NULL, to_ms INTEGER NOT NULL,
+  heard INTEGER NOT NULL, phone INTEGER NOT NULL, at INTEGER NOT NULL);
+CREATE INDEX review_playback_round ON review_playback(round_id);
+CREATE TABLE review_signoffs(
+  round_id INTEGER NOT NULL REFERENCES review_rounds(id), item TEXT NOT NULL, ticked INTEGER NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(round_id, item));
+CREATE TABLE caption_confirmations(
+  episode_id TEXT NOT NULL, segment_id TEXT NOT NULL, diff_hash TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY(episode_id, segment_id, diff_hash));
+CREATE TABLE approval_review(
+  approval_id INTEGER PRIMARY KEY REFERENCES approvals(id), round_id INTEGER NOT NULL, checks_artifact_id INTEGER, coverage_json TEXT NOT NULL, detail_json TEXT NOT NULL);
+CREATE TABLE exports(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, episode_id TEXT NOT NULL, approval_id INTEGER NOT NULL REFERENCES approvals(id), dir TEXT NOT NULL,
+  file_sha256 TEXT NOT NULL, files_json TEXT NOT NULL, exported_at INTEGER NOT NULL);
+`;
+
 /** Forward-only migrations, index = version - 1. Each runs in a transaction after a database copy is taken. */
-export const MIGRATIONS: string[] = [DDL_V1, DDL_V2];
+export const MIGRATIONS: string[] = [DDL_V1, DDL_V2, DDL_V3, DDL_V4];
 export const SCHEMA_VERSION = MIGRATIONS.length;
 
 export function openDb(path: string): DatabaseSync {

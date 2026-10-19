@@ -35,6 +35,9 @@ export function snapshotProcs(ps: PsFn = realPs): Map<number, ProcInfo> {
   return m;
 }
 
+/** A process that has died but whose parent has not collected it yet: it still shows in the table, cannot be signalled, and is gone for every purpose here. */
+export const isZombie = (p: ProcInfo): boolean => /<defunct>\s*$/.test(p.command);
+
 export function descendantsOf(procs: Map<number, ProcInfo>, roots: number[]): number[] {
   const out = new Set<number>();
   const queue = [...roots];
@@ -48,10 +51,14 @@ export function descendantsOf(procs: Map<number, ProcInfo>, roots: number[]): nu
 export type Owned = {pid: number; start: string; role: string};
 type Row = {owner: string; pid: number; start: string; role: string};
 
+export type SignalRecord = {pid: number; start: string; owner: string; signal: string; at: number; reason: string};
+
 export class OwnerRegistry {
   db: DatabaseSync;
   now: () => number;
   ps: PsFn;
+  /** Every signal this process sent to an owned process, so a worker's death can be explained as ours or not ours. */
+  signals: SignalRecord[] = [];
   constructor(db: DatabaseSync, now: () => number = Date.now, ps: PsFn = realPs) {
     this.db = db;
     this.now = now;
@@ -65,6 +72,10 @@ export class OwnerRegistry {
   }
   liveAll(): Row[] {
     return all<Row>(this.db.prepare('SELECT owner, pid, start, role FROM job_procs WHERE gone_at IS NULL'));
+  }
+  logSignal(r: SignalRecord): void {
+    this.signals.push(r);
+    if (this.signals.length > 500) this.signals.splice(0, this.signals.length - 500);
   }
   markGone(pid: number, start: string): void {
     this.db.prepare('UPDATE job_procs SET gone_at=? WHERE pid=? AND start=? AND gone_at IS NULL').run(this.now(), pid, start);
@@ -108,8 +119,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * immediately before each signal. SIGTERM first, SIGKILL after the grace period. Never touches other processes.
  * `handles` are child processes we hold; they are used only if the process table cannot be read.
  */
-export async function killOwned(reg: OwnerRegistry, owner: string, opts: {graceMs?: number; handles?: ChildProcess[]} = {}): Promise<KillResult> {
+export async function killOwned(reg: OwnerRegistry, owner: string, opts: {graceMs?: number; handles?: ChildProcess[]; why?: string} = {}): Promise<KillResult> {
   const grace = opts.graceMs ?? 1500;
+  const why = opts.why ?? 'stopping what this owner started';
   const signalled = new Set<number>();
   const verifiedNow = (): {verified: Owned[]; procs: Map<number, ProcInfo>} => {
     const procs = snapshotProcs(reg.ps);
@@ -117,12 +129,12 @@ export async function killOwned(reg: OwnerRegistry, owner: string, opts: {graceM
     const verified: Owned[] = [];
     for (const r of rows) {
       const cur = procs.get(r.pid);
-      if (cur && cur.start === r.start) verified.push({pid: r.pid, start: r.start, role: r.role});
-      else reg.markGone(r.pid, r.start); // gone, or the pid now belongs to something else: not ours any more
+      if (cur && cur.start === r.start && !isZombie(cur)) verified.push({pid: r.pid, start: r.start, role: r.role});
+      else reg.markGone(r.pid, r.start); // gone (or dead and waiting to be collected), or the pid now belongs to something else: not ours any more
     }
     for (const pid of descendantsOf(procs, verified.map((v) => v.pid))) {
       const cur = procs.get(pid)!;
-      if (!verified.some((v) => v.pid === pid)) {
+      if (!verified.some((v) => v.pid === pid) && !isZombie(cur)) {
         reg.record(owner, pid, cur.start, 'descendant');
         verified.push({pid, start: cur.start, role: 'descendant'});
       }
@@ -131,7 +143,7 @@ export async function killOwned(reg: OwnerRegistry, owner: string, opts: {graceM
   };
   const signal = (o: Owned, sig: NodeJS.Signals, procs: Map<number, ProcInfo>) => {
     if (procs.get(o.pid)?.start !== o.start) return; // identity re-checked against the latest table
-    try { process.kill(o.pid, sig); signalled.add(o.pid); } catch { /* already gone */ }
+    try { process.kill(o.pid, sig); signalled.add(o.pid); reg.logSignal({pid: o.pid, start: o.start, owner, signal: sig, at: Date.now(), reason: why}); } catch { /* already gone */ }
   };
 
   try {
@@ -162,6 +174,20 @@ export async function killOwned(reg: OwnerRegistry, owner: string, opts: {graceM
   }
 }
 
+/**
+ * End an attempt's claim on a worker it only borrowed: the lease itself and the helper processes that worker started
+ * (they were recorded under the attempt while it sampled memory). Nothing is signalled; the worker stays up for the next job.
+ */
+export function releaseLeased(reg: OwnerRegistry, owner: string): void {
+  const rows = reg.live(owner);
+  const leased = rows.filter((r) => r.role === 'host-lease');
+  if (!leased.length) return;
+  let below = new Set<number>();
+  try { below = new Set(descendantsOf(snapshotProcs(reg.ps), leased.map((l) => l.pid))); } catch { /* cannot inspect: the lease alone is released */ }
+  const stmt = reg.db.prepare('UPDATE job_procs SET gone_at=? WHERE owner=? AND pid=? AND start=? AND gone_at IS NULL');
+  for (const r of rows) if (r.role === 'host-lease' || (r.role === 'descendant' && below.has(r.pid))) stmt.run(reg.now(), owner, r.pid, r.start);
+}
+
 const sleepSync = (ms: number) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
 export type ReapResult = {reaped: number[]; survivors: Owned[]; inspection: 'ok' | 'unavailable' | 'not-needed'};
@@ -178,13 +204,14 @@ export function reapAllSync(reg: OwnerRegistry, graceMs = 1500): ReapResult {
   try { procs = snapshotProcs(reg.ps); } catch { return {reaped: [], survivors: rows.map((r) => ({pid: r.pid, start: r.start, role: r.role})), inspection: 'unavailable'}; }
   const targets = new Map<number, string>();
   for (const r of rows) {
-    if (procs.get(r.pid)?.start === r.start) targets.set(r.pid, r.start);
+    const cur = procs.get(r.pid);
+    if (cur?.start === r.start && !isZombie(cur)) targets.set(r.pid, r.start);
     else reg.markGone(r.pid, r.start);
   }
-  for (const pid of descendantsOf(procs, [...targets.keys()])) targets.set(pid, procs.get(pid)!.start);
+  for (const pid of descendantsOf(procs, [...targets.keys()])) if (!isZombie(procs.get(pid)!)) targets.set(pid, procs.get(pid)!.start);
   const alive = () => {
     const now = snapshotProcs(reg.ps);
-    return [...targets].filter(([pid, start]) => now.get(pid)?.start === start);
+    return [...targets].filter(([pid, start]) => now.get(pid)?.start === start && !isZombie(now.get(pid)!));
   };
   const send = (sig: NodeJS.Signals) => { for (const [pid] of alive()) { try { process.kill(pid, sig); } catch { /* gone */ } } };
   send('SIGTERM');
@@ -194,6 +221,12 @@ export function reapAllSync(reg: OwnerRegistry, graceMs = 1500): ReapResult {
   const left = new Set(alive().map(([pid]) => pid));
   for (const [pid, start] of targets) if (!left.has(pid)) reg.markGone(pid, start);
   return {reaped: [...targets.keys()].filter((p) => !left.has(p)), survivors: [...left].map((pid) => ({pid, start: targets.get(pid)!, role: 'orphan'})), inspection: 'ok'};
+}
+
+/** Is anything `owner` owns still alive (identity-verified, zombies excluded)? Throws ProcInspectionError if the table cannot be read. */
+export function ownedAlive(reg: OwnerRegistry, owner: string): boolean {
+  const procs = snapshotProcs(reg.ps);
+  return reg.live(owner).some((r) => { const c = procs.get(r.pid); return !!c && c.start === r.start && !isZombie(c); });
 }
 
 /** Sum of resident memory of everything `owner` owns (identity-verified) plus descendants; records new descendants. */

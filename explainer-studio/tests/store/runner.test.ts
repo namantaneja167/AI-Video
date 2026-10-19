@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import {spawn, type ChildProcess} from 'node:child_process';
-import {existsSync, readdirSync} from 'node:fs';
+import {execFileSync, spawn, type ChildProcess} from 'node:child_process';
+import {existsSync, readFileSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {afterEach, describe, test} from 'node:test';
 import {putBytes} from '../../core/blobs.ts';
@@ -25,7 +25,11 @@ afterEach(async () => {
 });
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const alive = (pid: number) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+// A process that has died but whose parent has not collected it yet (a zombie) still answers signal 0; it is dead.
+const alive = (pid: number) => {
+  try { process.kill(pid, 0); } catch { return false; }
+  try { return !/^Z/.test(execFileSync('ps', ['-o', 'stat=', '-p', String(pid)], {encoding: 'utf8'}).trim()); } catch { return false; }
+};
 async function until(cond: () => boolean, ms = 5000, what = 'condition') {
   const t0 = Date.now();
   while (!cond()) { if (Date.now() - t0 > ms) throw new Error(`timed out waiting for ${what}`); await sleep(25); }
@@ -407,18 +411,65 @@ describe('model host: unload and confirm before rendering', () => {
   };
   const handovers = (jobId: number) => events(t!.p, jobId).filter((e) => e.kind === 'handover').map((e) => e.data);
 
-  test('the model is unloaded and its release CONFIRMED (memory measured before and after) before the render handler starts', {skip: !procInspectable && 'process inspection unavailable'}, async () => {
-    const {r, host, log} = await mk();
-    const rssLoaded = host.worker!.rssBytes()!;
-    assert.ok(rssLoaded > 350 * MB, `model memory is really resident (${(rssLoaded / MB).toFixed(0)} MiB)`);
+  // The release guarantee is decided from two things: what the worker reports holding, and its resident size. The OS's resident
+  // size is not a stable measure of what a process holds: macOS compresses and swaps idle pages, so a worker holding 400 MB can read
+  // 330 MB while the machine is swapping. These tests therefore model the resident size in the process table from what the fake
+  // worker really holds (it publishes that to a file), which exercises the decision logic exactly and does not depend on paging.
+  function modelledPs(real: PsFn, stateFile: string): PsFn {
+    return () => {
+      const out = real();
+      let st: {pid: number; held_bytes: number};
+      try { st = JSON.parse(readFileSync(stateFile, 'utf8')); } catch { return out; }
+      const kb = 8 * 1024 + Math.round(st.held_bytes / 1024); // a bare interpreter plus what it holds
+      return out.split('\n').map((l) => l.replace(new RegExp(`^(\\s*${st.pid}\\s+\\d+\\s+\\d+\\s+)\\d+(\\s)`), `$1${kb}$2`)).join('\n');
+    };
+  }
+  const mkModelled = async (env: NodeJS.ProcessEnv = {}, log: Record<string, unknown> = {}) => {
+    t = newProject();
+    adoptEpisode(t.p, 'episodes/join-fanout/episode.json');
+    setAllComponents(t.p, t.root);
+    const stateFile = join(t.root, 'fake-worker-state.json');
+    const reg = new OwnerRegistry(t.p.db, t.p.now, modelledPs(new OwnerRegistry(t.p.db).ps, stateFile));
+    const host = hostFor({reg}, {...env, FAKE_STATE_FILE: stateFile}, {rssThresholdBytes: 150 * MB, residualBytes: 16 * MB, unloadTimeoutMs: 1500, killGraceMs: 500});
+    await host.ensureModel('tts', {hold_mb: 400});
+    const r = new JobRunner(t.p, {pollMs: 80, host, reg, killGraceMs: 500, releaseBefore: (k) => k.startsWith('render.'), handlers: {'render.draft': renderProbe(log), 'tts.block': quick}});
+    runners.push(r);
+    return {r, host, log};
+  };
+
+  test('the model is unloaded and its release CONFIRMED (what it reports, and its resident size, before and after) before the render handler starts', async () => {
+    const {r, host, log} = await mkModelled();
+    assert.ok(host.worker!.rssBytes()! >= 400 * MB, 'the worker holding the model reads as large');
     const id = r.enqueue({episodeId: 'join-fanout', jobKind: 'render.draft'});
     assert.equal((await r.waitFor(id)).state, 'succeeded');
     const [h] = handovers(id);
     assert.equal(h.outcome, 'released');
-    assert.ok(h.rssBeforeBytes > 350 * MB && h.rssAfterBytes < 150 * MB, `rss ${h.rssBeforeBytes} -> ${h.rssAfterBytes}`);
-    assert.equal(h.ack.activeBytes, 0);
+    assert.equal(h.mlxBeforeBytes, 400 * MB, 'before: the worker itself reported holding the model');
+    assert.ok(h.rssBeforeBytes >= 400 * MB, `before: resident size ${h.rssBeforeBytes}`);
+    assert.equal(h.ack.activeBytes, 0, 'after: the worker reports nothing held');
+    assert.ok(h.rssAfterBytes < 150 * MB, `after: resident size ${h.rssAfterBytes}`);
     assert.equal(log.loadedAtStart, null);
     assert.ok((log.rssAtStart as number) < 150 * MB, 'at render start the worker holds almost nothing');
+  });
+
+  test('a worker that reports nothing held but still holds the memory is caught by its resident size, killed, and only then does the render start', async () => {
+    const {r, host, log} = await mkModelled({FAKE_LIE_UNLOAD: '1'});
+    const pid = host.worker!.pid!;
+    const id = r.enqueue({episodeId: 'join-fanout', jobKind: 'render.draft'});
+    assert.equal((await r.waitFor(id)).state, 'succeeded');
+    const [h] = handovers(id);
+    assert.equal(h.ack.activeBytes, 0, 'it claimed to have released everything');
+    assert.ok(h.rssAfterBytes >= 400 * MB, `its resident size said otherwise (${h.rssAfterBytes})`);
+    assert.equal(h.outcome, 'killed');
+    assert.match(h.detail, /still holds \d+ MiB after unload/);
+    assert.equal(alive(pid), false);
+    assert.equal(log.workerAliveAtStart, false, 'the render did not start until it was gone');
+  });
+
+  test('the real process table can be read for a worker (the measurement exists; its value is not asserted, because paging changes it)', {skip: !procInspectable && 'process inspection unavailable'}, async () => {
+    const {host} = await mk();
+    const rss = host.worker!.rssBytes();
+    assert.ok(rss !== null && rss > 0, `resident size read as ${rss}`);
   });
 
   test('a worker that acknowledges but keeps its memory is killed, its exit confirmed, and only then does the render start', {skip: !procInspectable && 'process inspection unavailable'}, async () => {

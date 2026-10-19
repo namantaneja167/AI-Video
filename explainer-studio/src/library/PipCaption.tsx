@@ -29,7 +29,7 @@ export const PipCaption: React.FC<{cap: TlCaption; opacity: number; lift: number
   const emph = (i: number) => (cap.emphasis ?? []).some(([a, b]) => i >= a && i < b);
   return (
     <div style={{position: 'absolute', left: 0, right: 0, top, display: 'flex', justifyContent: 'center', opacity, transform: `translateY(${lift}px)`}}>
-      <div style={{background: '#211F1C', borderRadius: 26, padding: '22px 42px 26px', boxShadow: '0 16px 30px -12px rgba(40,30,10,0.35), 0 2px 0 rgba(255,255,255,0.08) inset', fontFamily: fonts.sans, fontWeight: 800, fontSize: fs, letterSpacing: '-0.01em', whiteSpace: 'nowrap'}}>
+      <div data-probe="zone" data-zone="caption" data-probe-id="caption" style={{background: '#211F1C', borderRadius: 26, padding: '22px 42px 26px', boxShadow: '0 16px 30px -12px rgba(40,30,10,0.35), 0 2px 0 rgba(255,255,255,0.08) inset', fontFamily: fonts.sans, fontWeight: 800, fontSize: fs, letterSpacing: '-0.01em', whiteSpace: 'nowrap'}}>
         {words.map((w, i) => (
           <span key={i} style={{color: emph(i) ? ORANGE_HI : '#FFFFFF'}}>{w}{i < words.length - 1 ? ' ' : ''}</span>
         ))}

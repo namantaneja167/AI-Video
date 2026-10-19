@@ -6,15 +6,9 @@ const empty = (v: unknown): boolean => v === undefined || v === null || (Array.i
 
 export const MIX_PARAM_KEYS = ['voiceGainDb', 'accentBusDb', 'accentDuck', 'mixScriptSha256'];
 
-/** Reasons this episode and these settings cannot be produced by this build. Empty means they can. */
-export function unsupportedInputs(doc: EpisodeV2, values: Record<string, unknown>): string[] {
+/** Reasons sound events, sound assets or mix parameters cannot be applied by this build. Empty means they can. */
+export function soundSettingsProblems(values: Record<string, unknown>): string[] {
   const out: string[] = [];
-  if (!empty(values.manualTiming)) out.push('Manual timing corrections are set, but this build does not apply them (planned with the timing editor). Clear the manual timing setting.');
-
-  const last = new Set(doc.narration.blocks.map((b) => b.segments[b.segments.length - 1]));
-  const inside = doc.narration.segments.filter((s) => s.pauseAfter !== undefined && s.pauseAfter > 0 && !last.has(s.id)).map((s) => s.id);
-  if (inside.length) out.push(`Segment pause(s) inside a narration block (${inside.join(', ')}) cannot be applied: a block is one continuous recording. Start a new block after that segment, or remove the pause.`);
-
   if (!empty(values.soundEvents)) out.push(...accentProblems(values.soundEvents));
   if (!empty(values.soundAssets)) out.push('Sound assets are set, but this build has no asset library: only the built-in synthesized accents are supported. Clear the sound assets.');
 
@@ -32,6 +26,19 @@ export function unsupportedInputs(doc: EpisodeV2, values: Record<string, unknown
       }
     }
   }
+  return out;
+}
+
+/** Reasons this episode and these settings cannot be produced by this build. Empty means they can. */
+export function unsupportedInputs(doc: EpisodeV2, values: Record<string, unknown>): string[] {
+  const out: string[] = [];
+  if (!empty(values.manualTiming)) out.push('Manual timing corrections are set, but this build does not apply them (planned with the timing editor). Clear the manual timing setting.');
+
+  const last = new Set(doc.narration.blocks.map((b) => b.segments[b.segments.length - 1]));
+  const inside = doc.narration.segments.filter((s) => s.pauseAfter !== undefined && s.pauseAfter > 0 && !last.has(s.id)).map((s) => s.id);
+  if (inside.length) out.push(`Segment pause(s) inside a narration block (${inside.join(', ')}) cannot be applied: a block is one continuous recording. Start a new block after that segment, or remove the pause.`);
+
+  out.push(...soundSettingsProblems(values));
   return out;
 }
 

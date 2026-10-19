@@ -1,0 +1,617 @@
+{
+  "ranAt": "2026-10-19T07:44:32.642Z",
+  "draft": "voice-demo-prompts",
+  "scenes": [
+    {
+      "id": "sb1",
+      "type": "pip-cards",
+      "segments": [
+        "s1",
+        "s2",
+        "s3"
+      ]
+    },
+    {
+      "id": "sb2",
+      "type": "pip-cards",
+      "segments": [
+        "s4",
+        "s5"
+      ]
+    },
+    {
+      "id": "sb3",
+      "type": "pip-cards",
+      "segments": [
+        "s6",
+        "s7"
+      ]
+    }
+  ],
+  "narrationUnchangedByScenes": true,
+  "takesStillFresh": {
+    "b1": "fresh",
+    "b2": "fresh"
+  },
+  "measures": {
+    "draftBuild": {
+      "plan": [
+        "take:b1:current",
+        "take:b2:current",
+        "timing:current",
+        "mix:draft:current",
+        "render:draft:run"
+      ],
+      "wallSec": 26.5,
+      "dialogNotes": [
+        "Make a draft video",
+        "Makes a draft video for review from your saved text (saved version 23). Its audio is the unmastered mix: a draft can be reviewed, but it can never be approved or exported. You can keep editing while it runs.",
+        "Draft audio mix\tAlready up to date\t–",
+        "Draft video\tWill run",
+        "Start draft"
+      ],
+      "carriedOverFrom": "2026-10-19T07:42:14.618Z",
+      "note": "the video was already built and up to date when this run started; these are the figures from the run that built it"
+    },
+    "draftChecks": {
+      "renderArtifactId": 33,
+      "fileSha256": "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+      "wallSec": 11.1,
+      "passed": true,
+      "summary": {
+        "pass": 20,
+        "warn": 2,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 2
+      },
+      "sampledFrames": 30,
+      "items": [
+        {
+          "id": "narration.takes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "2 of 2 blocks have a readable take",
+          "lines": []
+        },
+        {
+          "id": "narration.duration",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block is within the plausible range of words per second",
+          "lines": []
+        },
+        {
+          "id": "narration.pace",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "every block is at a usual pace",
+          "lines": []
+        },
+        {
+          "id": "narration.energy",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block has speech-level sound throughout",
+          "lines": []
+        },
+        {
+          "id": "narration.gaps",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no silent gap over 1.5 s",
+          "lines": []
+        },
+        {
+          "id": "narration.ending",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block ends quietly",
+          "lines": []
+        },
+        {
+          "id": "narration.edges",
+          "kind": "heuristic",
+          "status": "warn",
+          "detail": "1 thing to listen for",
+          "lines": [
+            "block b1 (segments s1, s2, s3, s4, s5): no trailing silence (the take ends within 20 ms of its last sound)"
+          ]
+        },
+        {
+          "id": "narration.alignment",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "segment times are ordered, inside the audio and plausible; timing source: qwen-aligned",
+          "lines": []
+        },
+        {
+          "id": "narration.timing-source",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Timing source: qwen-aligned.",
+          "lines": []
+        },
+        {
+          "id": "narration.words",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Not checked by the app. Alignment gives times to the text it is given, so it cannot show that a word was left out. Listening is required.",
+          "lines": []
+        },
+        {
+          "id": "narration.seams",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Blocks are generated separately and can differ slightly in delivery. Whether a join is audible is a listening judgement.",
+          "lines": []
+        },
+        {
+          "id": "captions.phrases",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every segment's phrases spell its text",
+          "lines": []
+        },
+        {
+          "id": "captions.overrides",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every caption with digits or symbols has a spoken reading",
+          "lines": []
+        },
+        {
+          "id": "captions.numbers",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every number in a caption is spoken correctly",
+          "lines": []
+        },
+        {
+          "id": "captions.diff",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "caption and speech use the same words",
+          "lines": []
+        },
+        {
+          "id": "file.hash",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "SHA-256 274b84ae837b… matches the recorded hash",
+          "lines": []
+        },
+        {
+          "id": "file.container",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "h264 1080 x 1920 at 30 fps with an aac audio track",
+          "lines": []
+        },
+        {
+          "id": "file.decode",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "the whole video and audio decode without errors and match the timing",
+          "lines": []
+        },
+        {
+          "id": "mastering.loudness",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Not mastered. This is a draft: its audio is the unmastered mix (measured -23 LUFS, true peak -7.5 dBTP). A draft cannot be approved or exported.",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 font list examined in the same browser engine that renders the video: system-ui in use (the system font stack cannot be tested as a single face)",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts-stack",
+          "kind": "heuristic",
+          "status": "warn",
+          "detail": "A later font in the list is used.",
+          "lines": [
+            "the first choice \"SF Pro Display\" is not available; \"system-ui\" is used instead"
+          ]
+        },
+        {
+          "id": "layout.overflow",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overflow in 30 sampled frames (DOM text only)",
+          "lines": []
+        },
+        {
+          "id": "layout.overlap",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overlap or intrusion in the sampled frames (Pip's box is taken from the layout geometry, not measured)",
+          "lines": []
+        },
+        {
+          "id": "layout.size",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every marked text is at or above its minimum size",
+          "lines": []
+        },
+        {
+          "id": "layout.coverage",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "all 3 scenes have marked elements that were measured",
+          "lines": []
+        },
+        {
+          "id": "custom.scenes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "this video has no custom scene",
+          "lines": []
+        }
+      ],
+      "captionDiffs": []
+    },
+    "finalBuild": {
+      "plan": [
+        "take:b1:current",
+        "take:b2:current",
+        "timing:current",
+        "mix:final:current",
+        "render:final:run"
+      ],
+      "wallSec": 25.5,
+      "dialogNotes": [
+        "Makes the final video from your saved text (saved version 23). You can keep editing while it runs."
+      ],
+      "carriedOverFrom": "2026-10-19T07:42:14.618Z",
+      "note": "the video was already built and up to date when this run started; these are the figures from the run that built it"
+    },
+    "finalChecks": {
+      "renderArtifactId": 35,
+      "fileSha256": "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+      "wallSec": 11.1,
+      "passed": true,
+      "summary": {
+        "pass": 22,
+        "warn": 2,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 1
+      },
+      "sampledFrames": 30,
+      "items": [
+        {
+          "id": "narration.takes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "2 of 2 blocks have a readable take",
+          "lines": []
+        },
+        {
+          "id": "narration.duration",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block is within the plausible range of words per second",
+          "lines": []
+        },
+        {
+          "id": "narration.pace",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "every block is at a usual pace",
+          "lines": []
+        },
+        {
+          "id": "narration.energy",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block has speech-level sound throughout",
+          "lines": []
+        },
+        {
+          "id": "narration.gaps",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no silent gap over 1.5 s",
+          "lines": []
+        },
+        {
+          "id": "narration.ending",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block ends quietly",
+          "lines": []
+        },
+        {
+          "id": "narration.edges",
+          "kind": "heuristic",
+          "status": "warn",
+          "detail": "1 thing to listen for",
+          "lines": [
+            "block b1 (segments s1, s2, s3, s4, s5): no trailing silence (the take ends within 20 ms of its last sound)"
+          ]
+        },
+        {
+          "id": "narration.alignment",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "segment times are ordered, inside the audio and plausible; timing source: qwen-aligned",
+          "lines": []
+        },
+        {
+          "id": "narration.timing-source",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Timing source: qwen-aligned.",
+          "lines": []
+        },
+        {
+          "id": "narration.words",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Not checked by the app. Alignment gives times to the text it is given, so it cannot show that a word was left out. Listening is required.",
+          "lines": []
+        },
+        {
+          "id": "narration.seams",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Blocks are generated separately and can differ slightly in delivery. Whether a join is audible is a listening judgement.",
+          "lines": []
+        },
+        {
+          "id": "captions.phrases",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every segment's phrases spell its text",
+          "lines": []
+        },
+        {
+          "id": "captions.overrides",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every caption with digits or symbols has a spoken reading",
+          "lines": []
+        },
+        {
+          "id": "captions.numbers",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every number in a caption is spoken correctly",
+          "lines": []
+        },
+        {
+          "id": "captions.diff",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "caption and speech use the same words",
+          "lines": []
+        },
+        {
+          "id": "file.hash",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "SHA-256 c3ba796a551b… matches the recorded hash",
+          "lines": []
+        },
+        {
+          "id": "file.container",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "h264 1080 x 1920 at 30 fps with an aac audio track",
+          "lines": []
+        },
+        {
+          "id": "file.decode",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "the whole video and audio decode without errors and match the timing",
+          "lines": []
+        },
+        {
+          "id": "mastering.loudness",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "-16.1 LUFS integrated (target -16) and -4.7 dBTP true peak (limit -1.5), measured on the audio inside the file",
+          "lines": []
+        },
+        {
+          "id": "mastering.flag",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "its record says the mastering chain was applied",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 font list examined in the same browser engine that renders the video: system-ui in use (the system font stack cannot be tested as a single face)",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts-stack",
+          "kind": "heuristic",
+          "status": "warn",
+          "detail": "A later font in the list is used.",
+          "lines": [
+            "the first choice \"SF Pro Display\" is not available; \"system-ui\" is used instead"
+          ]
+        },
+        {
+          "id": "layout.overflow",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overflow in 30 sampled frames (DOM text only)",
+          "lines": []
+        },
+        {
+          "id": "layout.overlap",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overlap or intrusion in the sampled frames (Pip's box is taken from the layout geometry, not measured)",
+          "lines": []
+        },
+        {
+          "id": "layout.size",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every marked text is at or above its minimum size",
+          "lines": []
+        },
+        {
+          "id": "layout.coverage",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "all 3 scenes have marked elements that were measured",
+          "lines": []
+        },
+        {
+          "id": "custom.scenes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "this video has no custom scene",
+          "lines": []
+        }
+      ],
+      "captionDiffs": []
+    },
+    "draftFile": {
+      "file": "out/phase7/demo/voice-demo-prompts-draft.mp4",
+      "sha256": "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+      "bytes": 1515971,
+      "durationSec": 22.73,
+      "label": "Draft (not mastered)"
+    },
+    "finalFile": {
+      "file": "out/phase7/demo/voice-demo-prompts-final.mp4",
+      "sha256": "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+      "bytes": 2395978,
+      "durationSec": 22.73,
+      "label": "Final (mastered)"
+    }
+  },
+  "jobsForThisDemo": [
+    {
+      "id": 27,
+      "kind": "timing.build",
+      "subject": "timeline",
+      "state": "succeeded",
+      "elapsedSec": 3.2,
+      "cacheHit": false
+    },
+    {
+      "id": 28,
+      "kind": "render.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 25.6,
+      "cacheHit": false
+    },
+    {
+      "id": 29,
+      "kind": "check.suite",
+      "subject": "28",
+      "state": "succeeded",
+      "elapsedSec": 10.7,
+      "cacheHit": false
+    },
+    {
+      "id": 30,
+      "kind": "mix.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 1.2,
+      "cacheHit": false
+    },
+    {
+      "id": 31,
+      "kind": "render.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 25,
+      "cacheHit": false
+    },
+    {
+      "id": 32,
+      "kind": "check.suite",
+      "subject": "31",
+      "state": "succeeded",
+      "elapsedSec": 10.7,
+      "cacheHit": false
+    },
+    {
+      "id": 33,
+      "kind": "render.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 25.6,
+      "cacheHit": false
+    },
+    {
+      "id": 34,
+      "kind": "check.suite",
+      "subject": "33",
+      "state": "succeeded",
+      "elapsedSec": 10.7,
+      "cacheHit": false
+    },
+    {
+      "id": 35,
+      "kind": "render.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 25.1,
+      "cacheHit": false
+    },
+    {
+      "id": 36,
+      "kind": "check.suite",
+      "subject": "35",
+      "state": "succeeded",
+      "elapsedSec": 10.8,
+      "cacheHit": false
+    },
+    {
+      "id": 37,
+      "kind": "check.suite",
+      "subject": "33",
+      "state": "succeeded",
+      "elapsedSec": 10.6,
+      "cacheHit": false
+    },
+    {
+      "id": 38,
+      "kind": "check.suite",
+      "subject": "35",
+      "state": "succeeded",
+      "elapsedSec": 10.6,
+      "cacheHit": false
+    }
+  ],
+  "narrationJobsRun": 0,
+  "awaitingYou": {
+    "approval": "none",
+    "signoffsTicked": 0,
+    "exportPossible": false,
+    "roundOpenedOnFinal": false,
+    "readinessBlockers": [
+      "This final video has not been opened for review yet. Start a review round on it."
+    ]
+  },
+  "baseline": {
+    "seqBefore": 15,
+    "hashBefore": "59396c69a98ceeee3f4ec20650864d54f212cdd9f3e21d023585b542129d101b",
+    "seqAfter": 15,
+    "hashAfter": "59396c69a98ceeee3f4ec20650864d54f212cdd9f3e21d023585b542129d101b",
+    "unchanged": true
+  },
+  "otherDraftUnchanged": true,
+  "consoleErrors": [],
+  "failedRequests": []
+}

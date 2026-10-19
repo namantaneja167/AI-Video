@@ -1,0 +1,942 @@
+{
+  "when": "2026-10-18T08:23:56.681Z",
+  "tempProject": "/var/folders/lz/slwgcy0j36186s3p540p9j340000gn/T/studio-p3-run-osUUDV",
+  "episode": {
+    "id": "context-window",
+    "file": "/Users/namantaneja/Downloads/AI Video /explainer-studio/samples/context-window/episode.json",
+    "style": "pip-paper-bundled",
+    "scenes": [
+      "context-window"
+    ],
+    "settingsFile": "/Users/namantaneja/Downloads/AI Video /explainer-studio/samples/context-window/settings.json",
+    "soundEvents": 16
+  },
+  "narration": "generated in this run",
+  "stageSeconds": {
+    "narration b1": 31.2,
+    "narration b2": 30.2,
+    "timing (aligner)": 20,
+    "mix final (voice only, for the placement check)": 1.1,
+    "mix final (mastering)": 0.9,
+    "render final": 27.5
+  },
+  "jobs": {
+    "take": [
+      1,
+      2
+    ],
+    "timing": 3,
+    "mix": 5,
+    "render": 6
+  },
+  "takeMeta": [
+    {
+      "cacheHit": false,
+      "durationSec": 9.92,
+      "genSec": 10.01,
+      "mlxPeakBytes": 8731049143,
+      "rtf": 1.01,
+      "sampleRate": 24000,
+      "seed": 11,
+      "used": {
+        "maxTokens": 600,
+        "mlxAudio": "0.5.9",
+        "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+        "referenceSha256": "e6d84a9dd60eea5ac096582960df19db0c8e1f40ac6d12a13a226c84817be866",
+        "referenceTranscriptSha256": "48a32f2c56a15c68c16018713b5eb8784791c6d72a84b2cb844c6e13177d1e1b",
+        "revision": "a6eb4f68e4b056f1215157bb696209bc82a6db48",
+        "workerSha256": "eb249896ae16f4f132bc16f9d851555c15ba15ed2f5780b67aa8d8a3a1907622"
+      }
+    },
+    {
+      "cacheHit": false,
+      "durationSec": 10.64,
+      "genSec": 11.55,
+      "mlxPeakBytes": 8764231477,
+      "rtf": 1.09,
+      "sampleRate": 24000,
+      "seed": 11,
+      "used": {
+        "maxTokens": 600,
+        "mlxAudio": "0.5.9",
+        "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+        "referenceSha256": "e6d84a9dd60eea5ac096582960df19db0c8e1f40ac6d12a13a226c84817be866",
+        "referenceTranscriptSha256": "48a32f2c56a15c68c16018713b5eb8784791c6d72a84b2cb844c6e13177d1e1b",
+        "revision": "a6eb4f68e4b056f1215157bb696209bc82a6db48",
+        "workerSha256": "eb249896ae16f4f132bc16f9d851555c15ba15ed2f5780b67aa8d8a3a1907622"
+      }
+    }
+  ],
+  "timingMeta": {
+    "alignSeconds": 0.5,
+    "alignerId": "mlx-community/Qwen3-ForcedAligner-0.6B-bf16",
+    "alignerRevision": "53c8c0e46733eec430e4b53dd6471d0e5dee45f8",
+    "durationSec": 24.26,
+    "notes": [],
+    "source": "qwen-aligned",
+    "timelineLogic": {
+      "core/timeline.ts": "e56ad4791093dcad40e66b0e473326c94095115de3a247337c2e8c9027df2e19",
+      "pipeline/timeline.py": "46c1bc56cabdf44ba934d03db0101e91d9aaafd3f8bf3ac4b9de4430276bae5a",
+      "pipeline/timeline_cli.py": "25d69767e1e1079c3e2c96d5668bfe1db900e7ad525a5bc1a5e2f02f6b8e8add",
+      "src/library/cues.ts": "4eb3f6225c30082b93d2408e32a20efb513158d35450e7ede2f004271d52e82a",
+      "src/library/sceneSpecs.ts": "a25b99c5ad365b932fabdecbcb70e9f46729b5d69f517b60bcd56200bcd0317c",
+      "workers/mouth.py": "b5b744a390ba577367f24f80c6313d9ba2442617bf2dd5e04692dee32656e0e3"
+    }
+  },
+  "mixMeta": {
+    "accents": {
+      "bus_db": -12,
+      "count": 16,
+      "duck": 0.55,
+      "scaled_by": 0.9368,
+      "sum_peak": 0.8479
+    },
+    "durationSec": 24.26,
+    "gain_db": 0,
+    "measured": {
+      "integrated_lufs": -17.4,
+      "true_peak_dbfs": -2
+    },
+    "mode": "final",
+    "sample_rate": 48000,
+    "samples": 1164480,
+    "target": {
+      "lra": 11,
+      "lufs": -16,
+      "true_peak_db": -1.5
+    },
+    "used": {
+      "accentBusDb": -12,
+      "accentDuck": 0.55,
+      "accents": [
+        {
+          "accent": "pop",
+          "gain_db": -6,
+          "params": {
+            "dur": 0.14,
+            "f": 430
+          },
+          "t": 1.04
+        },
+        {
+          "accent": "tick",
+          "gain_db": -5,
+          "params": {
+            "f": 1700
+          },
+          "t": 4.56
+        },
+        {
+          "accent": "swish",
+          "gain_db": -8.4,
+          "params": {
+            "dur": 0.4
+          },
+          "t": 7.32
+        },
+        {
+          "accent": "pop",
+          "gain_db": -9,
+          "params": {
+            "dur": 0.1,
+            "f": 520
+          },
+          "t": 8.47
+        },
+        {
+          "accent": "pop",
+          "gain_db": -9,
+          "params": {
+            "dur": 0.1,
+            "f": 550
+          },
+          "t": 8.63
+        },
+        {
+          "accent": "pop",
+          "gain_db": -9,
+          "params": {
+            "dur": 0.1,
+            "f": 580
+          },
+          "t": 8.79
+        },
+        {
+          "accent": "pop",
+          "gain_db": -9,
+          "params": {
+            "dur": 0.1,
+            "f": 610
+          },
+          "t": 8.95
+        },
+        {
+          "accent": "swish",
+          "gain_db": -9,
+          "params": {
+            "dur": 0.55
+          },
+          "t": 9.17
+        },
+        {
+          "accent": "pop",
+          "gain_db": -6,
+          "params": {
+            "dur": 0.12,
+            "f": 470
+          },
+          "t": 11.39
+        },
+        {
+          "accent": "ding",
+          "gain_db": -8,
+          "params": {
+            "dur": 0.7,
+            "f": 988
+          },
+          "t": 15.23
+        },
+        {
+          "accent": "thump",
+          "gain_db": -4.4,
+          "params": {
+            "dur": 0.3
+          },
+          "t": 17.26
+        },
+        {
+          "accent": "whoosh",
+          "gain_db": -7.5,
+          "params": {
+            "dur": 0.34,
+            "up": true
+          },
+          "t": 19.24
+        },
+        {
+          "accent": "thump",
+          "gain_db": -8,
+          "params": {
+            "dur": 0.2
+          },
+          "t": 19.63
+        },
+        {
+          "accent": "swish",
+          "gain_db": -9,
+          "params": {
+            "dur": 0.5
+          },
+          "t": 20.39
+        },
+        {
+          "accent": "whoosh",
+          "gain_db": -8,
+          "params": {
+            "dur": 0.3,
+            "seed": 4,
+            "up": false
+          },
+          "t": 21.98
+        },
+        {
+          "accent": "chime",
+          "gain_db": -6.9,
+          "params": {
+            "dur": 1,
+            "freqs": [
+              587,
+              740
+            ]
+          },
+          "t": 22.88
+        }
+      ],
+      "mastering": {
+        "lra": 11,
+        "lufs": -16,
+        "true_peak_db": -1.5
+      },
+      "mixScriptSha256": "d067ff86867e4af67134263eb8d8ab083a70d3774a49c92284277eac62786de5",
+      "voiceGainDb": 0
+    }
+  },
+  "renderMeta": {
+    "bundleMs": 579,
+    "bytes": 3050446,
+    "fps": 30,
+    "frames": 728,
+    "height": 1920,
+    "kind": "final",
+    "out": "/var/folders/lz/slwgcy0j36186s3p540p9j340000gn/T/studio-p3-run-osUUDV/.studio/tmp/6-1/render.mp4",
+    "totalMs": 27097,
+    "used": {
+      "crf": 18,
+      "mixBlob": "3d0e4ff0efe6d45643187670d9392cb413b687a25f91273d6077c94f5643721a",
+      "remotion": "4.0.536",
+      "settings": {
+        "audio": "aac",
+        "codec": "h264",
+        "crf": 18,
+        "fps": 30,
+        "height": 1920,
+        "width": 1080
+      },
+      "sourcesVerifiedAgainstRecorded": true,
+      "timelineBlob": "5bbbb1fa785a6cad6f534a491938ca40bfa87f531d1b469f9df47d8988ff686a"
+    },
+    "width": 1080
+  },
+  "handovers": [
+    {
+      "jobId": 6,
+      "at": 1792311808657,
+      "reason": "before render.final",
+      "outcome": "released",
+      "rssBeforeBytes": 2049163264,
+      "ack": {
+        "activeBytes": 485092,
+        "cacheBytes": 0,
+        "peakBytes": 2746773048
+      },
+      "rssAfterBytes": 211484672,
+      "thresholdBytes": 1610612736,
+      "waitedMs": 76,
+      "mlxBeforeBytes": 1842115572
+    }
+  ],
+  "attempts": [
+    {
+      "job_id": 1,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792311725244,
+      "finished_at": 1792311737864,
+      "peak_rss_bytes": 1950367744,
+      "pressure_max": 4
+    },
+    {
+      "job_id": 2,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792311756426,
+      "finished_at": 1792311768122,
+      "peak_rss_bytes": 67846144,
+      "pressure_max": 4
+    },
+    {
+      "job_id": 3,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792311786647,
+      "finished_at": 1792311788075,
+      "peak_rss_bytes": 2047082496,
+      "pressure_max": 1
+    },
+    {
+      "job_id": 4,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792311806624,
+      "finished_at": 1792311807670,
+      "peak_rss_bytes": 126697472,
+      "pressure_max": 1
+    },
+    {
+      "job_id": 5,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792311807729,
+      "finished_at": 1792311808604,
+      "peak_rss_bytes": null,
+      "pressure_max": null
+    },
+    {
+      "job_id": 6,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792311808655,
+      "finished_at": 1792311836144,
+      "peak_rss_bytes": 2651865088,
+      "pressure_max": 1
+    }
+  ],
+  "measurements": {
+    "targets": {
+      "lufs": -16,
+      "true_peak_dbtp": -1.5
+    },
+    "tolerances": {
+      "lufs": 1,
+      "wav_tp_over": 0.2,
+      "mp4_tp_over": 0.5,
+      "placement_ms": 80,
+      "lag_ms": 40
+    },
+    "mastered_wav": {
+      "integrated_lufs": -17.4,
+      "loudness_range_lu": 3,
+      "true_peak_dbtp": -2,
+      "loudness_error_lu": -1.4,
+      "pass": false
+    },
+    "decoded_mp4_audio": {
+      "integrated_lufs": -17.4,
+      "loudness_range_lu": 3,
+      "true_peak_dbtp": -5,
+      "loudness_error_lu": -1.4,
+      "pass": false
+    },
+    "mp4": {
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "duration_s": 24.277,
+      "bytes": 3050446,
+      "video": {
+        "codec": "h264",
+        "width": 1080,
+        "height": 1920,
+        "fps": 30,
+        "pix_fmt": "yuv420p",
+        "frames": 728,
+        "duration_s": 24.266667
+      },
+      "audio": {
+        "codec": "aac",
+        "sample_rate": 48000,
+        "channels": 2,
+        "duration_s": 24.277
+      }
+    },
+    "timeline_duration_s": 24.26,
+    "duration_difference_ms": 17,
+    "global_lag_ms": 0,
+    "lag_pass": true,
+    "placement_measured_on": "voice-only mix",
+    "placement": [
+      {
+        "segment": "s1",
+        "timeline_start": 1.12,
+        "audio_start": 1.14,
+        "start_error_ms": 20,
+        "timeline_end": 3.28,
+        "audio_end": 3.235,
+        "end_error_ms": -45
+      },
+      {
+        "segment": "s2",
+        "timeline_start": 3.68,
+        "audio_start": 3.625,
+        "start_error_ms": -55,
+        "timeline_end": 5.52,
+        "audio_end": 5.5,
+        "end_error_ms": -20
+      },
+      {
+        "segment": "s3",
+        "timeline_start": 6.08,
+        "audio_start": 6.09,
+        "start_error_ms": 10,
+        "timeline_end": 8.72,
+        "audio_end": 8.705,
+        "end_error_ms": -15
+      },
+      {
+        "segment": "s4",
+        "timeline_start": 9.12,
+        "audio_start": 9.105,
+        "start_error_ms": -15,
+        "timeline_end": 10.64,
+        "audio_end": 10.66,
+        "end_error_ms": 20
+      },
+      {
+        "segment": "s5",
+        "timeline_start": 11.44,
+        "audio_start": 11.425,
+        "start_error_ms": -15,
+        "timeline_end": 12.88,
+        "audio_end": 12.845,
+        "end_error_ms": -35
+      },
+      {
+        "segment": "s6",
+        "timeline_start": 13.12,
+        "audio_start": 13.16,
+        "start_error_ms": 40,
+        "timeline_end": 16.32,
+        "audio_end": 16.45,
+        "end_error_ms": 130
+      },
+      {
+        "segment": "s7",
+        "timeline_start": 16.72,
+        "audio_start": 16.755,
+        "start_error_ms": 35,
+        "timeline_end": 19.04,
+        "audio_end": 19.035,
+        "end_error_ms": -5
+      },
+      {
+        "segment": "s8",
+        "timeline_start": 19.44,
+        "audio_start": 19.43,
+        "start_error_ms": -10,
+        "timeline_end": 21.68,
+        "audio_end": 21.61,
+        "end_error_ms": -70
+      }
+    ],
+    "placement_worst_ms": 130,
+    "placement_pass": false
+  },
+  "status": {
+    "takes": {
+      "b1": {
+        "status": "fresh",
+        "artifactId": 1,
+        "reasons": []
+      },
+      "b2": {
+        "status": "fresh",
+        "artifactId": 2,
+        "reasons": []
+      }
+    },
+    "timing": {
+      "status": "fresh",
+      "artifactId": 3,
+      "reasons": []
+    },
+    "mix": {
+      "draft": {
+        "status": "none",
+        "reasons": [
+          "no output yet"
+        ]
+      },
+      "final": {
+        "status": "fresh",
+        "artifactId": 5,
+        "reasons": []
+      }
+    },
+    "render": {
+      "draft": {
+        "status": "none",
+        "reasons": [
+          "no output yet",
+          "upstream mix draft is not fresh"
+        ]
+      },
+      "final": {
+        "status": "fresh",
+        "artifactId": 6,
+        "reasons": []
+      }
+    },
+    "notFresh": [
+      "mix:draft",
+      "render:draft"
+    ],
+    "unsetComponents": []
+  },
+  "referenceUnchanged": true,
+  "outputs": {
+    "mp4": "/Users/namantaneja/Downloads/AI Video /explainer-studio/out/phase3/context-window/context-window_final.mp4",
+    "mastered_wav": "/Users/namantaneja/Downloads/AI Video /explainer-studio/out/phase3/context-window/mastered-mix.wav",
+    "timeline": "/Users/namantaneja/Downloads/AI Video /explainer-studio/out/phase3/context-window/timeline.json",
+    "mp4_sha256": "95a491367bf26d0d56d7db1d679cd3f30af018db96082722eee829fe41b4c5e7"
+  },
+  "memory": {
+    "samples": [
+      {
+        "t": 2028,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 7484.06,
+        "workerRssMb": 1514
+      },
+      {
+        "t": 4042,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 7991.38,
+        "workerRssMb": 318
+      },
+      {
+        "t": 6038,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 7975.38,
+        "workerRssMb": 303
+      },
+      {
+        "t": 8101,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 7967.38,
+        "workerRssMb": 231
+      },
+      {
+        "t": 10156,
+        "stage": "narration b1",
+        "pressure": 2,
+        "swapMb": 8218,
+        "workerRssMb": 183
+      },
+      {
+        "t": 12056,
+        "stage": "narration b1",
+        "pressure": 2,
+        "swapMb": 11062.5,
+        "workerRssMb": 18
+      },
+      {
+        "t": 14036,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 10966.5,
+        "workerRssMb": 38
+      },
+      {
+        "t": 16037,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 10918.5,
+        "workerRssMb": 38
+      },
+      {
+        "t": 18036,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 10702.5,
+        "workerRssMb": 38
+      },
+      {
+        "t": 20037,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 10670.5,
+        "workerRssMb": 38
+      },
+      {
+        "t": 22043,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 10154.75,
+        "workerRssMb": 38
+      },
+      {
+        "t": 24048,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 10010.75,
+        "workerRssMb": 38
+      },
+      {
+        "t": 26047,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 9994.75,
+        "workerRssMb": 38
+      },
+      {
+        "t": 28050,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 9946.75,
+        "workerRssMb": 38
+      },
+      {
+        "t": 30059,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 9938.75,
+        "workerRssMb": 38
+      },
+      {
+        "t": 32060,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 9618.75,
+        "workerRssMb": 61
+      },
+      {
+        "t": 34071,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 9396.62,
+        "workerRssMb": 64
+      },
+      {
+        "t": 36069,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 9084.62,
+        "workerRssMb": 64
+      },
+      {
+        "t": 38094,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 9036.62,
+        "workerRssMb": 64
+      },
+      {
+        "t": 40221,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 8908.62,
+        "workerRssMb": 53
+      },
+      {
+        "t": 42139,
+        "stage": "narration b2",
+        "pressure": 4,
+        "swapMb": 10620.12,
+        "workerRssMb": 12
+      },
+      {
+        "t": 44097,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 11337.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 46097,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 11233.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 48099,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 11121.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 50118,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 10809.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 52120,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 10793.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 54142,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 10785.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 56143,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 10769.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 58142,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 10753.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 60144,
+        "stage": "narration b2",
+        "pressure": 1,
+        "swapMb": 10641.38,
+        "workerRssMb": 32
+      },
+      {
+        "t": 62147,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10569.38,
+        "workerRssMb": 1240
+      },
+      {
+        "t": 64149,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10075.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 66151,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10067.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 68163,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10067.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 70168,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10059.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 72172,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10043.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 74171,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 10043.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 76174,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 9867.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 78176,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 9859.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 80172,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 9835.75,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 82173,
+        "stage": "mix final (voice only, for the placement check)",
+        "pressure": 1,
+        "swapMb": 9356,
+        "workerRssMb": 1954
+      },
+      {
+        "t": 84179,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9101.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 86178,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9101.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 88182,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9093.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 90189,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9093.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 92182,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 94190,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 96184,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 98188,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 100193,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 102194,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 104187,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 106188,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9085.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 108192,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 9077.31,
+        "workerRssMb": 202
+      },
+      {
+        "t": 110188,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 8901.31,
+        "workerRssMb": 202
+      }
+    ],
+    "peakWorkerRssMb": 1954,
+    "maxPressure": 4,
+    "maxSwapMb": 11337.38
+  }
+}

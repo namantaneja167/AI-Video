@@ -9,13 +9,25 @@ import {copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, writeFileSync
 import {join} from 'node:path';
 import type {EpisodeV2} from '../src/schema2.ts';
 import {findTakeByInputs, getReference, type JobKind} from './artifacts.ts';
-import {blobPath, putFile, requireBlob} from './blobs.ts';
+import {blobPath, putBytes, putFile, requireBlob} from './blobs.ts';
 import {UNSET, type ComponentName} from './deps.ts';
 import {hashJson, sha256} from './hash.ts';
 import {PreflightError, type JobCtx, type JobHandler} from './runner.ts';
 import {renderSettingsProblems, unsupportedInputs} from './support.ts';
 import {accentTimes, type AccentEvent} from '../src/library/accents.ts';
+import {LAYOUTS} from '../src/library/layouts.ts';
+import {layoutIdFor} from '../src/library/scenes/pipCardsGeometry.ts';
+import type {ProbeSample} from '../src/library/probeTypes.ts';
+import {analyzeLayout, buildReport, checkCaptions, checkFile, checkNarration, CHECKS_VERSION, type SceneProbeInfo, type TakeInput} from './checks.ts';
+import {analyzeWav, measureAudio, measureVideo, probeMedia, readWav, type MediaProbe} from './media.ts';
+import {probeFrames} from './probeFrames.ts';
+import {all, get} from './db.ts';
+import {getSnapshot} from './artifacts.ts';
+import {readBlob} from './blobs.ts';
+import {sha256File} from './hash.ts';
+import {emphasisPerCaption} from '../src/library/emphasis.ts';
 import {checkFonts} from '../src/library/fontCheck.ts';
+import {dynamicCues} from '../src/library/dynamicCues.ts';
 import {annotateTimeline, assembleSegTimings, buildTimelineViaPython, planLayout, timelineEpisode, wavDuration, type BlockTiming, type RunText} from './timeline.ts';
 import {defaultTools, fileSha, mixScriptFingerprint, renderSourceProblems, renderToolProblems, timelineLogicValue} from './toolchain.ts';
 import {WorkerError} from './worker.ts';
@@ -32,6 +44,7 @@ export type HandlerEnv = {
   audioWorker?: string;
   mixScript?: string;
   renderWorker?: string;
+  probeWorker?: string;
   timelineFiles?: string[];
   /** Where render sources are read from (default: root). */
   sourceRoot?: string;
@@ -103,7 +116,7 @@ function stageTakes(ctx: JobCtx): Record<string, string> {
 type VoiceRuntime = {engine: string; model: string; revision: string; mlxAudio: string; mlx: string; referenceSha256: string; referenceTranscriptSha256: string; generation: {maxTokens: number}; workerSha256: string};
 
 export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandler>> {
-  const tools = {...defaultTools(env.root), ...(env.audioWorker ? {audioWorker: env.audioWorker} : {}), ...(env.mixScript ? {mix: env.mixScript} : {}), ...(env.renderWorker ? {renderWorker: env.renderWorker} : {}), ...(env.timelineFiles ? {timeline: env.timelineFiles} : {})};
+  const tools = {...defaultTools(env.root), ...(env.audioWorker ? {audioWorker: env.audioWorker} : {}), ...(env.mixScript ? {mix: env.mixScript} : {}), ...(env.renderWorker ? {renderWorker: env.renderWorker} : {}), ...(env.probeWorker ? {probeWorker: env.probeWorker} : {}), ...(env.timelineFiles ? {timeline: env.timelineFiles} : {})};
   const cli = join(env.root, 'pipeline', 'timeline_cli.py');
   const sourceRoot = env.sourceRoot ?? env.root;
 
@@ -125,14 +138,21 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     if (typeof transcript !== 'string') throw new PreflightError(`approved reference "${doc.voice.profile}" has no recorded transcript`);
     if (ref.hash !== vr.referenceSha256 || sha256(transcript) !== vr.referenceTranscriptSha256) throw new PreflightError(`reference "${doc.voice.profile}" is not the reference (audio and transcript) recorded in the voice runtime`);
     ctx.progress({step: 'loading the voice model'});
+    const loadStart = Date.now();
+    if (ctx.signal.aborted) throw new Error('cancelled'); // a job cancelled while preparing must not go on to start the engine
     ctx.host.ensureWorker();
     ctx.leaseHost(); // so cancelling this job can stop the worker it is using
+    const wasLoaded = ctx.host.loaded === 'tts';
     await ctx.host.ensureModel('tts');
+    const loadSec = wasLoaded ? 0 : Math.round((Date.now() - loadStart) / 100) / 10;
+    if (ctx.signal.aborted) throw new Error('cancelled');
+    ctx.progress({step: 'generating speech', detail: {audioSeconds: 0, elapsedSeconds: 0}}); // the model is loaded from here on
     const refWav = join(ctx.ws, 'reference.wav');
     copyFileSync(ref.path, refWav);
     const out = join(ctx.ws, 'take.wav');
+    const text = blockText(doc, ctx.subject).join(' ');
     const r = await ctx.host.request('generate', {
-      text: blockText(doc, ctx.subject).join(' '), ref_wav: refWav, ref_sha256: ref.hash, ref_text: transcript, seed, out_wav: out,
+      text, ref_wav: refWav, ref_sha256: ref.hash, ref_text: transcript, seed, out_wav: out,
       max_tokens: vr.generation.maxTokens, expect: {model_revision: vr.revision, mlx_audio: vr.mlxAudio, mlx: vr.mlx},
     }, {
       timeoutMs: 15 * 60_000,
@@ -140,7 +160,7 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     });
     const {hash} = putFile(ctx.p, out);
     return {blobHash: hash, seed, meta: {
-      cacheHit: false, durationSec: r.duration_s, sampleRate: r.sample_rate, genSec: r.gen_s, rtf: r.rtf, mlxPeakBytes: r.peak_bytes,
+      cacheHit: false, durationSec: r.duration_s, sampleRate: r.sample_rate, genSec: r.gen_s, rtf: r.rtf, mlxPeakBytes: r.peak_bytes, words: text.split(/\s+/).filter(Boolean).length, loadSec,
       used: {referenceSha256: ref.hash, referenceTranscriptSha256: sha256(transcript), model: vr.model, revision: vr.revision, mlxAudio: vr.mlxAudio, maxTokens: vr.generation.maxTokens, workerSha256: vr.workerSha256},
     }};
   };
@@ -190,6 +210,8 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
       blocks: layout.blocks.map((b) => ({wav: wavs[b.id], offset_sec: b.offsetSec})), total_sec: layout.totalSec, fps: 30,
     })));
     annotateTimeline(timeline, doc, mouth);
+    const dynamic = dynamicCues(doc.scenes, timeline.segments);
+    if (Object.keys(dynamic).length) timeline.cues = {...(timeline.cues ?? {}), ...dynamic};
     const file = join(ctx.ws, 'timeline.json');
     writeFileSync(file, JSON.stringify(timeline));
     const blob = putFile(ctx.p, file);
@@ -238,6 +260,11 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     const srcBad = renderSourceProblems(ctx.p, snapshot, sourceRoot);
     if (srcBad.length) throw new PreflightError(`render refused; the working checkout differs from the sources recorded when the job was queued (${srcBad.length}):\n- ${srcBad.slice(0, 8).join('\n- ')}${srcBad.length > 8 ? '\n- ...' : ''}`);
     const timeline = JSON.parse(readFileSync(blobPath(ctx.p, timelineHash), 'utf8'));
+    // The timing hash does not cover emphasis (the render's content hash does), so the render applies its own document's emphasis.
+    if (Array.isArray(timeline.captions) && timeline.captions.every((c: any) => Array.isArray(c.words))) {
+      const per = emphasisPerCaption(timeline.captions, doc.narration.segments);
+      timeline.captions = timeline.captions.map((c: any, i: number) => { const {emphasis: _old, ...rest} = c; return per[i] ? {...rest, emphasis: per[i]} : rest; });
+    }
     const variant = 'full';
     const pub = join(ctx.ws, 'public', 'generated', doc.id, variant);
     mkdirSync(pub, {recursive: true});
@@ -274,8 +301,125 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
       child.on('exit', (code, sig) => (code === 0 && res ? resolve(res) : reject(new Error(failure ?? `render worker ${sig ? `was stopped (${sig})` : `exited with code ${code}`}: ${err.trim().split('\n').slice(-3).join(' | ')}`))));
     });
     const {hash} = putFile(ctx.p, out);
-    return {blobHash: hash, meta: {...result, kind, used: {crf, settings, timelineBlob: timelineHash, mixBlob: mixHash, sourcesVerifiedAgainstRecorded: true, remotion: versions?.remotion}}};
+    return {blobHash: hash, meta: {...result, kind, mastered: kind === 'final', used: {crf, settings, timelineBlob: timelineHash, mixBlob: mixHash, sourcesVerifiedAgainstRecorded: true, remotion: versions?.remotion}}};
   };
 
-  return {'tts.block': tts, 'timing.build': timing, 'mix.draft': mix('draft'), 'mix.final': mix('final'), 'render.draft': render('draft'), 'render.final': render('final')} satisfies Partial<Record<JobKind, JobHandler>>;
+  /** Scenes whose captions are drawn by the scene itself, not by the composition. */
+  const OWNS_CAPTIONS = new Set(['pip-scene-10x']);
+
+  const checkSuite: JobHandler = async (ctx) => {
+    const renderId = Number(ctx.subject);
+    const row = get<{kind: string; subject: string; blob_hash: string; snapshot_id: string | null; meta_json: string; episode_id: string}>(ctx.p.db.prepare('SELECT kind, subject, blob_hash, snapshot_id, meta_json, episode_id FROM artifacts WHERE id=?'), renderId);
+    if (!row || row.kind !== 'render' || row.episode_id !== ctx.episodeId) throw new PreflightError(`artifact ${ctx.subject} is not a rendered video of this episode`);
+    if (!row.snapshot_id) throw new PreflightError('this video has no recorded inputs (it was not built by this workspace), so there is nothing to check its parts against');
+    const renderKind = row.subject as 'draft' | 'final';
+    const meta = JSON.parse(row.meta_json) as {mastered?: boolean};
+    const rsnap = getSnapshot(ctx.p, row.snapshot_id);
+    const doc = JSON.parse(readBlob(ctx.p, rsnap.docBlob).toString()) as EpisodeV2;
+    const timelineBlob = rsnap.blobs.timing;
+    if (!timelineBlob) throw new PreflightError('this video has no recorded timing');
+    const timeline = JSON.parse(readFileSync(blobPath(ctx.p, timelineBlob), 'utf8'));
+    const ownedSpawn = (role: string) => (cmd: string, args: string[]) => ctx.spawn(role, cmd, args, {stdio: ['ignore', 'pipe', 'pipe']});
+    const stop = () => { if (ctx.signal.aborted) throw new Error('cancelled'); };
+
+    ctx.progress({step: 'checking the narration'});
+    const takes: Record<string, TakeInput> = {};
+    for (const b of doc.narration.blocks) {
+      const hash = rsnap.blobs.takes[b.id];
+      if (!hash) { takes[b.id] = {present: false}; continue; }
+      let path: string;
+      try { path = blobPath(ctx.p, hash); requireBlob(ctx.p, hash); } catch { takes[b.id] = {present: false, error: 'the audio file is not in the project'}; continue; }
+      try { takes[b.id] = {present: true, facts: analyzeWav(readWav(path))}; } catch (e) { takes[b.id] = {present: true, error: (e as Error).message}; }
+    }
+    const timingMeta = get<{meta_json: string}>(ctx.p.db.prepare("SELECT meta_json FROM artifacts WHERE kind='timing' AND blob_hash=? ORDER BY id DESC LIMIT 1"), timelineBlob);
+    const timingSource = (timingMeta ? (JSON.parse(timingMeta.meta_json) as {source?: string}).source : undefined) ?? timeline.source ?? null;
+    const items = checkNarration(doc, takes, {source: timingSource, durationSec: timeline.durationSec, segments: timeline.segments.map((s: any) => ({id: s.id, start: s.start, end: s.end}))});
+
+    stop();
+    ctx.progress({step: 'checking the captions against the spoken text'});
+    const confirmed = new Set(all<{segment_id: string; diff_hash: string}>(ctx.p.db.prepare('SELECT segment_id, diff_hash FROM caption_confirmations WHERE episode_id=?'), ctx.episodeId).map((r) => `${r.segment_id}:${r.diff_hash}`));
+    const caps = checkCaptions(doc, (seg, h) => confirmed.has(`${seg}:${h}`));
+    items.push(...caps.items);
+
+    stop();
+    ctx.progress({step: 'reading the video file'});
+    const file = blobPath(ctx.p, row.blob_hash);
+    let actualSha: string | null = null, fileError: string | undefined;
+    try { actualSha = sha256File(file).hash; } catch (e) { fileError = (e as Error).message; }
+    let probe: MediaProbe | null = null, probeError: string | undefined;
+    if (!fileError) { try { probe = await probeMedia(file, ownedSpawn('ffprobe')); } catch (e) { probeError = (e as Error).message; } }
+    stop();
+    ctx.progress({step: 'decoding the audio and measuring its loudness'});
+    const audio = probe ? await measureAudio(file, ownedSpawn('ffmpeg')) : null;
+    stop();
+    ctx.progress({step: 'decoding every video frame'});
+    const video = probe ? await measureVideo(file, ownedSpawn('ffmpeg')) : null;
+    const settings = (rsnap.componentValues?.renderSettings ?? {}) as {width?: number; height?: number; fps?: number};
+    const mp = rsnap.componentValues?.masteringParams as {lufs?: number; integratedLufs?: number; true_peak_db?: number; truePeakDb?: number} | undefined;
+    const lufs = mp?.lufs ?? mp?.integratedLufs, tp = mp?.true_peak_db ?? mp?.truePeakDb;
+    items.push(...checkFile({
+      kind: renderKind, recordedSha256: row.blob_hash, actualSha256: actualSha, fileError, probe, probeError, audio, video,
+      expected: {durationSec: timeline.durationSec, width: settings.width ?? 1080, height: settings.height ?? 1920, fps: settings.fps ?? 30},
+      target: lufs !== undefined && tp !== undefined ? {lufs, truePeakDb: tp} : null, markedMastered: meta.mastered,
+    }));
+
+    // fonts, overflow and overlaps: frames drawn by the same browser engine as the video, from the sources the video was rendered from
+    stop();
+    const scenes: SceneProbeInfo[] = doc.scenes.map((sc) => {
+      const template = sc.layout?.template;
+      const layoutId = sc.type === 'pip-cards' ? layoutIdFor(template) : template && LAYOUTS[template] ? template : null;
+      return {id: sc.id, type: sc.type, layoutId, captionsOn: sc.layout?.captionZone !== 'off' && !OWNS_CAPTIONS.has(sc.type), mascotShown: !!(layoutId && LAYOUTS[layoutId].mascot) && sc.layout?.mascot?.mode !== 'hidden'};
+    });
+    const frames = probeFrames(timeline, settings.fps ?? 30);
+    let samples: ProbeSample[] = [];
+    let layoutItems;
+    const style = doc.style ?? 'legacy-dark';
+    if (style === 'legacy-dark') layoutItems = analyzeLayout({style, probed: false, samples: [], scenes});
+    else {
+      const drift = renderSourceProblems(ctx.p, rsnap, sourceRoot);
+      if (drift.length) {
+        layoutItems = [{id: 'layout.coverage', section: 'layout' as const, title: 'Fonts, overflow and overlaps', kind: 'partial' as const, status: 'unchecked' as const, detail: `The working copy of the render sources differs from the sources this video was rendered from (${drift.length} difference${drift.length === 1 ? '' : 's'}), so frames drawn now would not be this video's frames. Fonts, overflow and overlaps were not examined. Rebuild the video from the current sources and check it again.`, lines: drift.slice(0, 5)}];
+      } else {
+        const pub = join(ctx.ws, 'public');
+        mkdirSync(pub, {recursive: true});
+        const libraryPublic = join(sourceRoot, 'public', 'library');
+        if (existsSync(libraryPublic)) cpSync(libraryPublic, join(pub, 'library'), {recursive: true});
+        mkdirSync(join(ctx.ws, 'tmp'), {recursive: true});
+        const spec = join(ctx.ws, 'probe-job.json');
+        const out = join(ctx.ws, 'probe.json');
+        writeFileSync(spec, JSON.stringify({entry: join(sourceRoot, 'src', 'index.ts'), publicDir: pub, bundleDir: join(ctx.ws, 'bundle'), out, composition: 'studio-episode',
+          inputProps: {episode: doc.id, variant: 'full', data: {episode: {id: doc.id, style, scenes: doc.scenes}, timeline, previewOnly: true, probe: true}}, frames}));
+        ctx.progress({step: 'preparing the browser probe'});
+        const child = ctx.spawn('probe-worker', process.execPath, [tools.probeWorker, spec], {cwd: sourceRoot, stdio: ['ignore', 'pipe', 'pipe'], env: {TMPDIR: join(ctx.ws, 'tmp')}});
+        await new Promise<void>((resolve, reject) => {
+          let buf = '', err = '', done = false, failure: string | undefined;
+          child.stdout!.setEncoding('utf8').on('data', (d: string) => {
+            buf += d;
+            const lines = buf.split('\n'); buf = lines.pop()!;
+            for (const l of lines) {
+              let m: any; try { m = JSON.parse(l); } catch { continue; }
+              if (m.event === 'progress') ctx.progress({step: m.step, ...(typeof m.fraction === 'number' ? {fraction: m.fraction} : {})});
+              else if (m.event === 'result') done = true;
+              else if (m.event === 'error') failure = m.message;
+            }
+          });
+          child.stderr!.setEncoding('utf8').on('data', (d: string) => { err = (err + d).slice(-4000); });
+          child.on('error', reject);
+          child.on('exit', (code, sig) => (code === 0 && done ? resolve() : reject(new Error(failure ?? `probe worker ${sig ? `was stopped (${sig})` : `exited with code ${code}`}: ${err.trim().split('\n').slice(-3).join(' | ')}`))));
+        });
+        const probed = JSON.parse(readFileSync(out, 'utf8')) as {samples: ProbeSample[]; problems: string[]};
+        samples = probed.samples;
+        layoutItems = analyzeLayout({style, probed: true, samples, scenes});
+        if (probed.problems.length) layoutItems.push({id: 'layout.probe-problems', section: 'layout', title: 'The probe read every sampled frame', kind: 'measured', status: 'warn', detail: `${probed.problems.length} sampled frame${probed.problems.length === 1 ? '' : 's'} could not be read, so they are not part of the result.`, lines: probed.problems.slice(0, 5)});
+      }
+    }
+    items.push(...layoutItems);
+
+    ctx.progress({step: 'writing the report'});
+    const report = buildReport({renderArtifactId: renderId, renderKind, fileSha256: row.blob_hash, items, captionDiffs: caps.diffs, sampled: {frames: samples.length, scenes: [...new Set(samples.map((s) => s.scene))]}});
+    const {hash} = putBytes(ctx.p, JSON.stringify(report));
+    return {blobHash: hash, meta: {passed: report.passed, summary: report.summary, renderArtifactId: renderId, renderKind, fileSha256: row.blob_hash, version: CHECKS_VERSION, sampledFrames: samples.length}};
+  };
+
+  return {'tts.block': tts, 'timing.build': timing, 'mix.draft': mix('draft'), 'mix.final': mix('final'), 'render.draft': render('draft'), 'render.final': render('final'), 'check.suite': checkSuite} satisfies Partial<Record<JobKind, JobHandler>>;
 }

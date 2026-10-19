@@ -1,7 +1,7 @@
 // Project store commands. Default project root is this repository; use --root to point elsewhere.
 //   init | adopt <episode.json> | status | external | import-external <id> | keep-project <id>
 //   revisions <id> | checkpoint <id> [--label L] | restore-revision <id> <n>
-//   add-reference <name> <file> | verify | backup <dir> [--include-drafts] | restore <backupDir> <emptyTarget>
+//   add-reference <name> <file> | verify | backup <dir> [--compact] | restore <backupDir> <emptyTarget>
 //   gc [--apply [--expect <digest>]] [--grace-days N] [--thin [--keep-recent N]]
 //      dry run (default) prints the exact plan incl. revision thinning and its digest; --apply with --expect runs
 //      only if a fresh plan has the same digest, otherwise it stops and asks for a new preview
@@ -60,7 +60,7 @@ try {
         const v = verifyAll(p);
         out(v);
         process.exitCode = v.missing.length || v.corrupt.length ? 1 : 0;
-      } else if (cmd === 'backup') out(createBackup(p, resolve(rest[0]), {includeDrafts: flag('--include-drafts')}));
+      } else if (cmd === 'backup') out(createBackup(p, resolve(rest[0]), {includeDrafts: !flag('--compact')}));
       else if (cmd === 'gc') {
         const days = Number(opt('--grace-days') ?? 14);
         const plan = planCleanup(p, {graceMs: days * 86_400_000, thin: flag('--thin') ? {...DEFAULT_THIN, keepRecent: Number(opt('--keep-recent') ?? DEFAULT_THIN.keepRecent)} : false});

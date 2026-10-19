@@ -1,0 +1,640 @@
+{
+  "ranAt": "2026-10-19T09:25:16.088Z",
+  "project": "(a new project created with ./studio-app new)",
+  "steps": [
+    {
+      "name": "create + research + script + storyboard (UI only)",
+      "wallSec": 1.4
+    },
+    {
+      "name": "apply scenes",
+      "wallSec": 0.6
+    },
+    {
+      "name": "voice: generate all blocks (real Qwen3-TTS, includes model load)",
+      "wallSec": 17.9
+    },
+    {
+      "name": "draft video",
+      "wallSec": 21.7,
+      "plan": [
+        "take:b1:current",
+        "timing:run",
+        "mix:draft:run",
+        "render:draft:run"
+      ]
+    },
+    {
+      "name": "draft checks",
+      "wallSec": 9.5,
+      "summary": {
+        "pass": 21,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "final video",
+      "wallSec": 19.4,
+      "plan": [
+        "take:b1:current",
+        "timing:current",
+        "mix:final:run",
+        "render:final:run"
+      ]
+    },
+    {
+      "name": "final checks",
+      "wallSec": 9.4,
+      "summary": {
+        "pass": 23,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 1
+      },
+      "passed": true
+    }
+  ],
+  "emptyProject": "This project has no episodes yet\n\nAn episode is one short video, made in steps: Idea, Research, Script, Storyboard, Scenes, Voice, then Review. Each step shows what it needs before anything runs, and nothing is built until you ask for it.\n\nStart with a title and who it is for. You can paste the research, script and storyboard from ChatGPT one step at a time; the app only reads what you paste.\n\nStart the first episode",
+  "requestsOutsideThisApp": [],
+  "invalidResearchError": "Nothing was imported. There is one problem:\nclaims[0].kind must be one of \"fact\", \"assumption\", \"proposed-wording\", but it is \"rumor\"\nFix the answer (or ask ChatGPT to correct exactly these lines) and check it again. Your pasted text is still here.",
+  "episodeId": "why-a-model-forgets-the-start-of-a-long-chat",
+  "applyPreview": [
+    "New sb1 Pip cards · lines s1 to s2 · 2 cards (\"Only so much\", \"The context window\") · 3 Pip actions · layout content-led",
+    "New sb2 Pip cards · lines s3 to s4 · 3 cards (\"A long chat\", \"Old words drop out\", \"Not seen, not used\") · 2 Pip actions · layout content-led",
+    "New sb3 Pip cards · lines s5 · 1 card (\"Repeat what matters\") · 2 Pip actions · layout content-led"
+  ],
+  "typeface": "Bundled fonts (Inter, JetBrains Mono)",
+  "styleOfNewEpisode": "pip-paper-bundled",
+  "scenes": [
+    {
+      "id": "sb1",
+      "type": "pip-cards",
+      "segments": [
+        "s1",
+        "s2"
+      ]
+    },
+    {
+      "id": "sb2",
+      "type": "pip-cards",
+      "segments": [
+        "s3",
+        "s4"
+      ]
+    },
+    {
+      "id": "sb3",
+      "type": "pip-cards",
+      "segments": [
+        "s5"
+      ]
+    }
+  ],
+  "voiceBefore": {
+    "blocks": [
+      {
+        "id": "b1",
+        "words": 49,
+        "status": "none",
+        "estimate": {
+          "measured": false
+        }
+      }
+    ],
+    "engine": "stopped",
+    "blockers": []
+  },
+  "voiceAfter": {
+    "blocks": [
+      {
+        "id": "b1",
+        "status": "fresh",
+        "takes": 1,
+        "selected": [
+          1
+        ]
+      }
+    ],
+    "jobs": [
+      {
+        "kind": "tts.block",
+        "subject": "b1",
+        "state": "succeeded",
+        "elapsedSec": 17.5
+      }
+    ]
+  },
+  "engineSamples": {
+    "count": 9,
+    "activities": [
+      "stopped",
+      "loading",
+      "generating"
+    ],
+    "peakWorkerRssMB": 603
+  },
+  "noteAfterAdd": [
+    "general 0:00.0 · s1 open round 1, draft video [Phase 8 journey test note] Written by the automated journey run to exercise review notes. It records no listening and no judgement of the video. Resolve it, or ignore it. What it was written about Resolve Won’t fix Edit"
+  ],
+  "measures": {
+    "draftChecks": {
+      "renderArtifactId": 4,
+      "fileSha256": "5f2a9a2d06e0e6cbe88596f5a6dca54c0044e817cf2da8af25008ee8bcd68a08",
+      "passed": true,
+      "summary": {
+        "pass": 21,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 2
+      },
+      "sampledFrames": 23,
+      "items": [
+        {
+          "id": "narration.takes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 of 1 blocks have a readable take",
+          "lines": []
+        },
+        {
+          "id": "narration.duration",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block is within the plausible range of words per second",
+          "lines": []
+        },
+        {
+          "id": "narration.pace",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "every block is at a usual pace",
+          "lines": []
+        },
+        {
+          "id": "narration.energy",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block has speech-level sound throughout",
+          "lines": []
+        },
+        {
+          "id": "narration.gaps",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no silent gap over 1.5 s",
+          "lines": []
+        },
+        {
+          "id": "narration.ending",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block ends quietly",
+          "lines": []
+        },
+        {
+          "id": "narration.edges",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "edges look normal",
+          "lines": []
+        },
+        {
+          "id": "narration.alignment",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "segment times are ordered, inside the audio and plausible; timing source: qwen-aligned",
+          "lines": []
+        },
+        {
+          "id": "narration.timing-source",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Timing source: qwen-aligned.",
+          "lines": []
+        },
+        {
+          "id": "narration.words",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Not checked by the app. Alignment gives times to the text it is given, so it cannot show that a word was left out. Listening is required.",
+          "lines": []
+        },
+        {
+          "id": "narration.seams",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Blocks are generated separately and can differ slightly in delivery. Whether a join is audible is a listening judgement.",
+          "lines": []
+        },
+        {
+          "id": "captions.phrases",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every segment's phrases spell its text",
+          "lines": []
+        },
+        {
+          "id": "captions.overrides",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every caption with digits or symbols has a spoken reading",
+          "lines": []
+        },
+        {
+          "id": "captions.numbers",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every number in a caption is spoken correctly",
+          "lines": []
+        },
+        {
+          "id": "captions.diff",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "caption and speech use the same words",
+          "lines": []
+        },
+        {
+          "id": "file.hash",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "SHA-256 5f2a9a2d06e0… matches the recorded hash",
+          "lines": []
+        },
+        {
+          "id": "file.container",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "h264 1080 x 1920 at 30 fps with an aac audio track",
+          "lines": []
+        },
+        {
+          "id": "file.decode",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "the whole video and audio decode without errors and match the timing",
+          "lines": []
+        },
+        {
+          "id": "mastering.loudness",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Not mastered. This is a draft: its audio is the unmastered mix (measured -22.8 LUFS, true peak -7 dBTP). A draft cannot be approved or exported.",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 font list examined in the same browser engine that renders the video: Inter in use",
+          "lines": []
+        },
+        {
+          "id": "layout.overflow",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overflow in 23 sampled frames (DOM text only)",
+          "lines": []
+        },
+        {
+          "id": "layout.overlap",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overlap or intrusion in the sampled frames (Pip's box is taken from the layout geometry, not measured)",
+          "lines": []
+        },
+        {
+          "id": "layout.size",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every marked text is at or above its minimum size",
+          "lines": []
+        },
+        {
+          "id": "layout.coverage",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "all 3 scenes have marked elements that were measured",
+          "lines": []
+        },
+        {
+          "id": "custom.scenes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "this video has no custom scene",
+          "lines": []
+        }
+      ],
+      "selected": {
+        "bytes": 1061752,
+        "durationSec": 15.8,
+        "label": "Draft (not mastered)",
+        "url": "/media/render/why-a-model-forgets-the-start-of-a-long-chat/4.mp4"
+      }
+    },
+    "finalChecks": {
+      "renderArtifactId": 7,
+      "fileSha256": "eac37082184c10f19419247500716081d60b214d2d33c978b3aa7c611cbf713e",
+      "passed": true,
+      "summary": {
+        "pass": 23,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 1
+      },
+      "sampledFrames": 23,
+      "items": [
+        {
+          "id": "narration.takes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 of 1 blocks have a readable take",
+          "lines": []
+        },
+        {
+          "id": "narration.duration",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block is within the plausible range of words per second",
+          "lines": []
+        },
+        {
+          "id": "narration.pace",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "every block is at a usual pace",
+          "lines": []
+        },
+        {
+          "id": "narration.energy",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block has speech-level sound throughout",
+          "lines": []
+        },
+        {
+          "id": "narration.gaps",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no silent gap over 1.5 s",
+          "lines": []
+        },
+        {
+          "id": "narration.ending",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block ends quietly",
+          "lines": []
+        },
+        {
+          "id": "narration.edges",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "edges look normal",
+          "lines": []
+        },
+        {
+          "id": "narration.alignment",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "segment times are ordered, inside the audio and plausible; timing source: qwen-aligned",
+          "lines": []
+        },
+        {
+          "id": "narration.timing-source",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Timing source: qwen-aligned.",
+          "lines": []
+        },
+        {
+          "id": "narration.words",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Not checked by the app. Alignment gives times to the text it is given, so it cannot show that a word was left out. Listening is required.",
+          "lines": []
+        },
+        {
+          "id": "narration.seams",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Blocks are generated separately and can differ slightly in delivery. Whether a join is audible is a listening judgement.",
+          "lines": []
+        },
+        {
+          "id": "captions.phrases",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every segment's phrases spell its text",
+          "lines": []
+        },
+        {
+          "id": "captions.overrides",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every caption with digits or symbols has a spoken reading",
+          "lines": []
+        },
+        {
+          "id": "captions.numbers",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every number in a caption is spoken correctly",
+          "lines": []
+        },
+        {
+          "id": "captions.diff",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "caption and speech use the same words",
+          "lines": []
+        },
+        {
+          "id": "file.hash",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "SHA-256 eac37082184c… matches the recorded hash",
+          "lines": []
+        },
+        {
+          "id": "file.container",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "h264 1080 x 1920 at 30 fps with an aac audio track",
+          "lines": []
+        },
+        {
+          "id": "file.decode",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "the whole video and audio decode without errors and match the timing",
+          "lines": []
+        },
+        {
+          "id": "mastering.loudness",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "-16 LUFS integrated (target -16) and -4.7 dBTP true peak (limit -1.5), measured on the audio inside the file",
+          "lines": []
+        },
+        {
+          "id": "mastering.flag",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "its record says the mastering chain was applied",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 font list examined in the same browser engine that renders the video: Inter in use",
+          "lines": []
+        },
+        {
+          "id": "layout.overflow",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overflow in 23 sampled frames (DOM text only)",
+          "lines": []
+        },
+        {
+          "id": "layout.overlap",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overlap or intrusion in the sampled frames (Pip's box is taken from the layout geometry, not measured)",
+          "lines": []
+        },
+        {
+          "id": "layout.size",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every marked text is at or above its minimum size",
+          "lines": []
+        },
+        {
+          "id": "layout.coverage",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "all 3 scenes have marked elements that were measured",
+          "lines": []
+        },
+        {
+          "id": "custom.scenes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "this video has no custom scene",
+          "lines": []
+        }
+      ],
+      "selected": {
+        "bytes": 1667368,
+        "durationSec": 15.8,
+        "label": "Final (mastered)",
+        "url": "/media/render/why-a-model-forgets-the-start-of-a-long-chat/7.mp4"
+      }
+    },
+    "draftFile": {
+      "file": "out/phase8/journey/why-a-model-forgets-the-start-of-a-long-chat-draft.mp4",
+      "sha256": "5f2a9a2d06e0e6cbe88596f5a6dca54c0044e817cf2da8af25008ee8bcd68a08",
+      "bytes": 1061752,
+      "durationSec": 15.8,
+      "label": "Draft (not mastered)"
+    },
+    "finalFile": {
+      "file": "out/phase8/journey/why-a-model-forgets-the-start-of-a-long-chat-final.mp4",
+      "sha256": "eac37082184c10f19419247500716081d60b214d2d33c978b3aa7c611cbf713e",
+      "bytes": 1667368,
+      "durationSec": 15.8,
+      "label": "Final (mastered)"
+    }
+  },
+  "jobs": [
+    {
+      "id": 1,
+      "kind": "tts.block",
+      "subject": "b1",
+      "state": "succeeded",
+      "elapsedSec": 17.5,
+      "cacheHit": false
+    },
+    {
+      "id": 2,
+      "kind": "timing.build",
+      "subject": "timeline",
+      "state": "succeeded",
+      "elapsedSec": 1.4,
+      "cacheHit": false
+    },
+    {
+      "id": 3,
+      "kind": "mix.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 0.7,
+      "cacheHit": false
+    },
+    {
+      "id": 4,
+      "kind": "render.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 19,
+      "cacheHit": false
+    },
+    {
+      "id": 5,
+      "kind": "check.suite",
+      "subject": "4",
+      "state": "succeeded",
+      "elapsedSec": 8.7,
+      "cacheHit": false
+    },
+    {
+      "id": 6,
+      "kind": "mix.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 1,
+      "cacheHit": false
+    },
+    {
+      "id": 7,
+      "kind": "render.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 17.9,
+      "cacheHit": false
+    },
+    {
+      "id": 8,
+      "kind": "check.suite",
+      "subject": "7",
+      "state": "succeeded",
+      "elapsedSec": 8.8,
+      "cacheHit": false
+    }
+  ],
+  "awaitingYou": {
+    "approval": "none",
+    "signoffsTicked": 0,
+    "exportPossible": false,
+    "roundOnFinal": null,
+    "openNotes": 1,
+    "blockers": [
+      "This final video has not been opened for review yet. Start a review round on it.",
+      "1 note is still open. Resolve them or mark them won't fix."
+    ]
+  },
+  "consoleErrors": [],
+  "failedRequests": [
+    "422 http://127.0.0.1:4421/api/plans/why-a-model-forgets-the-start-of-a-long-chat/imports"
+  ]
+}

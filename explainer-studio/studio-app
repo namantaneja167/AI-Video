@@ -1,0 +1,4 @@
+#!/bin/sh
+# Starts the Explainer Studio app on the persistent demo workspace (see app/main.ts).
+DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$DIR" && exec node app/main.ts "$@"

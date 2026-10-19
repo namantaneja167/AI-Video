@@ -1,6 +1,6 @@
 // A geometry fit check for Pip layouts. It checks rectangles and declared text sizes, nothing about how the scene looks:
 // whether every item is inside the safe area, readable at phone size, clear of the caption band, and clear of Pip.
-import {CAPTION_BAND, LAYOUTS, SAFE, mascotBox, type Rect} from './layouts';
+import {CAPTION_BAND, LAYOUTS, SAFE, mascotBox, type Rect} from './layouts.ts';
 
 export type FitItem = {
   id: string;

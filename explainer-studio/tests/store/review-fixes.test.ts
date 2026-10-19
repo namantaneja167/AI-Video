@@ -204,7 +204,7 @@ describe('review finding 1: restore validates the whole manifest and the staged 
 
 // ============================================================ 2. cleanup with thinning ================================
 
-/** The scenario from the review: 12 rounds, each with its own selected take and an automatic revision. */
+/** The scenario from the review: 12 rounds, each with its own selected take, a build output and an automatic revision. */
 function thinningScenario() {
   t = newProject();
   adoptEpisode(t.p, 'episodes/join-fanout/episode.json');
@@ -217,6 +217,9 @@ function thinningScenario() {
     const j = startJob(t.p, {episodeId: 'join-fanout', jobKind: 'tts.block', subject: block});
     const done = finishJob(t.p, j.jobId, {blobHash: fakeBlob(t.p, `take ${i}`), seed: i});
     selectTake(t.p, 'join-fanout', block, done.artifactId);
+    // a build output per round too: saved takes are never collected, so what thinning can free is the older builds that only old revisions hold
+    const tj = startJob(t.p, {episodeId: 'join-fanout', jobKind: 'timing.build'});
+    finishJob(t.p, tj.jobId, {blobHash: fakeBlob(t.p, `timing ${i}`)});
     createRevision(t.p, 'join-fanout', {kind: 'auto'});
     t.clock.advance(3_600_000);
   }

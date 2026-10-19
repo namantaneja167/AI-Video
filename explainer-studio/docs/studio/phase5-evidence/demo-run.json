@@ -1,0 +1,92 @@
+{
+  "ranAt": "2026-10-18T17:33:59.098Z",
+  "planId": "what-is-a-token",
+  "brokenPasteMessage": "Nothing was imported. There is one problem: claims[0].kind must be one of \"fact\", \"assumption\", \"proposed-wording\", but it is \"rumor\" Fix the answer (or ask ChatGPT to correct exactly these lines) and check it again. Your pasted text is still here.",
+  "scriptRowsAccepted": [
+    "A model reads text in small pieces.",
+    "Those pieces are called tokens.",
+    "A token is not always a whole word.",
+    "Sometimes it is only part of one.",
+    "Every model can only hold so many tokens at once."
+  ],
+  "requestsOutsideThisApp": [],
+  "consoleErrors": [],
+  "failedRequests": [
+    "422 http://127.0.0.1:4317/api/plans/what-is-a-token/imports"
+  ],
+  "plan": {
+    "sources": 3,
+    "claims": 4,
+    "scenes": 3,
+    "imports": [
+      {
+        "id": 3,
+        "shape": "json",
+        "state": "accepted",
+        "sha256": "f97e3a147e1b758395f0a66975d60abbeba333dbc5208b7282f122e865a55c92",
+        "bytes": 1048
+      },
+      {
+        "id": 2,
+        "shape": "script",
+        "state": "accepted",
+        "sha256": "26e8151e91c92d2af96bf8083f0a13f3ab15e9163d19d26c16c44f369b3d84d3",
+        "bytes": 183
+      },
+      {
+        "id": 1,
+        "shape": "json",
+        "state": "accepted",
+        "sha256": "3fb1527358fdcd9c368f0dd116aa1aabf17d9a6e507ef0814edc0ed611d68a9e",
+        "bytes": 1431
+      }
+    ]
+  },
+  "storyboardCheck": {
+    "producible": false,
+    "summary": "3 of 3 planned scenes cannot be produced yet (1 custom, 1 tied to other content, 1 need content).",
+    "scenes": [
+      {
+        "id": "sb1",
+        "kind": "reusable",
+        "blockers": [
+          "It still needs its content (what the cards, numbers or tables say). Entering scene content is a later step, so it cannot be produced yet."
+        ]
+      },
+      {
+        "id": "sb2",
+        "kind": "custom",
+        "blockers": [
+          "A custom scene has to be designed and built by a developer before it can be produced."
+        ]
+      },
+      {
+        "id": "sb3",
+        "kind": "own-content",
+        "blockers": [
+          "This scene was built for one specific piece of narration. It can be used here only if this narration fits it, and setting that up is a later step.",
+          "The \"label\" moment needs line 2 of the scene, which is not planned into this scene.",
+          "The \"prompt_in\" moment needs line 3 of the scene, which is not planned into this scene.",
+          "The \"split\" moment needs line 3 of the scene, which is not planned into this scene.",
+          "The \"tokens_fly\" moment needs line 3 of the scene, which is not planned into this scene.",
+          "The \"history\" moment needs line 4 of the scene, which is not planned into this scene.",
+          "and 15 more moments the narration does not match."
+        ]
+      }
+    ]
+  },
+  "library": [
+    {
+      "id": "what-is-a-token",
+      "hasPlan": true,
+      "hasEpisode": true,
+      "segments": 5
+    },
+    {
+      "id": "context-window",
+      "hasPlan": false,
+      "hasEpisode": true,
+      "segments": 8
+    }
+  ]
+}

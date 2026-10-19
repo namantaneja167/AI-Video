@@ -52,12 +52,22 @@ function copyVerified(src: string, dest: string, expect?: string): {sha256: stri
 }
 
 /** Remove, from the copied database, everything that refers to blobs the backup does not carry. */
-function pruneCopy(dbFile: string, keep: Set<string>): void {
+function pruneCopy(dbFile: string, keep: Set<string>): {droppedRounds: number} {
   const db = openDb(dbFile);
+  let droppedRounds = 0;
   try {
     const drop = all<{hash: string}>(db.prepare('SELECT hash FROM blobs')).map((b) => b.hash).filter((h) => !keep.has(h));
     db.exec('BEGIN');
     for (const h of drop) {
+      // a review round belongs to one video's file: when the file is not carried, its round, playback and sign-offs go with it
+      const rounds = all<{id: number}>(db.prepare('SELECT r.id FROM review_rounds r JOIN artifacts a ON a.id=r.render_artifact_id WHERE a.blob_hash=?'), h);
+      for (const r of rounds) {
+        db.prepare('DELETE FROM review_playback WHERE round_id=?').run(r.id);
+        db.prepare('DELETE FROM review_signoffs WHERE round_id=?').run(r.id);
+        db.prepare('DELETE FROM review_rounds WHERE id=?').run(r.id);
+        droppedRounds++;
+      }
+      db.prepare('UPDATE approval_review SET checks_artifact_id=NULL WHERE checks_artifact_id IN (SELECT id FROM artifacts WHERE blob_hash=?)').run(h);
       db.prepare('DELETE FROM current WHERE artifact_id IN (SELECT id FROM artifacts WHERE blob_hash=?)').run(h);
       db.prepare('DELETE FROM artifacts WHERE blob_hash=?').run(h);
       db.prepare('DELETE FROM revision_refs WHERE blob_hash=?').run(h);
@@ -68,12 +78,13 @@ function pruneCopy(dbFile: string, keep: Set<string>): void {
     db.exec('UPDATE jobs SET artifact_id=NULL WHERE artifact_id IS NOT NULL AND artifact_id NOT IN (SELECT id FROM artifacts)');
     db.exec('COMMIT');
     db.exec('PRAGMA wal_checkpoint(TRUNCATE); PRAGMA journal_mode=DELETE; VACUUM');
+    return {droppedRounds};
   } finally {
     db.close();
   }
 }
 
-export type BackupSummary = {dest: string; blobs: number; files: number; bytes: number; manifestSha256: string};
+export type BackupSummary = {dest: string; blobs: number; files: number; bytes: number; manifestSha256: string; /** Review rounds left out because the file they belong to is not carried. */ droppedReviewRounds: number};
 
 export function createBackup(p: Project, dest: string, opts: {includeDrafts?: boolean; trackedDirs?: string[]} = {}): BackupSummary {
   if (existsSync(dest) && !isEmptyDir(dest)) throw new BackupError(`${dest} exists and is not empty`);
@@ -84,7 +95,7 @@ export function createBackup(p: Project, dest: string, opts: {includeDrafts?: bo
 
   const dbFile = join(dest, 'project.sqlite');
   p.db.exec(`VACUUM INTO '${dbFile.replace(/'/g, "''")}'`);
-  pruneCopy(dbFile, keep);
+  const pruned = pruneCopy(dbFile, keep);
   const dbSum = sha256File(dbFile);
   files.push({kind: 'db', path: 'project.sqlite', sha256: dbSum.hash, bytes: dbSum.bytes});
 
@@ -107,7 +118,7 @@ export function createBackup(p: Project, dest: string, opts: {includeDrafts?: bo
   const text = JSON.stringify(manifest, null, 1) + '\n';
   writeFileSync(join(dest, 'manifest.json'), text);
   writeFileSync(join(dest, 'manifest.json.sha256'), sha256(text) + '\n');
-  return {dest, blobs: files.filter((f) => f.kind === 'blob').length, files: files.filter((f) => f.kind === 'file').length, bytes: files.reduce((a, f) => a + f.bytes, 0), manifestSha256: sha256(text)};
+  return {dest, blobs: files.filter((f) => f.kind === 'blob').length, files: files.filter((f) => f.kind === 'file').length, bytes: files.reduce((a, f) => a + f.bytes, 0), manifestSha256: sha256(text), droppedReviewRounds: pruned.droppedRounds};
 }
 
 const HASH = /^[0-9a-f]{64}$/;

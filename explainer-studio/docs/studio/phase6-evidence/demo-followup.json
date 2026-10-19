@@ -1,0 +1,335 @@
+{
+  "ranAt": "2026-10-19T05:58:13.379Z",
+  "draft": "voice-demo-prompts",
+  "estimateComparisons": [
+    {
+      "label": "b2 re-roll (23 words)",
+      "words": 23,
+      "estimateShownInPage": "about 6 s to 8 s, plus about 3 s to load the voice model",
+      "estimate": {
+        "measured": true,
+        "minSec": 5.579999999999999,
+        "maxSec": 7.579999999999998,
+        "runs": 7,
+        "sources": [
+          "a rebuild in this workspace (job 17)",
+          "a rebuild in this workspace (job 18)",
+          "a rebuild in this workspace (job 19)",
+          "a rebuild in this workspace (job 20)",
+          "a rebuild in this workspace (job 21)",
+          "a rebuild in this workspace (job 23)",
+          "a rebuild in this workspace (job 24)"
+        ],
+        "note": "Based on 7 earlier takes."
+      },
+      "modelLoadEstimateAddedSec": 2.8,
+      "engineLoadedBefore": null,
+      "predictedSec": {
+        "min": 8.379999999999999,
+        "max": 10.379999999999999
+      },
+      "actualSec": 10.419,
+      "withinThirtyPercent": true,
+      "ratioToMidpoint": 1.11,
+      "seed": 13
+    },
+    {
+      "label": "b1 re-roll (51 words)",
+      "words": 51,
+      "estimateShownInPage": "about 12 s to 16 s, plus about 3 s to load the voice model",
+      "estimate": {
+        "measured": true,
+        "minSec": 11.98,
+        "maxSec": 16.414782608695653,
+        "runs": 8,
+        "sources": [
+          "a rebuild in this workspace (job 17)",
+          "a rebuild in this workspace (job 18)",
+          "a rebuild in this workspace (job 19)",
+          "a rebuild in this workspace (job 20)",
+          "a rebuild in this workspace (job 21)",
+          "a rebuild in this workspace (job 23)",
+          "a rebuild in this workspace (job 24)",
+          "a rebuild in this workspace (job 25)"
+        ],
+        "note": "Based on 8 earlier takes."
+      },
+      "modelLoadEstimateAddedSec": 2.8,
+      "engineLoadedBefore": null,
+      "predictedSec": {
+        "min": 14.780000000000001,
+        "max": 19.214782608695653
+      },
+      "actualSec": 18.772,
+      "withinThirtyPercent": true,
+      "ratioToMidpoint": 1.1,
+      "seed": 14
+    }
+  ],
+  "files": [
+    {
+      "file": "b1-take1-seed11.wav",
+      "durationSec": 14.4,
+      "integratedLufs": -22.2,
+      "truePeakDbfs": -4.7,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.32,
+          "dur": 0.32
+        },
+        {
+          "start": 2.78,
+          "end": 3.55,
+          "dur": 0.77
+        },
+        {
+          "start": 6.28,
+          "end": 6.88,
+          "dur": 0.6
+        },
+        {
+          "start": 11.86,
+          "end": 12.46,
+          "dur": 0.6
+        }
+      ]
+    },
+    {
+      "file": "b1-take2-seed12-SELECTED.wav",
+      "durationSec": 14.4,
+      "integratedLufs": -23.2,
+      "truePeakDbfs": -4.5,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.33,
+          "dur": 0.33
+        },
+        {
+          "start": 3.07,
+          "end": 3.39,
+          "dur": 0.32
+        },
+        {
+          "start": 6.28,
+          "end": 6.72,
+          "dur": 0.44
+        },
+        {
+          "start": 9.33,
+          "end": 9.71,
+          "dur": 0.38
+        }
+      ]
+    },
+    {
+      "file": "b1-take3-seed11-earlier-wording.wav",
+      "durationSec": 9.68,
+      "integratedLufs": -22.5,
+      "truePeakDbfs": -4,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.35,
+          "dur": 0.35
+        },
+        {
+          "start": 2.6,
+          "end": 3.17,
+          "dur": 0.57
+        },
+        {
+          "start": 4.13,
+          "end": 4.41,
+          "dur": 0.28
+        },
+        {
+          "start": 5.15,
+          "end": 5.51,
+          "dur": 0.36
+        },
+        {
+          "start": 6.52,
+          "end": 6.89,
+          "dur": 0.37
+        }
+      ]
+    },
+    {
+      "file": "b1-take4-seed13.wav",
+      "durationSec": 13.28,
+      "integratedLufs": -23.1,
+      "truePeakDbfs": -4.6,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.27,
+          "dur": 0.27
+        },
+        {
+          "start": 2.31,
+          "end": 2.69,
+          "dur": 0.38
+        },
+        {
+          "start": 3.52,
+          "end": 3.77,
+          "dur": 0.25
+        },
+        {
+          "start": 5.61,
+          "end": 5.92,
+          "dur": 0.3
+        },
+        {
+          "start": 8.39,
+          "end": 8.98,
+          "dur": 0.58
+        },
+        {
+          "start": 10.02,
+          "end": 10.29,
+          "dur": 0.27
+        }
+      ]
+    },
+    {
+      "file": "b1-take5-seed14.wav",
+      "durationSec": 14.32,
+      "integratedLufs": -23.5,
+      "truePeakDbfs": -5,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.32,
+          "dur": 0.32
+        },
+        {
+          "start": 5.6,
+          "end": 6.08,
+          "dur": 0.48
+        },
+        {
+          "start": 8.67,
+          "end": 9.1,
+          "dur": 0.44
+        },
+        {
+          "start": 10.19,
+          "end": 10.45,
+          "dur": 0.25
+        },
+        {
+          "start": 11.75,
+          "end": 12.2,
+          "dur": 0.45
+        }
+      ]
+    },
+    {
+      "file": "b2-take1-seed11-SELECTED.wav",
+      "durationSec": 6.32,
+      "integratedLufs": -22.2,
+      "truePeakDbfs": -4.8,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.36,
+          "dur": 0.36
+        },
+        {
+          "start": 3.52,
+          "end": 4,
+          "dur": 0.48
+        }
+      ]
+    },
+    {
+      "file": "b2-take2-seed12.wav",
+      "durationSec": 5.68,
+      "integratedLufs": -22.5,
+      "truePeakDbfs": -5.8,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.43,
+          "dur": 0.43
+        },
+        {
+          "start": 3.06,
+          "end": 3.56,
+          "dur": 0.5
+        }
+      ]
+    },
+    {
+      "file": "b2-take3-seed13.wav",
+      "durationSec": 5.76,
+      "integratedLufs": -22.5,
+      "truePeakDbfs": -5.6,
+      "silencesOver250ms": [
+        {
+          "start": 2.96,
+          "end": 3.47,
+          "dur": 0.51
+        }
+      ]
+    },
+    {
+      "file": "listening-sample-selected-takes.wav",
+      "durationSec": 22.72,
+      "integratedLufs": -23,
+      "truePeakDbfs": -4.5,
+      "silencesOver250ms": [
+        {
+          "start": 0,
+          "end": 0.83,
+          "dur": 0.83
+        },
+        {
+          "start": 3.57,
+          "end": 3.89,
+          "dur": 0.32
+        },
+        {
+          "start": 6.78,
+          "end": 7.22,
+          "dur": 0.44
+        },
+        {
+          "start": 9.83,
+          "end": 10.21,
+          "dur": 0.38
+        },
+        {
+          "start": 14.9,
+          "end": 15.56,
+          "dur": 0.66
+        },
+        {
+          "start": 18.72,
+          "end": 19.2,
+          "dur": 0.48
+        },
+        {
+          "start": 21.47,
+          "end": 22.72,
+          "dur": 1.25
+        }
+      ]
+    }
+  ],
+  "audioDir": "out/phase6/voice-demo",
+  "filesOnDisk": [
+    "b1-take1-seed11.wav",
+    "b1-take2-seed12-SELECTED.wav",
+    "b1-take3-seed11-earlier-wording.wav",
+    "b1-take4-seed13.wav",
+    "b1-take5-seed14.wav",
+    "b2-take1-seed11-SELECTED.wav",
+    "b2-take2-seed12.wav",
+    "b2-take3-seed13.wav",
+    "listening-sample-selected-takes.wav"
+  ]
+}

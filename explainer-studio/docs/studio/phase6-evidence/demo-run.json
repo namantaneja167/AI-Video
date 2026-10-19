@@ -1,0 +1,447 @@
+{
+  "startedAt": "2026-10-19T05:39:54.181Z",
+  "draft": "voice-demo-prompts",
+  "title": "Voice demo: prompts",
+  "script": [
+    "A prompt is just the message you send to a model.",
+    "It can be a question, an instruction, or a few examples.",
+    "The model reads your prompt one small piece at a time.",
+    "Then it writes its answer, one piece after another.",
+    "A clear prompt gives the model less to guess.",
+    "If you say who the answer is for, it can pick better words.",
+    "If you show one example, it can copy the shape."
+  ],
+  "blocksBefore": [
+    {
+      "id": "b1",
+      "segments": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5"
+      ],
+      "words": 51,
+      "status": "none",
+      "estimate": {
+        "measured": false
+      }
+    },
+    {
+      "id": "b2",
+      "segments": [
+        "s6",
+        "s7"
+      ],
+      "words": 23,
+      "status": "none",
+      "estimate": {
+        "measured": false
+      }
+    }
+  ],
+  "engineBefore": {
+    "worker": "none",
+    "pid": null,
+    "loaded": null,
+    "activity": "stopped",
+    "summary": "The voice engine is not running. Nothing is loaded and it holds no memory.",
+    "rssBytes": null,
+    "job": null,
+    "lastHandover": null,
+    "idleStopInMs": null
+  },
+  "afterReroll": [
+    {
+      "number": 1,
+      "seed": 11,
+      "selected": true,
+      "durationSec": 14.4,
+      "genSec": 13.41
+    },
+    {
+      "number": 2,
+      "seed": 12,
+      "selected": false,
+      "durationSec": 14.4,
+      "genSec": 11.73
+    }
+  ],
+  "audition": [
+    {
+      "block": "b1",
+      "take": 1,
+      "seed": 11,
+      "recordedSec": 14.4,
+      "pageSec": 14.4,
+      "loads": true
+    },
+    {
+      "block": "b1",
+      "take": 2,
+      "seed": 12,
+      "recordedSec": 14.4,
+      "pageSec": 14.4,
+      "loads": true
+    },
+    {
+      "block": "b2",
+      "take": 1,
+      "seed": 11,
+      "recordedSec": 6.32,
+      "pageSec": 6.32,
+      "loads": true
+    }
+  ],
+  "splitPreview": "Before: b1 (s1 to s5). After: b1 (s1 to s3) and b3 (s4 and s5). The order of the segments does not change.\nb1: no saved take was made for exactly these lines, so it needs a new take.\nb3: no saved take was made for exactly these lines, so it needs a new take.\nEarlier takes of b1 (2) are kept and stay in the take list: it was made for the old grouping, so they cannot be selected for the new lines. If you undo this change they become usable again.\nb2 is not affected: its take stays selected and nothing is regenerated for it.\nTiming, the audio mixes and the video were built from the old takes, so they will be out of date until narration is rebuilt. The text, scenes and everything else are unchanged.",
+  "afterSplit": [
+    {
+      "id": "b1",
+      "segments": [
+        "s1",
+        "s2",
+        "s3"
+      ],
+      "status": "stale",
+      "takes": 2
+    },
+    {
+      "id": "b3",
+      "segments": [
+        "s4",
+        "s5"
+      ],
+      "status": "none",
+      "takes": 0
+    },
+    {
+      "id": "b2",
+      "segments": [
+        "s6",
+        "s7"
+      ],
+      "status": "fresh",
+      "takes": 1
+    }
+  ],
+  "joinPreview": "Before: b1 (s1 to s3) and b3 (s4 and s5). After: b1 (s1 to s5). The order of the segments does not change.\nb1: a saved take (take 2) was made for exactly these lines, so it can be used again; nothing needs generating for it.\nEarlier takes of b1 (3) are kept and stay in the take list: it was made for the old grouping, so they cannot be selected for the new lines. If you undo this change they become usable again.\nEarlier takes of b3 (1) are kept and stay in the take list: the block no longer exists under that grouping, so they cannot be selected for the new lines. If you undo this change they become usable again.\nb2 is not affected: its take stays selected and nothing is regenerated for it.\nTiming, the audio mixes and the video were built from the old takes, so they will be out of date until narration is rebuilt. The text, scenes and everything else are unchanged.",
+  "reuse": {
+    "jobsBefore": 5,
+    "jobsAfter": 5,
+    "nothingGenerated": true,
+    "note": "b1 reused saved take 2. Nothing else was started."
+  },
+  "sampleSeconds": 1.342,
+  "final": {
+    "blocks": [
+      {
+        "id": "b1",
+        "segments": [
+          "s1",
+          "s2",
+          "s3",
+          "s4",
+          "s5"
+        ],
+        "status": "fresh",
+        "durationSec": 14.4,
+        "takes": [
+          {
+            "number": 1,
+            "seed": 11,
+            "selected": false,
+            "compatible": true,
+            "durationSec": 14.4
+          },
+          {
+            "number": 2,
+            "seed": 12,
+            "selected": true,
+            "compatible": true,
+            "durationSec": 14.4
+          },
+          {
+            "number": 3,
+            "seed": 11,
+            "selected": false,
+            "compatible": false,
+            "durationSec": 9.68
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "segments": [
+          "s6",
+          "s7"
+        ],
+        "status": "fresh",
+        "durationSec": 6.32,
+        "takes": [
+          {
+            "number": 1,
+            "seed": 11,
+            "selected": true,
+            "compatible": true,
+            "durationSec": 6.32
+          }
+        ]
+      }
+    ],
+    "sample": {
+      "fresh": true,
+      "durationSec": 22.72,
+      "url": "/media/sample/voice-demo-prompts/22.wav"
+    },
+    "downstream": {
+      "timing": "not built",
+      "mixFinal": "not built",
+      "renderFinal": "not built",
+      "sentence": "Timing, the mix and the video are not affected by anything on this screen until a take changes."
+    }
+  },
+  "files": [
+    {
+      "file": "b1-take1-seed11.wav",
+      "integratedLufs": null,
+      "truePeakDbfs": null,
+      "silencesOver250ms": []
+    },
+    {
+      "file": "b1-take2-seed12-SELECTED.wav",
+      "integratedLufs": null,
+      "truePeakDbfs": null,
+      "silencesOver250ms": []
+    },
+    {
+      "file": "b1-take3-seed11-earlier-wording.wav",
+      "integratedLufs": null,
+      "truePeakDbfs": null,
+      "silencesOver250ms": []
+    },
+    {
+      "file": "b2-take1-seed11-SELECTED.wav",
+      "integratedLufs": null,
+      "truePeakDbfs": null,
+      "silencesOver250ms": []
+    },
+    {
+      "file": "listening-sample-selected-takes.wav",
+      "integratedLufs": null,
+      "truePeakDbfs": null,
+      "silencesOver250ms": []
+    }
+  ],
+  "engineAfterIdle": {
+    "worker": "none",
+    "loaded": null,
+    "activity": "stopped",
+    "summary": "The voice engine is not running. Nothing is loaded and it holds no memory."
+  },
+  "consoleErrors": [],
+  "failedRequests": [],
+  "finishedAt": "2026-10-19T05:41:02.373Z",
+  "jobs": [
+    {
+      "id": 22,
+      "block": "draft",
+      "kind": "mix.draft",
+      "state": "succeeded",
+      "seed": null,
+      "revision": 3,
+      "elapsedSec": 0.887,
+      "cacheHit": false,
+      "attempts": 1
+    },
+    {
+      "id": 21,
+      "block": "b3",
+      "kind": "tts.block",
+      "state": "succeeded",
+      "seed": 11,
+      "revision": 2,
+      "elapsedSec": 6.168,
+      "cacheHit": false,
+      "attempts": 1
+    },
+    {
+      "id": 20,
+      "block": "b1",
+      "kind": "tts.block",
+      "state": "succeeded",
+      "seed": 11,
+      "revision": 2,
+      "elapsedSec": 8.749,
+      "cacheHit": false,
+      "attempts": 1
+    },
+    {
+      "id": 19,
+      "block": "b1",
+      "kind": "tts.block",
+      "state": "succeeded",
+      "seed": 12,
+      "revision": 1,
+      "elapsedSec": 11.865,
+      "cacheHit": false,
+      "attempts": 1
+    },
+    {
+      "id": 18,
+      "block": "b2",
+      "kind": "tts.block",
+      "state": "succeeded",
+      "seed": 11,
+      "revision": 1,
+      "elapsedSec": 6.084,
+      "cacheHit": false,
+      "attempts": 1
+    },
+    {
+      "id": 17,
+      "block": "b1",
+      "kind": "tts.block",
+      "state": "succeeded",
+      "seed": 11,
+      "revision": 1,
+      "elapsedSec": 17.737,
+      "cacheHit": false,
+      "attempts": 1
+    }
+  ],
+  "estimateComparisons": [
+    {
+      "label": "b1 first take",
+      "block": "b1",
+      "words": 51,
+      "estimate": {
+        "measured": false
+      },
+      "loadEstimate": {
+        "sec": null,
+        "note": "Loading the voice model has not been measured in this workspace yet."
+      },
+      "predictedSec": null,
+      "actualSec": 17.737,
+      "jobsBefore": 0,
+      "state": "succeeded",
+      "withinThirtyPercent": null,
+      "ratioToMidpoint": null
+    },
+    {
+      "label": "b2 first take",
+      "block": "b2",
+      "words": 23,
+      "estimate": {
+        "measured": true,
+        "minSec": 6.04764705882353,
+        "maxSec": 6.04764705882353,
+        "runs": 1,
+        "sources": [
+          "a rebuild in this workspace (job 17)"
+        ],
+        "note": "Based on one earlier take, so it could be off by more than 30%."
+      },
+      "loadEstimate": null,
+      "predictedSec": {
+        "min": 6.04764705882353,
+        "max": 6.04764705882353
+      },
+      "actualSec": 6.084,
+      "jobsBefore": 1,
+      "state": "succeeded",
+      "withinThirtyPercent": true,
+      "ratioToMidpoint": 1.01
+    },
+    {
+      "label": "b1 re-roll",
+      "block": "b1",
+      "words": 51,
+      "estimate": {
+        "measured": false
+      },
+      "loadEstimate": null,
+      "predictedSec": null,
+      "actualSec": 11.865,
+      "jobsBefore": 2,
+      "state": "succeeded",
+      "withinThirtyPercent": null,
+      "ratioToMidpoint": null
+    },
+    {
+      "label": "b1 (s1 to s3) after the split",
+      "block": "b1",
+      "words": 33,
+      "estimate": {
+        "measured": true,
+        "minSec": 7.590000000000001,
+        "maxSec": 8.677058823529412,
+        "runs": 3,
+        "sources": [
+          "a rebuild in this workspace (job 17)",
+          "a rebuild in this workspace (job 18)",
+          "a rebuild in this workspace (job 19)"
+        ],
+        "note": "Based on 3 earlier takes."
+      },
+      "loadEstimate": null,
+      "predictedSec": {
+        "min": 7.590000000000001,
+        "max": 8.677058823529412
+      },
+      "actualSec": 8.749,
+      "jobsBefore": 3,
+      "state": "succeeded",
+      "withinThirtyPercent": true,
+      "ratioToMidpoint": 1.08
+    },
+    {
+      "label": "b3 (s4 and s5) after the split",
+      "block": "b3",
+      "words": 18,
+      "estimate": {
+        "measured": true,
+        "minSec": 4.140000000000001,
+        "maxSec": 4.745454545454545,
+        "runs": 4,
+        "sources": [
+          "a rebuild in this workspace (job 17)",
+          "a rebuild in this workspace (job 18)",
+          "a rebuild in this workspace (job 19)",
+          "a rebuild in this workspace (job 20)"
+        ],
+        "note": "Based on 4 earlier takes."
+      },
+      "loadEstimate": null,
+      "predictedSec": {
+        "min": 4.140000000000001,
+        "max": 4.745454545454545
+      },
+      "actualSec": 6.168,
+      "jobsBefore": 4,
+      "state": "succeeded",
+      "withinThirtyPercent": true,
+      "ratioToMidpoint": 1.39
+    }
+  ],
+  "engineReadings": {
+    "count": 90,
+    "activities": [
+      "stopped",
+      "loading",
+      "generating",
+      "idle",
+      "working-elsewhere"
+    ],
+    "peakWorkerRssMB": 451,
+    "contradictions": []
+  },
+  "baseline": {
+    "seqBefore": 15,
+    "seqAfter": 15,
+    "hashBefore": "59396c69a98ceeee3f4ec20650864d54f212cdd9f3e21d023585b542129d101b",
+    "hashAfter": "59396c69a98ceeee3f4ec20650864d54f212cdd9f3e21d023585b542129d101b",
+    "unchanged": true
+  },
+  "otherDemoEpisodesUnchanged": true
+}

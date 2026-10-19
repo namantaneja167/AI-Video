@@ -3,6 +3,7 @@ import {AbsoluteFill, Audio, staticFile, useCurrentFrame, useVideoConfig} from '
 import {EpisodeVideo} from '../Episode';
 import {fontSetFor, useBundledFonts} from './fonts';
 import {PipCaption, activeCaption} from './PipCaption';
+import {ProbeReporter} from './probe';
 import {SCENES} from './registry';
 import type {LibData} from './types';
 import {P} from '../art/palette';
@@ -31,13 +32,14 @@ export const LibraryEpisode: React.FC<LibraryProps> = ({episode: id, variant, da
   if (!def) throw new Error(`No registered Pip scene of type ${scene.type}`);
   const fonts = fontSetFor(style);
   const segments = timeline.segments.filter((s) => scene.segments.includes(s.id));
-  const caption = def.ownsCaptions ? null : activeCaption(timeline.captions.filter((c) => scene.segments.includes(c.segment)), t);
+  const caption = def.ownsCaptions || scene.layout?.captionZone === 'off' ? null : activeCaption(timeline.captions.filter((c) => scene.segments.includes(c.segment)), t);
   const Scene = def.component;
   return (
     <AbsoluteFill style={{background: P.cream, overflow: 'hidden'}}>
-      <Audio src={staticFile(`generated/${id}/${variant}/${timeline.audio}`)} />
+      {data.previewOnly ? null : <Audio src={staticFile(`generated/${id}/${variant}/${timeline.audio}`)} />}
       <Scene scene={scene} timeline={timeline} segments={segments} cues={timeline.cues?.[scene.id] ?? {}} t={t} fps={fps} fonts={fonts} sceneData={data.sceneData?.[scene.id]} audioSrc={`generated/${id}/${variant}/${timeline.audio}`} />
       {caption ? <PipCaption cap={caption.cap} opacity={caption.opacity} lift={caption.lift} fonts={fonts} /> : null}
+      {data.probe ? <ProbeReporter frame={frame} t={t} scene={scene.id} bundledFonts={style === 'pip-paper-bundled'} /> : null}
     </AbsoluteFill>
   );
 };

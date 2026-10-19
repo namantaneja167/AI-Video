@@ -28,9 +28,9 @@ export class ExternalParseError extends Error {}
 
 export type ProjectionState = 'in-sync' | 'lag' | 'missing' | 'external';
 export type ProjectionAction = {episodeId: string; action: 'in-sync' | 'rewritten' | 'recreated' | 'external'};
-export type SaveResult = {changed: boolean; seq: number; docHash: string; revision: number | null; projection: 'written' | 'external-pending' | 'unchanged' | 'error'};
+export type SaveResult = {changed: boolean; seq: number; docHash: string; revision: number | null; projection: 'written' | 'external-pending' | 'unchanged' | 'deferred' | 'error'};
 
-const PERMANENT = new Set(['milestone', 'approval', 'final', 'adopt', 'restore']);
+const PERMANENT = new Set(['milestone', 'approval', 'final', 'adopt', 'restore', 'create', 'script-import', 'scenes-apply', 'scenes-before', 'blocks-edit']);
 export const isPermanentRevision = (kind: string): boolean => PERMANENT.has(kind);
 
 // ---- reading ---------------------------------------------------------------------------------------------------
@@ -94,7 +94,24 @@ export function adoptEpisode(p: Project, path: string): {id: string; seq: number
   });
 }
 
-export type SaveOptions = {baseSeq?: number; kind?: string; label?: string; forceProjection?: boolean};
+/** A brand-new episode written by the app itself (not adopted from a file). One transaction; the file follows the commit. */
+export function createEpisode(p: Project, input: unknown, opts: {label?: string; skipProjection?: boolean} = {}): {id: string; seq: number; revision: number; projection: 'written' | 'external-pending' | 'deferred' | 'error'} {
+  const doc = validated(input);
+  if (get(p.db.prepare('SELECT 1 FROM episodes WHERE id=?'), doc.id)) throw new EpisodeExistsError(`episode "${doc.id}" is already in this project`);
+  const docHash = hashJson(doc);
+  const relPath = `episodes/${doc.id}/episode.json`;
+  const res = p.tx('create-episode', () => {
+    const seq = Number(p.db.prepare('INSERT INTO ops(episode_id,kind,doc_hash,projection_hash,at) VALUES(?,?,?,?,?)').run(doc.id, 'create', docHash, sha256(projectionBytes(doc)), p.now()).lastInsertRowid);
+    p.db.prepare('INSERT INTO episodes(id,doc_json,doc_hash,seq,updated_at,ops_since_checkpoint,last_checkpoint_at) VALUES(?,?,?,?,?,0,?)').run(doc.id, JSON.stringify(doc), docHash, seq, p.now(), p.now());
+    p.db.prepare('INSERT INTO projections(episode_id,path,confirmed_hash,confirmed_seq) VALUES(?,?,NULL,0)').run(doc.id, relPath);
+    const revision = createRevision(p, doc.id, {kind: 'create', label: opts.label ?? 'created in the app'});
+    return {id: doc.id, seq, revision};
+  });
+  if (opts.skipProjection) return {...res, projection: 'deferred'};
+  try { return {...res, projection: writeProjection(p, doc.id)}; } catch { return {...res, projection: 'error'}; }
+}
+
+export type SaveOptions = {baseSeq?: number; kind?: string; label?: string; forceProjection?: boolean; /** The caller is inside a larger transaction and writes the file after it commits (writeProjection). */ skipProjection?: boolean};
 
 /** One transaction: validate, record the op, replace the working document, maybe checkpoint. Then project. */
 export function saveEpisode(p: Project, id: string, input: unknown, opts: SaveOptions = {}): SaveResult {
@@ -115,6 +132,7 @@ export function saveEpisode(p: Project, id: string, input: unknown, opts: SaveOp
     return {changed: true, seq, docHash, revision};
   });
   if (!res.changed) return {...res, projection: 'unchanged'};
+  if (opts.skipProjection) return {...res, projection: 'deferred'};
   let projection: SaveResult['projection'];
   try {
     projection = writeProjection(p, id, {force: opts.forceProjection});

@@ -14,11 +14,12 @@ import {captureFileSet, setComponent} from './state.ts';
 
 export const fileSha = (path: string): string => sha256File(path).hash;
 
-export type ToolPaths = {audioWorker: string; mix: string; renderWorker: string; timeline: string[]};
+export type ToolPaths = {audioWorker: string; mix: string; renderWorker: string; probeWorker: string; timeline: string[]};
 export const defaultTools = (root: string): ToolPaths => ({
   audioWorker: join(root, 'workers/audio_worker.py'),
   mix: join(root, 'workers/mix.py'),
   renderWorker: join(root, 'workers/render-worker.ts'),
+  probeWorker: join(root, 'workers/probe-worker.ts'),
   timeline: ['pipeline/timeline.py', 'pipeline/timeline_cli.py', 'core/timeline.ts', 'workers/mouth.py', 'src/library/cues.ts', 'src/library/sceneSpecs.ts'].map((f) => join(root, f)),
 });
 

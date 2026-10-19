@@ -1,0 +1,680 @@
+{
+  "ranAt": "2026-10-19T08:22:25.716Z",
+  "project": "(a new project created with ./studio-app new)",
+  "steps": [
+    {
+      "name": "draft checks",
+      "wallSec": 10.2,
+      "summary": {
+        "pass": 21,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 2
+      },
+      "passed": true
+    },
+    {
+      "name": "final checks",
+      "wallSec": 9.2,
+      "summary": {
+        "pass": 23,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 1
+      },
+      "passed": true
+    }
+  ],
+  "emptyProject": "",
+  "episodeId": "why-a-model-forgets-the-start-of-a-long-chat",
+  "resumed": "the episode already existed; creation and scenes were not repeated",
+  "typeface": "Bundled fonts (Inter, JetBrains Mono)",
+  "styleOfNewEpisode": "pip-paper-bundled",
+  "scenes": [
+    {
+      "id": "sb1",
+      "type": "pip-cards",
+      "segments": [
+        "s1",
+        "s2"
+      ]
+    },
+    {
+      "id": "sb2",
+      "type": "pip-cards",
+      "segments": [
+        "s3",
+        "s4"
+      ]
+    },
+    {
+      "id": "sb3",
+      "type": "pip-cards",
+      "segments": [
+        "s5"
+      ]
+    }
+  ],
+  "voiceBefore": {
+    "blocks": [
+      {
+        "id": "b1",
+        "words": 49,
+        "status": "fresh",
+        "estimate": {
+          "measured": true,
+          "minSec": 14.799999999999999,
+          "maxSec": 14.799999999999999,
+          "runs": 1,
+          "sources": [
+            "a rebuild in this workspace (job 2)"
+          ],
+          "note": "Based on one earlier take, so it could be off by more than 30%. Includes about 0.6 s of fixed time per block."
+        }
+      }
+    ],
+    "engine": "stopped",
+    "blockers": []
+  },
+  "voiceAfter": {
+    "blocks": [
+      {
+        "id": "b1",
+        "status": "fresh",
+        "takes": 1,
+        "selected": [
+          1
+        ]
+      }
+    ],
+    "jobs": [
+      {
+        "kind": "tts.block",
+        "subject": "b1",
+        "state": "succeeded",
+        "elapsedSec": 17.9
+      },
+      {
+        "kind": "tts.block",
+        "subject": "b1",
+        "state": "failed",
+        "elapsedSec": 7.3
+      }
+    ]
+  },
+  "engineSamples": {
+    "count": 1,
+    "activities": [
+      "stopped"
+    ],
+    "peakWorkerRssMB": 0
+  },
+  "measures": {
+    "draftChecks": {
+      "renderArtifactId": 9,
+      "fileSha256": "5f2a9a2d06e0e6cbe88596f5a6dca54c0044e817cf2da8af25008ee8bcd68a08",
+      "passed": true,
+      "summary": {
+        "pass": 21,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 2
+      },
+      "sampledFrames": 23,
+      "items": [
+        {
+          "id": "narration.takes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 of 1 blocks have a readable take",
+          "lines": []
+        },
+        {
+          "id": "narration.duration",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block is within the plausible range of words per second",
+          "lines": []
+        },
+        {
+          "id": "narration.pace",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "every block is at a usual pace",
+          "lines": []
+        },
+        {
+          "id": "narration.energy",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block has speech-level sound throughout",
+          "lines": []
+        },
+        {
+          "id": "narration.gaps",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no silent gap over 1.5 s",
+          "lines": []
+        },
+        {
+          "id": "narration.ending",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block ends quietly",
+          "lines": []
+        },
+        {
+          "id": "narration.edges",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "edges look normal",
+          "lines": []
+        },
+        {
+          "id": "narration.alignment",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "segment times are ordered, inside the audio and plausible; timing source: qwen-aligned",
+          "lines": []
+        },
+        {
+          "id": "narration.timing-source",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Timing source: qwen-aligned.",
+          "lines": []
+        },
+        {
+          "id": "narration.words",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Not checked by the app. Alignment gives times to the text it is given, so it cannot show that a word was left out. Listening is required.",
+          "lines": []
+        },
+        {
+          "id": "narration.seams",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Blocks are generated separately and can differ slightly in delivery. Whether a join is audible is a listening judgement.",
+          "lines": []
+        },
+        {
+          "id": "captions.phrases",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every segment's phrases spell its text",
+          "lines": []
+        },
+        {
+          "id": "captions.overrides",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every caption with digits or symbols has a spoken reading",
+          "lines": []
+        },
+        {
+          "id": "captions.numbers",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every number in a caption is spoken correctly",
+          "lines": []
+        },
+        {
+          "id": "captions.diff",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "caption and speech use the same words",
+          "lines": []
+        },
+        {
+          "id": "file.hash",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "SHA-256 5f2a9a2d06e0… matches the recorded hash",
+          "lines": []
+        },
+        {
+          "id": "file.container",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "h264 1080 x 1920 at 30 fps with an aac audio track",
+          "lines": []
+        },
+        {
+          "id": "file.decode",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "the whole video and audio decode without errors and match the timing",
+          "lines": []
+        },
+        {
+          "id": "mastering.loudness",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Not mastered. This is a draft: its audio is the unmastered mix (measured -22.8 LUFS, true peak -7 dBTP). A draft cannot be approved or exported.",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 font list examined in the same browser engine that renders the video: Inter in use",
+          "lines": []
+        },
+        {
+          "id": "layout.overflow",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overflow in 23 sampled frames (DOM text only)",
+          "lines": []
+        },
+        {
+          "id": "layout.overlap",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overlap or intrusion in the sampled frames (Pip's box is taken from the layout geometry, not measured)",
+          "lines": []
+        },
+        {
+          "id": "layout.size",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every marked text is at or above its minimum size",
+          "lines": []
+        },
+        {
+          "id": "layout.coverage",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "all 3 scenes have marked elements that were measured",
+          "lines": []
+        },
+        {
+          "id": "custom.scenes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "this video has no custom scene",
+          "lines": []
+        }
+      ],
+      "selected": {
+        "bytes": 1061752,
+        "durationSec": 15.8,
+        "label": "Draft (not mastered)",
+        "url": "/media/render/why-a-model-forgets-the-start-of-a-long-chat/9.mp4"
+      }
+    },
+    "finalChecks": {
+      "renderArtifactId": 11,
+      "fileSha256": "eac37082184c10f19419247500716081d60b214d2d33c978b3aa7c611cbf713e",
+      "passed": true,
+      "summary": {
+        "pass": 23,
+        "warn": 0,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 1
+      },
+      "sampledFrames": 23,
+      "items": [
+        {
+          "id": "narration.takes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 of 1 blocks have a readable take",
+          "lines": []
+        },
+        {
+          "id": "narration.duration",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block is within the plausible range of words per second",
+          "lines": []
+        },
+        {
+          "id": "narration.pace",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "every block is at a usual pace",
+          "lines": []
+        },
+        {
+          "id": "narration.energy",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block has speech-level sound throughout",
+          "lines": []
+        },
+        {
+          "id": "narration.gaps",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no silent gap over 1.5 s",
+          "lines": []
+        },
+        {
+          "id": "narration.ending",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every block ends quietly",
+          "lines": []
+        },
+        {
+          "id": "narration.edges",
+          "kind": "heuristic",
+          "status": "pass",
+          "detail": "edges look normal",
+          "lines": []
+        },
+        {
+          "id": "narration.alignment",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "segment times are ordered, inside the audio and plausible; timing source: qwen-aligned",
+          "lines": []
+        },
+        {
+          "id": "narration.timing-source",
+          "kind": "measured",
+          "status": "info",
+          "detail": "Timing source: qwen-aligned.",
+          "lines": []
+        },
+        {
+          "id": "narration.words",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Not checked by the app. Alignment gives times to the text it is given, so it cannot show that a word was left out. Listening is required.",
+          "lines": []
+        },
+        {
+          "id": "narration.seams",
+          "kind": "manual",
+          "status": "unchecked",
+          "detail": "Blocks are generated separately and can differ slightly in delivery. Whether a join is audible is a listening judgement.",
+          "lines": []
+        },
+        {
+          "id": "captions.phrases",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every segment's phrases spell its text",
+          "lines": []
+        },
+        {
+          "id": "captions.overrides",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every caption with digits or symbols has a spoken reading",
+          "lines": []
+        },
+        {
+          "id": "captions.numbers",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every number in a caption is spoken correctly",
+          "lines": []
+        },
+        {
+          "id": "captions.diff",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "caption and speech use the same words",
+          "lines": []
+        },
+        {
+          "id": "file.hash",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "SHA-256 eac37082184c… matches the recorded hash",
+          "lines": []
+        },
+        {
+          "id": "file.container",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "h264 1080 x 1920 at 30 fps with an aac audio track",
+          "lines": []
+        },
+        {
+          "id": "file.decode",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "the whole video and audio decode without errors and match the timing",
+          "lines": []
+        },
+        {
+          "id": "mastering.loudness",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "-16 LUFS integrated (target -16) and -4.7 dBTP true peak (limit -1.5), measured on the audio inside the file",
+          "lines": []
+        },
+        {
+          "id": "mastering.flag",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "its record says the mastering chain was applied",
+          "lines": []
+        },
+        {
+          "id": "layout.fonts",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "1 font list examined in the same browser engine that renders the video: Inter in use",
+          "lines": []
+        },
+        {
+          "id": "layout.overflow",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overflow in 23 sampled frames (DOM text only)",
+          "lines": []
+        },
+        {
+          "id": "layout.overlap",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "no overlap or intrusion in the sampled frames (Pip's box is taken from the layout geometry, not measured)",
+          "lines": []
+        },
+        {
+          "id": "layout.size",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "every marked text is at or above its minimum size",
+          "lines": []
+        },
+        {
+          "id": "layout.coverage",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "all 3 scenes have marked elements that were measured",
+          "lines": []
+        },
+        {
+          "id": "custom.scenes",
+          "kind": "measured",
+          "status": "pass",
+          "detail": "this video has no custom scene",
+          "lines": []
+        }
+      ],
+      "selected": {
+        "bytes": 1667368,
+        "durationSec": 15.8,
+        "label": "Final (mastered)",
+        "url": "/media/render/why-a-model-forgets-the-start-of-a-long-chat/11.mp4"
+      }
+    },
+    "draftFile": {
+      "file": "out/phase8/journey/why-a-model-forgets-the-start-of-a-long-chat-draft.mp4",
+      "sha256": "5f2a9a2d06e0e6cbe88596f5a6dca54c0044e817cf2da8af25008ee8bcd68a08",
+      "bytes": 1061752,
+      "durationSec": 15.8,
+      "label": "Draft (not mastered)"
+    },
+    "finalFile": {
+      "file": "out/phase8/journey/why-a-model-forgets-the-start-of-a-long-chat-final.mp4",
+      "sha256": "eac37082184c10f19419247500716081d60b214d2d33c978b3aa7c611cbf713e",
+      "bytes": 1667368,
+      "durationSec": 15.8,
+      "label": "Final (mastered)"
+    }
+  },
+  "jobs": [
+    {
+      "id": 1,
+      "kind": "tts.block",
+      "subject": "b1",
+      "state": "failed",
+      "elapsedSec": 7.3,
+      "cacheHit": false
+    },
+    {
+      "id": 2,
+      "kind": "tts.block",
+      "subject": "b1",
+      "state": "succeeded",
+      "elapsedSec": 17.9,
+      "cacheHit": false
+    },
+    {
+      "id": 3,
+      "kind": "timing.build",
+      "subject": "timeline",
+      "state": "succeeded",
+      "elapsedSec": 1.4,
+      "cacheHit": false
+    },
+    {
+      "id": 4,
+      "kind": "mix.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 1,
+      "cacheHit": false
+    },
+    {
+      "id": 5,
+      "kind": "render.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 18.4,
+      "cacheHit": false
+    },
+    {
+      "id": 6,
+      "kind": "check.suite",
+      "subject": "4",
+      "state": "succeeded",
+      "elapsedSec": 8.5,
+      "cacheHit": false
+    },
+    {
+      "id": 7,
+      "kind": "mix.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 1,
+      "cacheHit": false
+    },
+    {
+      "id": 8,
+      "kind": "render.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 17.9,
+      "cacheHit": false
+    },
+    {
+      "id": 9,
+      "kind": "check.suite",
+      "subject": "7",
+      "state": "succeeded",
+      "elapsedSec": 8.6,
+      "cacheHit": false
+    },
+    {
+      "id": 10,
+      "kind": "render.draft",
+      "subject": "draft",
+      "state": "succeeded",
+      "elapsedSec": 17.8,
+      "cacheHit": false
+    },
+    {
+      "id": 11,
+      "kind": "check.suite",
+      "subject": "9",
+      "state": "succeeded",
+      "elapsedSec": 8.6,
+      "cacheHit": false
+    },
+    {
+      "id": 12,
+      "kind": "render.final",
+      "subject": "final",
+      "state": "succeeded",
+      "elapsedSec": 17.9,
+      "cacheHit": false
+    },
+    {
+      "id": 13,
+      "kind": "check.suite",
+      "subject": "11",
+      "state": "succeeded",
+      "elapsedSec": 8.6,
+      "cacheHit": false
+    },
+    {
+      "id": 14,
+      "kind": "check.suite",
+      "subject": "9",
+      "state": "succeeded",
+      "elapsedSec": 8.9,
+      "cacheHit": false
+    },
+    {
+      "id": 15,
+      "kind": "check.suite",
+      "subject": "11",
+      "state": "succeeded",
+      "elapsedSec": 9.3,
+      "cacheHit": false
+    },
+    {
+      "id": 16,
+      "kind": "check.suite",
+      "subject": "9",
+      "state": "succeeded",
+      "elapsedSec": 9.3,
+      "cacheHit": false
+    },
+    {
+      "id": 17,
+      "kind": "check.suite",
+      "subject": "11",
+      "state": "succeeded",
+      "elapsedSec": 8.9,
+      "cacheHit": false
+    }
+  ],
+  "awaitingYou": {
+    "approval": "none",
+    "signoffsTicked": 0,
+    "exportPossible": false,
+    "roundOnFinal": null,
+    "openNotes": 1,
+    "blockers": [
+      "This final video has not been opened for review yet. Start a review round on it.",
+      "1 note is still open. Resolve them or mark them won't fix."
+    ]
+  },
+  "consoleErrors": [],
+  "failedRequests": []
+}

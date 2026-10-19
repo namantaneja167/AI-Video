@@ -19,6 +19,10 @@ export type LibData = {
   timeline: Timeline;
   /** Scene-specific data that does not come from the pipeline (e.g. the original prototype timing), keyed by scene id. */
   sceneData?: Record<string, unknown>;
+  /** A composition preview made from estimated timing: it has no audio and is not a build. */
+  previewOnly?: boolean;
+  /** The production checks' browser probe: measure the marked elements of each frame and print them. Never set for a render. */
+  probe?: boolean;
 };
 
 export type SceneProps = {

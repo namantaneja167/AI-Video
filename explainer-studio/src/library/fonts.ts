@@ -11,16 +11,20 @@ export const FONT_SETS: Record<'system' | 'bundled', FontSet> = {
 };
 export const fontSetFor = (style: string): FontSet => (style === 'pip-paper-bundled' ? FONT_SETS.bundled : FONT_SETS.system);
 
+let bundled: Promise<void> | null = null;
+/** Loads the bundled faces once per page; the probe awaits the same promise so it never measures before they are in the document. */
+export const loadBundledFonts = (): Promise<void> => (bundled ??= Promise.all(
+  manifest.files.map(async (f) => {
+    const face = new FontFace(f.family, `url(${staticFile(`library/fonts/${f.file}`)})`, {weight: f.weight});
+    document.fonts.add(await face.load());
+  }),
+).then(() => undefined));
+
 /** Loads the bundled fonts before the first frame; a font that fails to load fails the render. */
 export function useBundledFonts(enabled: boolean): void {
   const [handle] = useState(() => (enabled ? delayRender('bundled fonts') : null));
   useEffect(() => {
     if (handle === null) return;
-    Promise.all(
-      manifest.files.map(async (f) => {
-        const face = new FontFace(f.family, `url(${staticFile(`library/fonts/${f.file}`)})`, {weight: f.weight});
-        document.fonts.add(await face.load());
-      }),
-    ).then(() => continueRender(handle), (e) => cancelRender(e));
+    loadBundledFonts().then(() => continueRender(handle), (e) => cancelRender(e));
   }, [handle]);
 }

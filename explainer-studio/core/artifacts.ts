@@ -8,6 +8,7 @@ import {
 } from './deps.ts';
 import {createRevision, getEpisode} from './episodes.ts';
 import {hashJson, sha256File, stableStringify} from './hash.ts';
+import {CHECKS_VERSION} from './checks.ts';
 import type {Project} from './project.ts';
 import {collectRefs, currentRows, getComponentHashes, getComponentValues, upstreamBlobs} from './state.ts';
 
@@ -37,6 +38,8 @@ export const JOB_KINDS = {
   'mix.final': {kind: 'mix', subject: 'final'},
   'render.draft': {kind: 'render', subject: 'draft'},
   'render.final': {kind: 'render', subject: 'final'},
+  // The production checks of one rendered video (the subject is that render's artifact id).
+  'check.suite': {kind: 'check'},
 } as const;
 export type JobKind = keyof typeof JOB_KINDS;
 
@@ -46,7 +49,15 @@ const targetOf = (jobKind: JobKind, subject?: string): Target => {
   return {kind: t.kind, subject: 'subject' in t ? t.subject : (subject ?? '')};
 };
 
-function inputsFor(e: Expected, t: Target): string {
+/** The inputs of a check run: the exact bytes of the video and the version of the check suite. */
+export function checkInputsHash(p: Project, renderArtifactId: number): string {
+  const r = get<{blob_hash: string; kind: string}>(p.db.prepare('SELECT blob_hash, kind FROM artifacts WHERE id=?'), renderArtifactId);
+  if (!r || r.kind !== 'render') throw new JobError(`artifact ${renderArtifactId} is not a rendered video`);
+  return hashJson({kind: 'check', render: r.blob_hash, version: CHECKS_VERSION});
+}
+
+function inputsFor(e: Expected, t: Target, p?: Project): string {
+  if (t.kind === 'check') return checkInputsHash(p!, Number(t.subject));
   if (t.kind === 'take') return e.take[t.subject];
   if (t.kind === 'timing') return e.timing;
   if (t.kind === 'mix') return e.mix[t.subject as RenderKind];
@@ -88,7 +99,7 @@ export function createJob(p: Project, opts: NewJob, state: 'queued' | 'running')
       p.db.prepare('INSERT INTO jobs(episode_id,kind,subject,snapshot_id,state,created_at,lane,params_json) VALUES(?,?,?,?,?,?,?,?)')
         .run(opts.episodeId, opts.jobKind, target.subject, snapshotId, state, p.now(), opts.lane ?? 'heavy', stableStringify(opts.params ?? {})).lastInsertRowid,
     );
-    return {jobId, snapshotId, inputsHash: inputsFor(expected, target), revision};
+    return {jobId, snapshotId, inputsHash: inputsFor(expected, target, p), revision};
   });
 }
 
@@ -112,8 +123,8 @@ export function finishJob(p: Project, jobId: number, out: {blobHash: string; met
     requireBlob(p, out.blobHash);
     const snap = getSnapshot(p, job.snapshot_id);
     const target = targetOf(job.kind, job.subject);
-    const built = inputsFor(snap.expected, target);
-    const now = inputsFor(expectedNow(p, job.episode_id).expected, target);
+    const built = inputsFor(snap.expected, target, p);
+    const now = inputsFor(expectedNow(p, job.episode_id).expected, target, p);
     const outcome = built === now ? 'current' : 'outdated';
     const meta = {...(out.meta ?? {}), ...(target.kind === 'take' ? {seed: out.seed ?? 0} : {})};
     const cacheKey = target.kind === 'take' ? hashJson({inputs: built, seed: out.seed ?? 0}) : null;
@@ -151,6 +162,23 @@ function setCurrent(p: Project, episodeId: string, t: Target, artifactId: number
   p.db
     .prepare('INSERT INTO current(episode_id,kind,subject,artifact_id) VALUES(?,?,?,?) ON CONFLICT(episode_id,kind,subject) DO UPDATE SET artifact_id=excluded.artifact_id')
     .run(episodeId, t.kind, t.subject, artifactId);
+}
+
+/** An existing output made from exactly these inputs whose file is still there: it can be reused instead of rebuilt. */
+export function findArtifactByInputs(p: Project, episodeId: string, kind: string, subject: string, inputsHash: string): {artifactId: number; blobHash: string} | undefined {
+  const rows = all<{id: number; blob_hash: string}>(p.db.prepare('SELECT id, blob_hash FROM artifacts WHERE episode_id=? AND kind=? AND subject=? AND inputs_hash=? ORDER BY id DESC'), episodeId, kind, subject, inputsHash);
+  const hit = rows.find((r) => existsSync(blobPath(p, r.blob_hash)));
+  return hit && {artifactId: hit.id, blobHash: hit.blob_hash};
+}
+
+/** Make an existing output the current one. Nothing is built or deleted. */
+export function selectArtifact(p: Project, episodeId: string, artifactId: number): void {
+  p.tx('select-artifact', () => {
+    const a = get<{episode_id: string; kind: string; subject: string; blob_hash: string}>(p.db.prepare('SELECT episode_id, kind, subject, blob_hash FROM artifacts WHERE id=?'), artifactId);
+    if (!a || a.episode_id !== episodeId) throw new JobError(`artifact ${artifactId} does not belong to episode "${episodeId}"`);
+    requireBlob(p, a.blob_hash);
+    setCurrent(p, episodeId, {kind: a.kind, subject: a.subject}, artifactId);
+  });
 }
 
 /** The author's choice among takes for a block. */
@@ -247,7 +275,7 @@ export type Signoffs = Record<(typeof SIGNOFFS)[number], boolean>;
  * Record approval of the current final render. Everything is checked first and all problems are reported together.
  * This is the only operation that moves the approved-file pointer.
  */
-export function approve(p: Project, episodeId: string, signoffs: Signoffs): number {
+export function approve(p: Project, episodeId: string, signoffs: Signoffs, inSameTransaction?: (approvalId: number) => void): number {
   const problems: string[] = [];
   const status = statusReport(p, episodeId);
   const cur = currentRows(p, episodeId).find((r) => r.kind === 'render' && r.subject === 'final');
@@ -273,6 +301,7 @@ export function approve(p: Project, episodeId: string, signoffs: Signoffs): numb
         .run(episodeId, cur!.artifact_id, cur!.blob_hash, stableStringify(expected.render.final.parts), expected.render.final.hash, revision, stableStringify(signoffs), p.now()).lastInsertRowid,
     );
     p.db.prepare('INSERT INTO approved(episode_id,approval_id) VALUES(?,?) ON CONFLICT(episode_id) DO UPDATE SET approval_id=excluded.approval_id').run(episodeId, id);
+    inSameTransaction?.(id);
     return id;
   });
 }

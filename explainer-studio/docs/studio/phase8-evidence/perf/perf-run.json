@@ -1,0 +1,36 @@
+{
+  "measuredAt": "2026-10-19T08:53:08.556Z",
+  "machine": {
+    "node": "v26.4.0",
+    "platform": "darwin arm64"
+  },
+  "runs": {},
+  "pageBundleBuildMs": 56,
+  "createProjectMs": 1026,
+  "startupOpenProjectMs": {
+    "runs": [
+      123,
+      112,
+      114,
+      114,
+      115
+    ],
+    "n": 5,
+    "min": 112,
+    "median": 114,
+    "max": 123
+  },
+  "firstScreenMs": 206,
+  "operations": {
+    "create a draft from the form": 112,
+    "open the Project screen with the quick environment check": 173,
+    "a backup of a small project, written and verified": 43,
+    "the thorough environment check (starts both Python environments)": 159
+  },
+  "libraryRequestMs": {
+    "n": 30,
+    "min": 0.2,
+    "median": 1.4,
+    "max": 1.9
+  }
+}

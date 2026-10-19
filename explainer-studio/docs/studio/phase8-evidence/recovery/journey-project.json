@@ -1,0 +1,117 @@
+{
+  "ranAt": "2026-10-19T09:05:52.242Z",
+  "project": "(real project, path not recorded)",
+  "steps": [
+    {
+      "what": "a backup was made by the running app and verified",
+      "ok": true,
+      "detail": {
+        "seconds": 0.072,
+        "files": 1,
+        "blobs": 135,
+        "bytes": 9074391
+      }
+    },
+    {
+      "what": "restored into a fresh path",
+      "ok": true,
+      "detail": {
+        "seconds": 0.063,
+        "missingBlobs": [],
+        "interruptedJobs": []
+      }
+    },
+    {
+      "what": "the same episodes are listed",
+      "ok": true,
+      "detail": [
+        "why-a-model-forgets-the-start-of-a-long-chat"
+      ]
+    },
+    {
+      "what": "every episode compares equal between the original and the restored copy",
+      "ok": true,
+      "detail": [
+        {
+          "id": "why-a-model-forgets-the-start-of-a-long-chat",
+          "document": true,
+          "revisions": 3,
+          "videos": 4,
+          "notes": true,
+          "approval": true,
+          "videoBytesMatchTheirHash": true,
+          "selectedTakes": [
+            [
+              "b1",
+              "fresh",
+              [
+                1
+              ]
+            ]
+          ],
+          "takeAudioBytesEqual": true
+        }
+      ]
+    },
+    {
+      "what": "the restored app reports its own new location, not the original",
+      "ok": true
+    },
+    {
+      "what": "every damaged copy of the backup is refused and leaves nothing behind",
+      "ok": true,
+      "detail": {
+        "one-changed-byte": "refused: backup is damaged or incomplete:",
+        "a-missing-file": "refused: backup is damaged or incomplete:",
+        "no-manifest": "refused: backup is damaged or incomplete:",
+        "truncated-database": "refused: backup is damaged or incomplete:"
+      }
+    },
+    {
+      "what": "restoring into a folder that has files in it is refused",
+      "ok": true,
+      "detail": "refused: /var/folders/lz/slwgcy0j36186s3p540p9j340000gn/T/studio-relocated-gQq7sd/busy is"
+    },
+    {
+      "what": "the original backup is still intact",
+      "ok": true
+    }
+  ],
+  "backup": {
+    "name": "backup-2026-10-19T09-05-52",
+    "bytes": 9074391,
+    "blobs": 135
+  },
+  "restoreReport": {
+    "missingBlobs": [],
+    "interruptedJobs": []
+  },
+  "episodes": [
+    {
+      "id": "why-a-model-forgets-the-start-of-a-long-chat",
+      "document": true,
+      "revisions": 3,
+      "videos": 4,
+      "notes": true,
+      "approval": true,
+      "videoBytesMatchTheirHash": true,
+      "selectedTakes": [
+        [
+          "b1",
+          "fresh",
+          [
+            1
+          ]
+        ]
+      ],
+      "takeAudioBytesEqual": true
+    }
+  ],
+  "restoredWorksAsAProject": true,
+  "damagedBackups": {
+    "one-changed-byte": "refused: backup is damaged or incomplete:",
+    "a-missing-file": "refused: backup is damaged or incomplete:",
+    "no-manifest": "refused: backup is damaged or incomplete:",
+    "truncated-database": "refused: backup is damaged or incomplete:"
+  }
+}

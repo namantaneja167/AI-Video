@@ -40,3 +40,11 @@ coverage/
 
 # Project database, blobs, job workspaces (Phase 1 onward)
 .studio/
+
+# Persistent demo workspace of the app (a real project store; never committed)
+demo-workspace/
+# Built UI bundle
+app/dist/
+
+# User projects created with ./studio-app new (never committed)
+projects/

@@ -5,6 +5,7 @@
 import {readFileSync} from 'node:fs';
 import type {EpisodeV2} from '../src/schema2.ts';
 import {resolveCues} from '../src/library/cues.ts';
+import {emphasisPerCaption} from '../src/library/emphasis.ts';
 import {SCENE_CUES} from '../src/library/sceneSpecs.ts';
 
 export type Layout = {leadInSec: number; blocks: {id: string; offsetSec: number; durationSec: number; gapAfterSec: number}[]; tailSec: number; totalSec: number};
@@ -95,16 +96,7 @@ export async function buildTimelineViaPython(run: RunText, python: string, cli: 
  * named cue times of each scene (from the scene's cue rules), and the mouth track. The Python logic is not touched.
  */
 export function annotateTimeline(timeline: any, doc: EpisodeV2, mouth?: number[]): any {
-  const used: Record<string, number> = {};
-  for (const cap of timeline.captions) {
-    const o = used[cap.segment] ?? 0;
-    const n = cap.words.length;
-    used[cap.segment] = o + n;
-    const ranges = (doc.narration.segments.find((s) => s.id === cap.segment)?.emphasis ?? [])
-      .filter((r) => r.to > o && r.from < o + n)
-      .map((r) => [Math.max(r.from, o) - o, Math.min(r.to, o + n) - o]);
-    if (ranges.length) cap.emphasis = ranges;
-  }
+  emphasisPerCaption(timeline.captions, doc.narration.segments).forEach((r, i) => { if (r) timeline.captions[i].emphasis = r; });
   const cues: Record<string, Record<string, number>> = {};
   for (const scene of doc.scenes) {
     const spec = SCENE_CUES[scene.type];

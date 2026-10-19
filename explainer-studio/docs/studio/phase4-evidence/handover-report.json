@@ -1,0 +1,559 @@
+{
+  "when": "2026-10-18T16:39:26.149Z",
+  "tempProject": "/var/folders/lz/slwgcy0j36186s3p540p9j340000gn/T/studio-p4-handover-t8Esdm",
+  "episode": {
+    "id": "dense-pip-fixture",
+    "file": "/Users/namantaneja/Downloads/AI Video /explainer-studio/samples/dense-pip-fixture/episode.json",
+    "text": [
+      "Twenty-four fictional checks, all at a glance."
+    ]
+  },
+  "stages": [
+    {
+      "label": "narration b1",
+      "jobId": 1,
+      "startedAt": 0,
+      "finishedAt": 9313,
+      "state": "succeeded"
+    },
+    {
+      "label": "timing (aligner)",
+      "jobId": 2,
+      "startedAt": 9315,
+      "finishedAt": 11029,
+      "state": "succeeded"
+    },
+    {
+      "label": "mix final",
+      "jobId": 3,
+      "startedAt": 11030,
+      "finishedAt": 11996,
+      "state": "succeeded"
+    },
+    {
+      "label": "render final",
+      "jobId": 4,
+      "startedAt": 11996,
+      "finishedAt": 19633,
+      "state": "succeeded"
+    }
+  ],
+  "checks": [
+    {
+      "check": "every stage succeeded, one at a time",
+      "ok": true,
+      "detail": "narration b1 9.3 s; timing (aligner) 1.7 s; mix final 1.0 s; render final 7.6 s"
+    },
+    {
+      "check": "no automatic retry and no failed attempt",
+      "ok": true,
+      "detail": "[[1,1,\"succeeded\"],[2,1,\"succeeded\"],[3,1,\"succeeded\"],[4,1,\"succeeded\"]]"
+    },
+    {
+      "check": "tts -> aligner: the first model was released or its worker stopped and confirmed gone",
+      "ok": true,
+      "detail": "released; before 30 MiB (worker reported 4410 MiB held), after 131 MiB; ack {\"activeBytes\":282748,\"cacheBytes\":0,\"peakBytes\":9049510757}"
+    },
+    {
+      "check": "before render: memory release confirmed (never \"kill-unconfirmed\")",
+      "ok": true,
+      "detail": "released; before 1946 MiB (reported held 1757 MiB), after 195 MiB (threshold 1536 MiB); ack {\"activeBytes\":485092,\"cacheBytes\":0,\"peakBytes\":2629080924}"
+    },
+    {
+      "check": "the render started only after the hand-over",
+      "ok": true,
+      "detail": "hand-over at 1792341558378, render running at 1792341558448"
+    },
+    {
+      "check": "during the render no audio model was loaded and the worker (if any) held little",
+      "ok": true,
+      "detail": "render samples: 8; loaded ; max worker MiB 195"
+    },
+    {
+      "check": "worker generations are numbered and distinct",
+      "ok": true,
+      "detail": "host:audio#1"
+    },
+    {
+      "check": "every signal names a worker generation and a process identity",
+      "ok": true,
+      "detail": "2 signals: {\"host:audio#1\":[\"SIGTERM pid 20120 (shutting down the audio worker)\",\"SIGTERM pid 20325 (shutting down the audio worker)\"]}"
+    },
+    {
+      "check": "the idle shutdown stopped the worker without any signal",
+      "ok": false,
+      "detail": "{\"before\":{\"owner\":\"host:audio#1\",\"pid\":20120},\"signals\":2}"
+    },
+    {
+      "check": "the approved voice reference is unchanged",
+      "ok": true,
+      "detail": "e6d84a9dd60eea5a"
+    },
+    {
+      "check": "no critical memory pressure was recorded",
+      "ok": false,
+      "detail": "max pressure level 4, max swap 13082.69 MB, peak worker 1946 MiB"
+    }
+  ],
+  "allChecksPass": false,
+  "handovers": [
+    {
+      "eventId": 10,
+      "jobId": 0,
+      "at": 1792341555725,
+      "reason": "switching from tts to aligner",
+      "outcome": "released",
+      "rssBeforeBytes": 31571968,
+      "ack": {
+        "activeBytes": 282748,
+        "cacheBytes": 0,
+        "peakBytes": 9049510757
+      },
+      "rssAfterBytes": 137560064,
+      "thresholdBytes": 1610612736,
+      "waitedMs": 271,
+      "mlxBeforeBytes": 4624204872
+    },
+    {
+      "eventId": 21,
+      "jobId": 0,
+      "at": 1792341558378,
+      "reason": "before render.final",
+      "outcome": "released",
+      "rssBeforeBytes": 2040283136,
+      "ack": {
+        "activeBytes": 485092,
+        "cacheBytes": 0,
+        "peakBytes": 2629080924
+      },
+      "rssAfterBytes": 204308480,
+      "thresholdBytes": 1610612736,
+      "waitedMs": 69,
+      "mlxBeforeBytes": 1842115572
+    },
+    {
+      "eventId": 22,
+      "jobId": 4,
+      "at": 1792341558378,
+      "reason": "before render.final",
+      "outcome": "released",
+      "rssBeforeBytes": 2040283136,
+      "ack": {
+        "activeBytes": 485092,
+        "cacheBytes": 0,
+        "peakBytes": 2629080924
+      },
+      "rssAfterBytes": 204308480,
+      "thresholdBytes": 1610612736,
+      "waitedMs": 69,
+      "mlxBeforeBytes": 1842115572
+    }
+  ],
+  "workerGenerations": [
+    {
+      "owner": "host:audio#1",
+      "pid": 20120,
+      "start": "Sun Oct 18 22:09:06 2026",
+      "role": "audio-worker",
+      "recordedAt": 1792341546415,
+      "goneAt": 1792341566036
+    },
+    {
+      "owner": "host:audio#1",
+      "pid": 20325,
+      "start": "Sun Oct 18 22:09:10 2026",
+      "role": "descendant",
+      "recordedAt": 1792341551414,
+      "goneAt": 1792341566093
+    }
+  ],
+  "signals": [
+    {
+      "pid": 20120,
+      "start": "Sun Oct 18 22:09:06 2026",
+      "owner": "host:audio#1",
+      "signal": "SIGTERM",
+      "at": 1792341566031,
+      "reason": "shutting down the audio worker"
+    },
+    {
+      "pid": 20325,
+      "start": "Sun Oct 18 22:09:10 2026",
+      "owner": "host:audio#1",
+      "signal": "SIGTERM",
+      "at": 1792341566031,
+      "reason": "shutting down the audio worker"
+    }
+  ],
+  "gracefulShutdown": {
+    "workerBefore": {
+      "owner": "host:audio#1",
+      "pid": 20120
+    },
+    "signalsSentByShutdown": [
+      {
+        "pid": 20120,
+        "start": "Sun Oct 18 22:09:06 2026",
+        "owner": "host:audio#1",
+        "signal": "SIGTERM",
+        "at": 1792341566031,
+        "reason": "shutting down the audio worker"
+      },
+      {
+        "pid": 20325,
+        "start": "Sun Oct 18 22:09:10 2026",
+        "owner": "host:audio#1",
+        "signal": "SIGTERM",
+        "at": 1792341566031,
+        "reason": "shutting down the audio worker"
+      }
+    ],
+    "workerAfter": null
+  },
+  "attempts": [
+    {
+      "job_id": 1,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792341546384,
+      "finished_at": 1792341555614,
+      "error": null,
+      "peak_rss_bytes": 553582592,
+      "pressure_max": 4
+    },
+    {
+      "job_id": 2,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792341555694,
+      "finished_at": 1792341557334,
+      "error": null,
+      "peak_rss_bytes": 2038644736,
+      "pressure_max": 1
+    },
+    {
+      "job_id": 3,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792341557409,
+      "finished_at": 1792341558322,
+      "error": null,
+      "peak_rss_bytes": null,
+      "pressure_max": null
+    },
+    {
+      "job_id": 4,
+      "n": 1,
+      "state": "succeeded",
+      "started_at": 1792341558375,
+      "finished_at": 1792341565955,
+      "error": null,
+      "peak_rss_bytes": 2601566208,
+      "pressure_max": 1
+    }
+  ],
+  "takeMeta": {
+    "cacheHit": false,
+    "durationSec": 2.96,
+    "genSec": 5.3,
+    "mlxPeakBytes": 9049510757,
+    "rtf": 1.79,
+    "sampleRate": 24000,
+    "seed": 11,
+    "used": {
+      "maxTokens": 600,
+      "mlxAudio": "0.5.9",
+      "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+      "referenceSha256": "e6d84a9dd60eea5ac096582960df19db0c8e1f40ac6d12a13a226c84817be866",
+      "referenceTranscriptSha256": "48a32f2c56a15c68c16018713b5eb8784791c6d72a84b2cb844c6e13177d1e1b",
+      "revision": "a6eb4f68e4b056f1215157bb696209bc82a6db48",
+      "workerSha256": "eb249896ae16f4f132bc16f9d851555c15ba15ed2f5780b67aa8d8a3a1907622"
+    }
+  },
+  "timingMeta": {
+    "alignSeconds": 0.8,
+    "alignerId": "mlx-community/Qwen3-ForcedAligner-0.6B-bf16",
+    "alignerRevision": "53c8c0e46733eec430e4b53dd6471d0e5dee45f8",
+    "durationSec": 4.96,
+    "notes": [],
+    "source": "qwen-aligned",
+    "timelineLogic": {
+      "core/timeline.ts": "ed22a84adff925386641d0b30a25fcc0ce77fb69ffa70a29520e2c5cb954ac39",
+      "pipeline/timeline.py": "46c1bc56cabdf44ba934d03db0101e91d9aaafd3f8bf3ac4b9de4430276bae5a",
+      "pipeline/timeline_cli.py": "25d69767e1e1079c3e2c96d5668bfe1db900e7ad525a5bc1a5e2f02f6b8e8add",
+      "src/library/cues.ts": "4eb3f6225c30082b93d2408e32a20efb513158d35450e7ede2f004271d52e82a",
+      "src/library/sceneSpecs.ts": "99885b9ad26a59df429b0f9c570625a0f7538c98d3f9454b235c6aa00833caf6",
+      "workers/mouth.py": "b5b744a390ba577367f24f80c6313d9ba2442617bf2dd5e04692dee32656e0e3"
+    }
+  },
+  "renderMeta": {
+    "bundleMs": 575,
+    "bytes": 614635,
+    "fps": 30,
+    "frames": 149,
+    "height": 1920,
+    "kind": "final",
+    "out": "/var/folders/lz/slwgcy0j36186s3p540p9j340000gn/T/studio-p4-handover-t8Esdm/.studio/tmp/4-1/render.mp4",
+    "totalMs": 7199,
+    "used": {
+      "crf": 18,
+      "mixBlob": "a15d6f571574c34072536dde4a1f23a18d6a075f0c373589d223752aa55e681f",
+      "remotion": "4.0.536",
+      "settings": {
+        "audio": "aac",
+        "codec": "h264",
+        "crf": 18,
+        "fps": 30,
+        "height": 1920,
+        "width": 1080
+      },
+      "sourcesVerifiedAgainstRecorded": true,
+      "timelineBlob": "4a2625efdd2240f53b08f75bca9beef8ba1c3c14985f3df530d221c5f80f09c6"
+    },
+    "width": 1080
+  },
+  "status": {
+    "takes": {
+      "b1": {
+        "status": "fresh",
+        "artifactId": 1,
+        "reasons": []
+      }
+    },
+    "timing": {
+      "status": "fresh",
+      "artifactId": 2,
+      "reasons": []
+    },
+    "mix": {
+      "draft": {
+        "status": "none",
+        "reasons": [
+          "no output yet"
+        ]
+      },
+      "final": {
+        "status": "fresh",
+        "artifactId": 3,
+        "reasons": []
+      }
+    },
+    "render": {
+      "draft": {
+        "status": "none",
+        "reasons": [
+          "no output yet",
+          "upstream mix draft is not fresh"
+        ]
+      },
+      "final": {
+        "status": "fresh",
+        "artifactId": 4,
+        "reasons": []
+      }
+    },
+    "notFresh": [
+      "mix:draft",
+      "render:draft"
+    ],
+    "unsetComponents": []
+  },
+  "output": {
+    "mp4": "/Users/namantaneja/Downloads/AI Video /explainer-studio/out/phase4/handover-check/dense-pip-fixture_check.mp4",
+    "sha256": "1b85aa2dca54e5140aaeab13edf91e2948b357e840c25ed2974fc94919cf9587",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1080,
+          "height": 1920,
+          "duration": "4.966667"
+        },
+        {
+          "codec_name": "aac",
+          "duration": "4.971000"
+        }
+      ]
+    }
+  },
+  "memory": {
+    "samples": [
+      {
+        "t": 1538,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 5642.56,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 280,
+        "loaded": null
+      },
+      {
+        "t": 2135,
+        "stage": "narration b1",
+        "pressure": 2,
+        "swapMb": 5966.38,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 985,
+        "loaded": null
+      },
+      {
+        "t": 3037,
+        "stage": "narration b1",
+        "pressure": 4,
+        "swapMb": 6812.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 459,
+        "loaded": null
+      },
+      {
+        "t": 4056,
+        "stage": "narration b1",
+        "pressure": 4,
+        "swapMb": 8601.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 403,
+        "loaded": "tts"
+      },
+      {
+        "t": 5040,
+        "stage": "narration b1",
+        "pressure": 2,
+        "swapMb": 9530.88,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 427,
+        "loaded": "tts"
+      },
+      {
+        "t": 6042,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 9530.88,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 428,
+        "loaded": "tts"
+      },
+      {
+        "t": 7037,
+        "stage": "narration b1",
+        "pressure": 1,
+        "swapMb": 9530.88,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 430,
+        "loaded": "tts"
+      },
+      {
+        "t": 8176,
+        "stage": "narration b1",
+        "pressure": 4,
+        "swapMb": 11191.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 76,
+        "loaded": "tts"
+      },
+      {
+        "t": 9053,
+        "stage": "narration b1",
+        "pressure": 2,
+        "swapMb": 13082.69,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 28,
+        "loaded": "tts"
+      },
+      {
+        "t": 10051,
+        "stage": "timing (aligner)",
+        "pressure": 1,
+        "swapMb": 13026.69,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 1653,
+        "loaded": null
+      },
+      {
+        "t": 11089,
+        "stage": "mix final",
+        "pressure": 1,
+        "swapMb": 12986.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 1946,
+        "loaded": "aligner"
+      },
+      {
+        "t": 12143,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 12978.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 13146,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 12962.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 14147,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 12866.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 15150,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 12858.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 16148,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 12858.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 17149,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 12842.62,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 18149,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 10498.25,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      },
+      {
+        "t": 19153,
+        "stage": "render final",
+        "pressure": 1,
+        "swapMb": 10186.25,
+        "workerOwner": "host:audio#1",
+        "workerRssMb": 195,
+        "loaded": null
+      }
+    ],
+    "peakWorkerRssMb": 1946,
+    "maxPressure": 4,
+    "maxSwapMb": 13082.69
+  }
+}

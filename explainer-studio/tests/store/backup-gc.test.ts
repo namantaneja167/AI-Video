@@ -291,7 +291,7 @@ describe('reference-safe cleanup', () => {
     assert.equal(after.length, before.length - removed.length);
   });
 
-  test('blobs held only by thinned revisions are collected; blobs held by retained revisions are kept', () => {
+  test('thinning removes old revisions, but every saved narration take stays: re-rolls are never collected', () => {
     t = newProject();
     adoptEpisode(t.p, 'episodes/join-fanout/episode.json');
     setAllComponents(t.p, t.root);
@@ -314,10 +314,8 @@ describe('reference-safe cleanup', () => {
     assert.ok(Object.values(res.thinned).flat().length > 0);
     const surviving = new Set(reachableBlobs(t.p));
     const alive = held.filter((h) => existsSync(blobPath(t.p, h)));
-    assert.ok(alive.length < held.length, 'some old takes were collected');
-    assert.ok(existsSync(blobPath(t.p, held[3])), 'the milestone revision still holds its take');
-    assert.ok(existsSync(blobPath(t.p, held[11])), 'the newest take is current');
-    for (const h of alive) assert.ok(surviving.has(h), 'whatever remains is still referenced');
+    assert.equal(alive.length, held.length, 'every take of every round is still on disk, selected or not');
+    assert.ok(held.every((h) => surviving.has(h)), 'and every one is still counted as referenced');
   });
 });
 

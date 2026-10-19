@@ -1,0 +1,150 @@
+{
+  "ranAt": "2026-10-19T09:01:27.215Z",
+  "before": {
+    "videos": [
+      [
+        "final",
+        "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+        true,
+        true,
+        null
+      ],
+      [
+        "draft",
+        "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+        true,
+        true,
+        null
+      ],
+      [
+        "final",
+        "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+        false,
+        false,
+        null
+      ],
+      [
+        "draft",
+        "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+        false,
+        false,
+        null
+      ]
+    ],
+    "approval": "none",
+    "signoffsTicked": 0,
+    "notes": 0
+  },
+  "rebuilds": [
+    {
+      "mode": "draft",
+      "steps": [
+        "take:b1:current",
+        "take:b2:current",
+        "timing:current",
+        "mix:draft:current",
+        "render:draft:run"
+      ],
+      "wallSec": 26.1
+    },
+    {
+      "mode": "final",
+      "steps": [
+        "take:b1:current",
+        "take:b2:current",
+        "timing:current",
+        "mix:final:current",
+        "render:final:run"
+      ],
+      "wallSec": 25.6
+    }
+  ],
+  "checks": {
+    "draft": {
+      "renderArtifactId": 39,
+      "fileSha256": "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+      "summary": {
+        "pass": 20,
+        "warn": 2,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 2
+      },
+      "passed": true,
+      "wallSec": 11.6,
+      "warnings": [
+        "narration.edges: 1 thing to listen for",
+        "layout.fonts-stack: A later font in the list is used."
+      ]
+    },
+    "final": {
+      "renderArtifactId": 40,
+      "fileSha256": "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+      "summary": {
+        "pass": 22,
+        "warn": 2,
+        "fail": 0,
+        "unchecked": 2,
+        "info": 1
+      },
+      "passed": true,
+      "wallSec": 10.6,
+      "warnings": [
+        "narration.edges: 1 thing to listen for",
+        "layout.fonts-stack: A later font in the list is used."
+      ]
+    }
+  },
+  "after": {
+    "videos": [
+      [
+        "final",
+        "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+        true,
+        true,
+        null
+      ],
+      [
+        "draft",
+        "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+        true,
+        true,
+        null
+      ],
+      [
+        "final",
+        "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+        false,
+        false,
+        null
+      ],
+      [
+        "draft",
+        "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+        false,
+        false,
+        null
+      ],
+      [
+        "final",
+        "c3ba796a551bab6cc280077c6587feebb89ef55b2e420a27704aaf6ed10a8a3a",
+        false,
+        false,
+        null
+      ],
+      [
+        "draft",
+        "274b84ae837b30095b7928be93d1103195b99b6c22afe718a14827b7f1a94aaf",
+        false,
+        false,
+        null
+      ]
+    ],
+    "approval": "none",
+    "signoffsTicked": 0,
+    "notes": 0,
+    "exportPossible": false
+  },
+  "baselineUnchanged": true,
+  "newestVideosHaveTheSameBytesAsBefore": true
+}
