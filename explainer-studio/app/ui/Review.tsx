@@ -7,7 +7,7 @@ import type {CheckItem} from '../../core/checks.ts';
 import type {Note} from '../../src/schema2.ts';
 import {unresolvedFailures, type NoteView, type ReviewView, type VideoRow} from '../shared/review.ts';
 import type {Plan} from '../shared/plan-types.ts';
-import {cancelJob, getPlan, getReview, reviewApprove, reviewChecks, reviewConfirmDiff, reviewExport, reviewNoteAdd, reviewNoteChange, reviewPlayback, reviewRound, reviewSignoff, startRebuild, type ReviewReply} from './api';
+import {cancelJob, getPlan, getReview, reviewApprove, reviewChecks, reviewCover, reviewConfirmDiff, reviewExport, reviewNoteAdd, reviewNoteChange, reviewPlayback, reviewRound, reviewSignoff, startRebuild, type ReviewReply} from './api';
 import {Notice, Rail, Stepper, type StageNote} from './Chrome';
 import {mmss, when, whenShort} from './labels';
 import {PlanDialog, type PlanState} from './Rebuild';
@@ -117,6 +117,7 @@ export function Review({id, workspace, onList, onEditor, onVoice}: {id: string; 
             {sel && <Notes v={v} sel={sel} apply={apply} />}
           </div>
           <div className="rv-side">
+            {sel?.cover && <CoverCard v={v} sel={sel} cover={sel.cover} apply={apply} />}
             {sel && <Checks v={v} sel={sel} apply={apply} />}
             {sel && <Approval v={v} sel={sel} apply={apply} />}
             <Export v={v} apply={apply} />
@@ -162,6 +163,34 @@ function Videos({v, onPick, onBuild, onCancel}: {v: ReviewView; onPick: (id: num
       </ul>
       {v.videos.length === 0 && <div className="muted small">Nothing has been rendered by this workspace for this episode yet.</div>}
       <div className="hrow"><button className="btn sm" onClick={() => onBuild('draft')} disabled={v.busy}>Draft…</button><button className="btn sm" onClick={() => onBuild('final')} disabled={v.busy}>Final…</button></div>
+    </aside>
+  );
+}
+
+// ---- the cover image that belongs to this exact video ---------------------------------------------------------------------------------
+function CoverCard({v, sel, cover, apply}: {v: ReviewView; sel: VideoRow; cover: NonNullable<VideoRow['cover']>; apply: (r: ReviewReply, ok?: string) => boolean}) {
+  const [busy, setBusy] = useState(false);
+  const label = {none: 'No cover yet', running: 'Drawing the cover…', fresh: 'Matches this video', outdated: 'Out of date'}[cover.state];
+  const tone = {none: '', running: 'acc', fresh: 'green', outdated: 'amber'}[cover.state];
+  return (
+    <aside className="rv-cover card" aria-label="Cover image" data-testid="cover-card" data-state={cover.state} data-render={sel.renderArtifactId}>
+      <div className="hrow"><b>Cover image</b><span className={`chip sm ${tone}`} data-testid="cover-state">{label}</span><span className="muted small">for the {sel.kind} video beside it</span></div>
+      <div className="rv-coverbody">
+      {cover.url ? <img className={`rv-coverimg ${cover.state === 'outdated' ? 'old' : ''}`} src={`${cover.url}?v=${(cover.fileSha256 ?? '').slice(0, 12)}`} alt={`Cover for ${sel.label} video: ${cover.hook ?? ''}`} width={162} height={288} data-testid="cover-image" />
+        : <div className="rv-coverimg empty" aria-hidden="true">{cover.state === 'running' ? <i className="spin" /> : 'No cover yet'}</div>}
+      <div className="rv-coverinfo">
+      <div className="small" data-testid="cover-hook">Hook: <b>{cover.hook ?? 'none'}</b></div>
+      <div className="muted small" data-testid="cover-belongs">{cover.url ? <>Drawn from the opening of this exact video (SHA-256 <code title={cover.renderSha256}>{short(cover.renderSha256)}</code>) at {cover.frame !== null ? (cover.frame / 30).toFixed(2) : '?'} s, without captions · {cover.width} × {cover.height} PNG{cover.bytes ? ` · ${(cover.bytes / 1024).toFixed(0)} KB` : ''}.</> : <>It is drawn from the opening of this exact video, without captions, by the same engine that renders the video.</>}</div>
+      {cover.state === 'outdated' && cover.why && <div className="inline warn" role="status" data-testid="cover-outdated">Out of date. {cover.why} Make the video again, then its cover.</div>}
+      <div className="hrow">
+        <button className="btn sm pri" disabled={busy || v.busy || cover.state === 'running' || cover.state === 'fresh'} onClick={() => { setBusy(true); void reviewCover(v.episodeId, sel.renderArtifactId).then((r) => { setBusy(false); apply(r, 'The cover is being drawn from this video.'); }); }} data-testid="make-cover">{cover.url ? 'Make the cover again' : 'Make the cover'}</button>
+        {cover.downloadUrl && (cover.state === 'fresh'
+          ? <a className="btn sm" href={cover.downloadUrl} download={cover.filename} data-testid="download-cover">Download cover</a>
+          : <span className="btn sm off" aria-disabled="true" title="This cover does not match the video's current inputs, so it is not offered for download" data-testid="download-cover-off">Download cover</span>)}
+      </div>
+      <div className="muted small">It is not attached to a post for you: choose it as the cover when you upload. It is included in the export package.</div>
+      </div>
+      </div>
     </aside>
   );
 }

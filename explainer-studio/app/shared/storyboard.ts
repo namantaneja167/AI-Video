@@ -21,6 +21,11 @@ export const SCENE_TYPES: SceneTypeInfo[] = [
   {id: 'cards', label: 'Cards (dark style)', reuse: 'data-driven', look: 'dark (legacy)', pip: false, summary: 'One to four cards in the dark legacy style; not available in Pip-style episodes'},
   {id: 'kpi-mismatch', label: 'Dashboard mismatch', reuse: 'data-driven', look: 'dark (legacy)', pip: false, summary: 'Pipeline checks passing while a dashboard number disagrees with the expected one (dark style)'},
   {id: 'tables-lab', label: 'Tables lab', reuse: 'data-driven', look: 'dark (legacy)', pip: false, summary: 'Small tables and a wrong and a fixed SQL query, run for real (dark style)'},
+  {id: 'rotating-ticket', label: 'Rotating ticket: live code, screenshot and gate reader', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'A live pass and its frozen screenshot checked against a reader time window; tied to the Tech Under the Hood 01 script'},
+  {id: 'ticket-motion', label: 'Rotating ticket, in motion: assembly, copy, time, reader', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'Hook-first opening; one pass assembles, a screenshot lifts off it, the live code changes, and the code data travels to a reader that compares it with its window; tied to the Tech Under the Hood 01 script'},
+  {id: 'prompt-injection', label: 'Prompt injection: task versus page text', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'A user task and planted page text competing for an agent; tied to the AI Maxxing 02 script. Optional params.treatment (interface, investigation, mechanism) redraws the passage s2 to s4 as a presentation proof'},
+  {id: 'token-journey', label: 'Tokens: text, pieces, numbers and counts', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'A message cut into the pieces a real tokenizer produces, their ids, and the token counts; tied to the AI Maxxing tokens script'},
+  {id: 'cache-journey', label: 'Caching: miss, hit and refresh', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'A price request, a cached copy, a hit, stale data and explicit invalidation; tied to the caching sample script'},
   {id: 'context-window', label: 'Context window explainer', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'Built for one explainer, timed on named words in its eight narration lines'},
   {id: 'pip-scene-10x', label: 'Pip scene', reuse: 'own-content-only', look: 'Pip, warm paper', pip: true, summary: 'The preserved Pip prototype scene, timed on named words in its own script'},
   {id: 'pip-dense-fixture', label: 'Dense layout test', reuse: 'test-fixture', look: 'Pip, warm paper', pip: true, summary: 'A fixture for testing dense layouts, not a scene for an episode'},
@@ -202,7 +207,10 @@ export function planApplication(plan: PlanDoc, doc: EpisodeV2): Application {
     if (check.doubled.length) problems.push(`Narration in more than one scene: ${check.doubled.join(', ')}.`);
     if (!check.unassigned.length && !check.doubled.length && flat.every((id) => want.includes(id)) && flat.join(',') !== want.join(',')) problems.push(`The scenes must follow the narration in order, without gaps (the script runs ${want.join(', ')}; the scenes run ${flat.join(', ')}).`);
   }
-  const scenes = problems.length ? null : episodeScenesFromPlan(plan, segments, doc.style);
+  const built = problems.length ? null : episodeScenesFromPlan(plan, segments, doc.style);
+  // the opening hook belongs to the episode's first scene: a storyboard that does not set one never takes it away
+  const carried = doc.scenes[0]?.openingHook;
+  const scenes = built && carried && !built[0]?.openingHook ? [{...built[0], openingHook: carried} as EpisodeV2['scenes'][number], ...built.slice(1)] : built;
   const existing = isPlaceholderEpisode(doc) ? [] : doc.scenes;
   const next = scenes ?? [];
   const changes: SceneChange[] = [
@@ -218,9 +226,11 @@ export function planApplication(plan: PlanDoc, doc: EpisodeV2): Application {
 
 /** Reasons a rebuild must not start, from the plan while the episode still has its stand-in scene, from its own scenes after. */
 export function productionBlockers(plan: PlanDoc, doc: EpisodeV2): {message: string}[] {
-  if (!isPlaceholderEpisode(doc)) return sceneBlockers(doc).map((message) => ({message}));
+  const hook = plan.brand === 'pip-explains' && isPipStyle(doc.style) && !doc.scenes[0]?.openingHook ? [{message: 'This is a Pip Explains episode and its opening hook is not set. Enter it on the Script or Scenes step (at most 48 characters): the opening, its sound and the cover come from it.'}] : [];
+  if (!isPlaceholderEpisode(doc)) return [...hook, ...sceneBlockers(doc).map((message) => ({message}))];
   const check = checkStoryboard(plan, doc.narration.segments, doc.style);
   return [
+    ...hook,
     {message: check.producible ? 'The planned scenes are ready but have not been applied to this episode: it still has only its stand-in scene.' : 'This episode has only a stand-in scene: its planned scenes have not been applied to it.'},
     ...check.problems.map((m) => ({message: `Storyboard: ${m}`})),
   ];

@@ -3,7 +3,7 @@ import type {Status} from '../../core/artifacts.ts';
 import type {MeasuredRuns} from '../shared/costs.ts';
 import type {Committed, SendResult} from '../shared/autosave.ts';
 import type {ActiveWork, Plan} from '../shared/plan-types.ts';
-import type {JobView, RebuildView} from '../jobs.ts';
+import type {JobView, RebuildView, SlotView} from '../jobs.ts';
 import type {ImportRow} from '../planning.ts';
 import type {Selection} from '../shared/importing.ts';
 import type {Proposal, ParseError} from '../shared/packet.ts';
@@ -21,7 +21,8 @@ export type Build = {
   render: {id: number; kind: string; url: string; bytes: number; builtAt: number; revision: number | null; fresh: boolean; imported: Imported} | null;
 };
 export type BuildSummary = {id: string; revision: number | null; builtAt: number; imported: Imported; outdatedFlag: boolean; hasVideo: boolean; isLatest: boolean; shown: boolean; hasFinalVideo: boolean; videoRevision: number | null; timingRevision: number | null};
-export type EpisodePayload = {doc: EpisodeV2; seq: number; docHash: string; planned: boolean; renderDrift: string[]; status: Status; build: Build | null; builds: BuildSummary[]; rebuilds: boolean; active: ActiveWork | null};
+export type EpisodePayload = {doc: EpisodeV2; seq: number; docHash: string; planned: boolean; renderDrift: string[]; status: Status; build: Build | null; builds: BuildSummary[]; rebuilds: boolean; active: ActiveWork | null; animatic?: AnimaticInfo};
+export type AnimaticInfo = {state: 'none' | 'running' | 'fresh' | 'outdated'; artifactId: number | null; hook: string | null; seriesLabel: string | null; fileSha256: string | null; bytes: number | null; builtAt: number | null; why: string | null};
 export type Session = {serverId: string; startedAt: number; workspace: string; rebuilds: boolean; episodes: {id: string; title: string; seq: number}[]};
 
 const H = {'x-studio': '1', 'content-type': 'application/json'};
@@ -57,7 +58,7 @@ const friendlyIssues = (j: {message?: string; issues?: {path: string; message: s
 export type Blocker = Plan['blockers'][number];
 export const getPlan = (id: string, mode: 'draft' | 'final' = 'final') => call<Plan>('GET', `/api/episodes/${id}/plan${mode === 'draft' ? '?mode=draft' : ''}`);
 export const startRebuild = (id: string, seq: number, requestId: string, mode: 'draft' | 'final' = 'final') => call<any>('POST', `/api/episodes/${id}/rebuild`, {seq, requestId, mode});
-export type JobsReply = {available: boolean; jobs: JobView[]; rebuilds: RebuildView[]};
+export type JobsReply = {available: boolean; jobs: JobView[]; rebuilds: RebuildView[]; slot: SlotView | null};
 export const getJobs = (episode: string) => call<JobsReply>('GET', `/api/jobs?episode=${encodeURIComponent(episode)}`).then((r) => r.json);
 export const cancelJob = (id: number) => call<any>('POST', `/api/jobs/${id}/cancel`);
 export const retryJob = (id: number) => call<any>('POST', `/api/jobs/${id}/retry`);
@@ -80,7 +81,7 @@ export type PlanRevisionRow = {number: number; kind: string; label: string | nul
 export type Failure = {error?: string; message?: string; issues?: PlanIssue[]; errors?: ParseError[]; shape?: string | null; current?: PlanPayload | null; problems?: string[]};
 
 export const getLibrary = () => call<{items: LibraryItem[]}>('GET', '/api/library').then((r) => r.json.items ?? []);
-export const createPlan = (b: {title: string; audience: string; objective: string; durationMin: number | null}) => call<PlanPayload & Failure>('POST', '/api/plans', {...b, tab: TAB_ID});
+export const createPlan = (b: {title: string; audience: string; objective: string; durationMin: number | null; brand?: 'pip-explains'}) => call<PlanPayload & Failure>('POST', '/api/plans', {...b, tab: TAB_ID});
 export const getPlanPayload = (id: string) => call<PlanPayload & Failure>('GET', `/api/plans/${id}`);
 export const savePlanDoc = (id: string, plan: PlanDoc, baseSeq: number, label?: string) => call<PlanPayload & Failure>('PUT', `/api/plans/${id}`, {plan, baseSeq, label, tab: TAB_ID});
 export const getPlanRevisions = (id: string) => call<{revisions: PlanRevisionRow[]}>('GET', `/api/plans/${id}/revisions`).then((r) => r.json.revisions ?? []);
@@ -110,6 +111,12 @@ export const getReview = (id: string, render: number | null = null) => call<Revi
 const rv = (id: string, sub: string, body: Record<string, unknown>) => call<ReviewReply>('POST', `/api/episodes/${id}/review/${sub}`, {...body, tab: TAB_ID}).then((r) => r.json);
 export const reviewRound = (id: string, renderArtifactId: number) => rv(id, 'round', {renderArtifactId});
 export const reviewChecks = (id: string, renderArtifactId: number) => rv(id, 'checks', {renderArtifactId});
+export type OpeningInfo = {hook: string | null; title: string; brand: 'pip-explains' | null; signature: {count: number; events: number}; signatureSpec: {t: number; accent: string; gainDb: number}; pipStyle: boolean};
+export const getOpening = (id: string) => call<OpeningInfo>('GET', `/api/episodes/${id}/opening`).then((r) => r.json);
+export const setOpeningSignature = (id: string, on: boolean) => call<any>('POST', `/api/episodes/${id}/opening`, {signature: on, tab: TAB_ID});
+export const startAnimatic = (id: string) => call<any>('POST', `/api/episodes/${id}/animatic`, {tab: TAB_ID});
+export const linkPlan = (id: string, b: {audience?: string; brand?: boolean}) => call<any>('POST', `/api/episodes/${id}/link-plan`, {...b, tab: TAB_ID});
+export const reviewCover = (id: string, renderArtifactId: number) => rv(id, 'cover', {renderArtifactId});
 export const reviewPlayback = (id: string, roundId: number, fromSec: number, toSec: number, heard: boolean, phone: boolean) => rv(id, 'playback', {roundId, fromSec, toSec, heard, phone});
 export const reviewSignoff = (id: string, roundId: number, item: string, ticked: boolean, render: number | null) => rv(id, 'signoff', {roundId, item, ticked, render});
 export const reviewNoteAdd = (id: string, b: {roundId: number; text: string; type: string; timeSec?: number; segment?: string; build?: string; seq: number; render: number | null}) => rv(id, 'note', b);

@@ -53,7 +53,7 @@ function JobRow({job, now, fetchedAt, actions}: {job: JobView; now: number; fetc
         {job.canRetry && <button className="btn sm" onClick={() => actions.retry(job.id)}>Retry</button>}
       </div>
       <Progress job={job} elapsed={elapsed} />
-      {job.state === 'queued' && <div className="muted small">Waiting for earlier heavy work to finish. Heavy jobs run one at a time.</div>}
+      {job.state === 'queued' && <div className="muted small" data-testid="job-waiting">{job.displayStep?.startsWith('waiting for') || job.displayStep?.startsWith('waiting:') ? `${job.displayStep[0].toUpperCase()}${job.displayStep.slice(1)}. Nothing is lost; it starts by itself when the slot is free.` : 'Waiting for earlier heavy work to finish. Heavy jobs run one at a time on this computer.'}</div>}
       {job.state === 'cancelling' && <div className="muted small">Stopping the processes this job started…</div>}
       {job.state === 'succeeded' && elapsed !== null && !job.cacheHit && <div className="muted small">Took {clock(elapsed)}.</div>}
       {job.friendlyError && <div className="jerr" role="alert">{job.friendlyError}</div>}
@@ -87,6 +87,7 @@ export function JobsTray({data, fetchedAt, actions, onClose, episodeTitle}: {dat
       <div className="dbody">
         {!data && <p className="muted pad">Loading…</p>}
         {data && !data.available && <p className="muted pad">Rebuilding is not available in this session.</p>}
+        {data?.slot && (data.slot.state === 'other' || data.slot.state === 'unknown') && <p className="pad small" role="status" data-testid="slot-banner" data-slot={data.slot.state}>{data.slot.summary}</p>}
         {data?.available && !data.rebuilds.length && !jobs.length && <p className="muted pad">No jobs yet. After editing, use Rebuild to make a new video.</p>}
         {data?.rebuilds.map((r) => {
           const rows = (byRebuild.get(r.id) ?? []).sort((a, b) => a.id - b.id);

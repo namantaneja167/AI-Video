@@ -24,7 +24,7 @@ checklist.
 | Revision history, inspect, restore | yes | unit, HTTP and browser tests; real restore and redo | no |
 | Worker-kill diagnosis and fixes | yes | seven regression tests that fail on the earlier code (section 5) | no |
 | Placement measurement kept separate from final-output checks | yes | four regression tests (section 6) | no |
-| One real rebuild with the approved voice | yes | section 7 | no: the rebuilt sample has not been listened to or watched by you |
+| One real rebuild with the approved voice | yes | section 7 | not approved. Later: the author watched this build and preferred it to the Phase 8 final (visual feedback only; `15-creative-benchmark-and-review-records.md`); it has not been signed off, and its words were not verified |
 | Restart recovery of steps that were only waiting (found during the isolation work) | yes | one HTTP test (section 8.2) | no |
 | Test isolation (own workspace, server, port and browser per test; heavy suites take turns) | yes | section 8.2 | no |
 | Real-model hand-over through the real runner (one bounded run) | yes | section 8.4 | no |

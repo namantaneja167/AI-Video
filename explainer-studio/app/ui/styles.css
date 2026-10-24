@@ -362,3 +362,13 @@ details summary{cursor:pointer;font-weight:600;font-size:12.5px}
 .kv{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:8px 0;font-size:13.5px}.kv dt{color:var(--muted)}.kv dd{margin:0;word-break:break-word}
 .envlist{list-style:none;padding:0;margin:8px 0;display:grid;gap:8px;font-size:13.5px}
 .rail a.it{text-decoration:none}
+
+/* the cover beside its video */
+.rv-pair{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.rv-cover{display:flex;flex-direction:column;gap:8px;padding:12px}
+.rv-coverbody{display:grid;grid-template-columns:162px 1fr;gap:12px;align-items:start}
+.rv-coverinfo{display:flex;flex-direction:column;gap:8px;min-width:0}
+.rv-coverimg{width:162px;height:288px;border-radius:10px;border:1px solid var(--line, #d8d2c4);object-fit:cover;background:#f4efe3}
+.rv-coverimg.old{opacity:.55;filter:grayscale(.6)}
+.rv-coverimg.empty{display:flex;align-items:center;justify-content:center;color:#7a7466;font-size:13px}
+.btn.off{opacity:.7}

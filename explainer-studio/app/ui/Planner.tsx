@@ -7,6 +7,8 @@ import {SHAPE_LABEL} from '../shared/packet.ts';
 import {TAB_ID, getPlanPayload, getPlanRevisions, restorePlanRevision, savePlanDoc, type PlanPayload, type PlanRevisionRow} from './api';
 import {Notice, Rail, Stepper, type StageNote} from './Chrome';
 import {Handoff, ImportDialog, ProvenanceChip} from './Import';
+import {OpeningHook} from './OpeningHook';
+import {Creative} from './Creative';
 import {when, whenShort} from './labels';
 import {Research} from './Research';
 import {Scenes} from './Scenes';
@@ -145,6 +147,8 @@ export function Planner({id, tab, workspace, onTab, onList, onEditor, onVoice, o
                   <div className="hrow"><button className="btn sm pri" onClick={onEditor} data-testid="open-editor-2">Open the script editor</button><span className="muted small">Edit words, pauses and emphasis there. Replacing the whole script with a new import asks you first and keeps this version in History.</span></div>
                 </section>
               )}
+              {episode && <OpeningHook id={id} refreshKey={episode.seq} />}
+              <Creative id={id} plan={plan} hasEpisode={!!episode} commit={commit} refreshKey={episode?.seq} />
               <Handoff kind="script" text={brief.script} pending={pending} onImport={() => openImport()} onReview={(n) => openImport(n)} />
             </div>
           )}

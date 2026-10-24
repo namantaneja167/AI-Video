@@ -1,5 +1,6 @@
 // Export: copies the approved final video, byte for byte, into a package folder, with files derived from the approved record
-// (captions, metadata, credits, checksums). It never renders, encodes, masters or re-muxes anything, and it starts no process: the
+// (captions, metadata, credits, checksums) and, for a video with the branded opening, its matching cover image (a byte copy of the cover made
+// from that very video). It never renders, encodes, masters or re-muxes anything, and it starts no process: the
 // video is a file copy checked by SHA-256 before and after, and the other files are written from data the project already holds.
 //
 // What is left out on purpose, because the package is meant to be shared: prompts and briefs (they live in the planning records, which
@@ -9,6 +10,8 @@ import {join} from 'node:path';
 import type {EpisodeV2} from '../src/schema2.ts';
 import {approvalStatus, ApprovalVoidError, getApprovedFile, getSnapshot} from './artifacts.ts';
 import {blobPath} from './blobs.ts';
+import {coverFor} from './cover.ts';
+import {pngSize} from './coverSpec.ts';
 import {all, get} from './db.ts';
 import {getComponentValue} from './state.ts';
 import {readBlob} from './blobs.ts';
@@ -16,12 +19,12 @@ import {sha256, sha256File} from './hash.ts';
 import type {Project} from './project.ts';
 
 export class ExportError extends Error {
-  code: 'no-approval' | 'void' | 'missing' | 'altered' | 'exists' | 'copy-failed' | 'unsafe';
+  code: 'no-approval' | 'void' | 'missing' | 'altered' | 'exists' | 'copy-failed' | 'unsafe' | 'no-cover';
   changed: string[];
   constructor(code: ExportError['code'], message: string, changed: string[] = []) { super(message); this.name = 'ExportError'; this.code = code; this.changed = changed; }
 }
 
-export type ExportedFile = {name: string; sha256: string; bytes: number; role: 'video' | 'captions' | 'metadata' | 'credits' | 'checksums'};
+export type ExportedFile = {name: string; sha256: string; bytes: number; role: 'video' | 'cover' | 'captions' | 'metadata' | 'credits' | 'checksums'};
 export type ExportResult = {
   exportId: number; approvalId: number; dir: string; files: ExportedFile[];
   /** The approved file's hash, read from the project before the copy, from the copy after it, and from the project again afterwards. */
@@ -99,8 +102,17 @@ export function exportApproved(p: Project, episodeId: string, o: ExportOptions):
   const snap = approvedSnapshot(p, status.approvalId!);
   const { doc, timeline } = snap;
   const slug = doc.id;
+  // the cover that belongs to exactly this video: a video with the branded opening must have it
+  const approvedRender = get<{artifact_id: number}>(p.db.prepare('SELECT artifact_id FROM approvals WHERE id=?'), status.approvalId!)!.artifact_id;
+  const cover = coverFor(p, episodeId, approvedRender);
+  const coverFile = cover.state === 'fresh' && cover.fileSha256 ? blobPath(p, cover.fileSha256) : null;
+  if (doc.scenes[0]?.openingHook && !coverFile) throw new ExportError('no-cover', `This video has the branded opening, so its matching cover image must be made first${cover.state === 'outdated' ? ` (the existing cover is out of date: ${cover.why})` : ''}. Make the cover on the Review screen; nothing was exported.`);
+  const coverBytes = coverFile ? readFileSync(coverFile) : null;
+  const coverSize = coverBytes ? pngSize(coverBytes) : null;
+  if (coverFile && (!coverSize || cover.renderSha256 !== approved.sha256 || sha256File(coverFile).hash !== cover.fileSha256)) throw new ExportError('altered', 'The cover image is damaged or does not belong to the approved video. Make it again; nothing was exported.');
   const dir = join(o.exportsRoot, episodeId, `approval-${status.approvalId}-${approved.sha256.slice(0, 8)}`);
   const videoName = `${slug}.mp4`;
+  const coverName = `${slug}-cover.png`;
   const meta = (() => {
     const voice = getComponentValue<{model?: string; engine?: string}>(p, 'voiceRuntime', episodeId);
     const chapters = doc.chapters.map((c) => ({label: c.label, startSec: Math.round((timeline.segments.find((s) => s.id === c.segment)?.start ?? 0) * 100) / 100}));
@@ -109,6 +121,7 @@ export function exportApproved(p: Project, episodeId: string, o: ExportOptions):
       durationSec: Math.round(timeline.durationSec * 100) / 100, width: snap.settings.width, height: snap.settings.height, fps: snap.settings.fps,
       video: {file: videoName, sha256: approved.sha256, bytes: approved.bytes, codec: 'h264', audio: 'aac', note: 'The file is exactly the approved video; it was copied, not re-encoded.'},
       chapters, captions: {srt: `${slug}.srt`, vtt: `${slug}.vtt`},
+      ...(coverFile && coverSize ? {cover: {file: coverName, sha256: cover.fileSha256!, bytes: coverBytes!.length, width: coverSize.width, height: coverSize.height, frame: cover.frame, hook: cover.hook, belongsToVideoSha256: approved.sha256, note: 'A clean frame of the video\'s own opening, without captions. It is not attached to a post automatically: choose it as the cover when uploading.'}} : {}),
       synthetic: {narration: true, disclosure: 'The narration is a synthetic voice made with a text-to-speech model, reading the script. The presenter, Pip, is an illustrated character.'},
       voiceModel: voice?.model ?? null,
       approvedAt: new Date(snap.approvedAt).toISOString(),
@@ -152,10 +165,19 @@ export function exportApproved(p: Project, episodeId: string, o: ExportOptions):
     rmSync(dest, {force: true});
     throw new ExportError('copy-failed', 'The copy does not match the approved file (SHA-256 differs); it was removed and nothing was exported.');
   }
+  // the cover is a byte copy too, never overwriting a different file
+  if (coverFile) {
+    const cdest = join(dir, coverName);
+    const cexists = existsSync(cdest);
+    if (cexists && sha256File(cdest).hash !== cover.fileSha256) throw new ExportError('exists', `The package folder already holds a different ${coverName}. It was not overwritten.`);
+    if (!cexists) { try { copyFileSync(coverFile, cdest, constants.COPYFILE_EXCL); } catch (e) { throw new ExportError('copy-failed', `The cover could not be copied: ${(e as Error).message}`); } }
+    if (sha256File(cdest).hash !== cover.fileSha256) { rmSync(cdest, {force: true}); throw new ExportError('copy-failed', 'The copied cover does not match the cover in the project (SHA-256 differs); it was removed.'); }
+  }
   // 4. the derived files, then checksums over everything that is in the package
   for (const [name, text] of Object.entries(texts)) writeFileSync(join(dir, name), text);
   const entries: ExportedFile[] = [
     {name: videoName, sha256: copied, bytes: approved.bytes, role: 'video'},
+    ...(coverFile ? [{name: coverName, sha256: cover.fileSha256!, bytes: coverBytes!.length, role: 'cover' as const}] : []),
     ...Object.entries(texts).map(([name, text]): ExportedFile => ({name, sha256: sha256(text), bytes: Buffer.byteLength(text), role: name.endsWith('.json') ? 'metadata' : name.endsWith('.md') ? 'credits' : 'captions'})),
   ];
   const sums = entries.map((e) => `${e.sha256}  ${e.name}`).join('\n') + '\n';

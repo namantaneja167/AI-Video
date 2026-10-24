@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {approvalStatus, getSnapshot, statusReport} from '../core/artifacts.ts';
 import {blobPath} from '../core/blobs.ts';
 import {all, get} from '../core/db.ts';
+import {coverFor} from '../core/cover.ts';
 import {exportApproved, exportsOf, type ExportResult} from '../core/export.ts';
 import {getEpisode, getEpisodeInfo} from '../core/episodes.ts';
 import {
@@ -16,7 +17,7 @@ import {currentRows} from '../core/state.ts';
 import type {Note} from '../src/schema2.ts';
 import {listBuilds} from './builds.ts';
 import type {JobService} from './jobs.ts';
-import type {ApprovalView, ExportView, NoteView, ReviewView, VideoRow} from './shared/review.ts';
+import type {ApprovalView, CoverView, ExportView, NoteView, ReviewView, VideoRow} from './shared/review.ts';
 
 export type ReviewOptions = {exportsRoot: string; libraryRoot?: string};
 
@@ -60,6 +61,8 @@ export class ReviewService {
       const round = roundForRender(this.p, r.id);
       const report = checkReportFor(this.p, episodeId, r.id);
       const running = jobs.some((j) => j.subject === String(r.id));
+      const cv = coverFor(this.p, episodeId, r.id);
+      const cover: CoverView | null = cv.hook || cv.coverArtifactId ? {state: cv.state, hook: cv.hook, fileSha256: cv.fileSha256, bytes: cv.bytes, width: cv.width, height: cv.height, frame: cv.frame, builtAt: cv.builtAt, renderSha256: cv.renderSha256, why: cv.why, url: cv.coverArtifactId ? `/media/cover/${episodeId}/${r.id}.png` : null, downloadUrl: cv.coverArtifactId ? `/media/cover/${episodeId}/${r.id}.png?download=1` : null, filename: `${episodeId}-cover.png`} : null;
       return {
         renderArtifactId: r.id, kind, label: kind === 'final' ? 'Final (mastered)' : 'Draft (not mastered)', buildId: builds.find((b) => b.render?.id === r.id)?.id ?? null,
         revision: r.revision_number, builtAt: r.created_at, fileSha256: r.blob_hash, bytes: statSync(blobPath(this.p, r.blob_hash)).size, durationSec: this.durationOf(r.id),
@@ -68,6 +71,7 @@ export class ReviewService {
         imported: (JSON.parse(r.meta_json) as {imported?: {note?: string}}).imported?.note ?? null,
         round: round ? {id: round.id, number: round.number, closedAt: round.closedAt} : null,
         checks: {state: running ? 'running' : report ? 'done' : 'none', passed: report ? report.report.passed : null, fail: report?.report.summary.fail ?? 0, warn: report?.report.summary.warn ?? 0, unchecked: report?.report.summary.unchecked ?? 0, ranAt: report?.ranAt ?? null},
+        cover,
       };
     });
   }
@@ -126,6 +130,13 @@ export class ReviewService {
   openRound(episodeId: string, renderArtifactId: number): Round { return openRound(this.p, episodeId, renderArtifactId); }
 
   runChecks(episodeId: string, renderArtifactId: number): number { return this.jobs.startChecks(episodeId, renderArtifactId); }
+
+  /** Draw the cover of one video: its branded opening, without captions. */
+  makeCover(episodeId: string, renderArtifactId: number): number {
+    const cv = coverFor(this.p, episodeId, renderArtifactId);
+    if (!cv.hook) throw new ReviewError('refused', 'This video has no branded opening (its first scene has no opening hook), so there is no cover to make from it.');
+    return this.jobs.startCover(episodeId, renderArtifactId);
+  }
 
   private roundOf(episodeId: string, roundId: number): {round: Round; duration: number} {
     const round = getRound(this.p, roundId);

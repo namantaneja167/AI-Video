@@ -1,0 +1,189 @@
+{
+ "schemaVersion": 2,
+ "id": "tokens-why-ai-doesnt-read-one-word-at-a-time",
+ "title": "Tokens: why AI doesn't read one word at a time",
+ "learningObjective": "After one watch the viewer can say that an AI splits text into tokens, turns them into numbers, and that token counts differ from word counts and vary by model and language.",
+ "status": "draft",
+ "style": "pip-paper-bundled",
+ "voice": {
+  "engine": "qwen3-tts",
+  "profile": "pip-voice-v1"
+ },
+ "pacing": {
+  "leadInSec": 0.5,
+  "tailSec": 1.6,
+  "segmentGapSec": 0.2
+ },
+ "narration": {
+  "segments": [
+   {
+    "id": "s1",
+    "text": "You type: Remind me to recharge my Jio plan tomorrow. Eight words."
+   },
+   {
+    "id": "s2",
+    "text": "But AI doesn't read eight words. A tokenizer cuts text into pieces called tokens."
+   },
+   {
+    "id": "s3",
+    "text": "Here, one tokenizer splits Remind into Rem and ind. Jio becomes J and io."
+   },
+   {
+    "id": "s4",
+    "text": "Then every piece becomes an ID number. The model works with those numbers."
+   },
+   {
+    "id": "s5",
+    "text": "So the count is tokens, not words. Eight words became ten tokens."
+   },
+   {
+    "id": "s6",
+    "text": "Language matters. With this tokenizer, an English alarm request is six tokens. In Hindi: twenty-three."
+   },
+   {
+    "id": "s7",
+    "text": "Another model could split it differently."
+   },
+   {
+    "id": "s8",
+    "text": "So before pasting a long prompt, check its tokens with your model's tokenizer."
+   },
+   {
+    "id": "s9",
+    "text": "AI reads tokens, not words. Count tokens."
+   }
+  ],
+  "blocks": [
+   {
+    "id": "b1",
+    "segments": [
+     "s1",
+     "s2",
+     "s3"
+    ]
+   },
+   {
+    "id": "b2",
+    "segments": [
+     "s4",
+     "s5"
+    ]
+   },
+   {
+    "id": "b3",
+    "segments": [
+     "s6",
+     "s7"
+    ]
+   },
+   {
+    "id": "b4",
+    "segments": [
+     "s8",
+     "s9"
+    ]
+   }
+  ]
+ },
+ "scenes": [
+  {
+   "id": "token-world",
+   "type": "token-journey",
+   "segments": [
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5",
+    "s6",
+    "s7",
+    "s8",
+    "s9"
+   ],
+   "params": {
+    "tokenizer": {
+     "name": "Qwen3-TTS text tokenizer",
+     "note": "byte-level BPE; ids belong to this tokenizer"
+    },
+    "example": {
+     "text": "Remind me to recharge my Jio plan tomorrow",
+     "pieces": [
+      "Rem",
+      "ind",
+      " me",
+      " to",
+      " recharge",
+      " my",
+      " J",
+      "io",
+      " plan",
+      " tomorrow"
+     ],
+     "ids": [
+      6590,
+      484,
+      752,
+      311,
+      46823,
+      847,
+      619,
+      815,
+      3119,
+      16577
+     ]
+    },
+    "comparison": {
+     "english": {
+      "text": "Wake me at six tomorrow morning",
+      "tokens": 6
+     },
+     "hindi": {
+      "text": "मुझे कल सुबह छह बजे उठाना",
+      "tokens": 23
+     }
+    }
+   },
+   "layout": {
+    "template": "content-led",
+    "captionZone": "bottom",
+    "mascot": {
+     "mode": "docked",
+     "position": "bottom-left",
+     "scale": 0.42
+    }
+   },
+   "openingHook": "AI doesn't read one word at a time"
+  }
+ ],
+ "sources": [
+  {
+   "title": "OpenAI Help Center: Understanding and counting tokens",
+   "url": "https://help.openai.com/en/articles/4936856-understanding-and-counting-tokens",
+   "note": "Primary source for what a token is, that counts differ by model, encoding and language, that token IDs depend on the encoding, the Tokenizer tool, and that the context window limits tokens. Read 2026-10-20 (page shows a relative 'Updated' date only)."
+  },
+  {
+   "title": "tiktoken README (OpenAI)",
+   "url": "https://github.com/openai/tiktoken",
+   "note": "Primary source for 'language models see sequences of numbers (tokens)' and how byte pair encoding turns text into tokens. Read 2026-10-20."
+  },
+  {
+   "title": "Hugging Face Transformers: Tokenization algorithms",
+   "url": "https://huggingface.co/docs/transformers/tokenizer_summary",
+   "note": "Documentation of BPE, byte-level BPE, Unigram and WordPiece; lists Qwen2 among BPE models. Read 2026-10-20."
+  },
+  {
+   "title": "Neural Machine Translation of Rare Words with Subword Units (Sennrich, Haddow, Birch)",
+   "url": "https://arxiv.org/abs/1508.07909",
+   "note": "Original paper applying byte pair encoding to subword units (arXiv v5 dated 2016-06-10; first submitted 2015-08-31). Used only for the idea of subword pieces."
+  },
+  {
+   "title": "OpenAI Tokenizer (web tool)",
+   "url": "https://platform.openai.com/tokenizer",
+   "note": "Named as the tool for seeing how text is divided in source 1. Not opened or run by this work; recorded only as the example of a model provider's own tokenizer."
+  }
+ ],
+ "beats": [],
+ "chapters": [],
+ "reviewNotes": [],
+ "previews": {}
+}

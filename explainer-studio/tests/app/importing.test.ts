@@ -277,7 +277,7 @@ describe('the scene catalog', () => {
     assert.deepEqual(catalog, schemaTypes);
     // the registry imports React components, so it is read as text rather than loaded
     const registered = [...readFileSync('src/library/registry.ts', 'utf8').matchAll(/^\s*'([a-z0-9-]+)':\s*\{type:/gm)].map((m) => m[1]);
-    assert.deepEqual(registered.sort(), ['context-window', 'pip-cards', 'pip-dense-fixture', 'pip-scene-10x']);
+    assert.deepEqual(registered.sort(), ['cache-journey', 'context-window', 'pip-cards', 'pip-dense-fixture', 'pip-scene-10x', 'prompt-injection', 'rotating-ticket', 'ticket-motion', 'token-journey']);
     for (const id of registered.filter((r) => r !== 'pip-cards')) assert.notEqual(SCENE_TYPES.find((t) => t.id === id)?.reuse, 'data-driven', `${id} is a registered Pip scene tied to its content`);
     assert.equal(SCENE_TYPES.find((t) => t.id === 'pip-cards')?.reuse, 'data-driven', 'the one reusable Pip scene');
     for (const t of SCENE_TYPES.filter((t) => t.reuse === 'data-driven' && !t.pip)) assert.equal(registered.includes(t.id), false, `${t.id} is a legacy data-driven scene`);

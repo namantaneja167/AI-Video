@@ -2,6 +2,8 @@
 // row, every process a job starts is recorded with its identity, and progress is stored as it happens.
 //
 //   * one HEAVY job at a time (TTS, alignment, mix, render); light jobs run beside it up to a small limit;
+//   * with a production slot (core/slot.ts) that one heavy job is machine-wide: a heavy job starts only once it holds the slot,
+//     so apps on other projects wait instead of loading a second model; the slot is released when the attempt ends;
 //   * every job runs on the immutable snapshot taken when it was enqueued;
 //   * before a render starts the model host unloads the audio model and confirms memory was released;
 //   * cancel stops only processes recorded as owned by the job's attempt (identity-checked), then frees the slot;
@@ -17,6 +19,7 @@ import {getComponentValues} from './state.ts';
 import {all, get} from './db.ts';
 import type {Project} from './project.ts';
 import {killOwned, OwnerRegistry, ownedRssBytes, releaseLeased, spawnOwned, systemMemory, type MemoryProbe} from './proc.ts';
+import type {ProductionSlot, SlotHolder} from './slot.ts';
 import {WorkerCrashError, type Handover, type ModelHost} from './worker.ts';
 
 export class PreflightError extends Error {}
@@ -69,7 +72,12 @@ export type RunnerOptions = {
   killGraceMs?: number;
   /** Reasons the episode and settings cannot be produced; checked before a job is even queued. */
   preflight?: (doc: EpisodeV2, values: Record<string, unknown>) => string[];
+  /** The machine-wide production slot and who this project is. Without it only the per-project rule applies. */
+  slot?: {slot: ProductionSlot; project: string; projectRoot: string; /** How often a waiting job looks again. */ pollMs?: number; /** Words for what a job is, shown to a project that has to wait for it. */ describe?: (job: JobRow) => string};
 };
+
+/** A heavy job that is queued only because another project holds the production slot. */
+export type SlotWait = {jobId: number; holder: SlotHolder | null; unknown: boolean; why: string; since: number; /** Processes of the holder's project that still run although its app is gone. */ orphans: number};
 
 type Active = {
   job: JobRow; ctl: AbortController; attemptId: number; owner: string; reason: 'cancel' | 'memory' | null; memoryMessage?: string;
@@ -86,6 +94,10 @@ export class JobRunner {
   private waiters = new Map<number, ((j: JobRow) => void)[]>();
   private idleWaiters: (() => void)[] = [];
   private stopped = false;
+  private slotRelease: (() => void) | null = null;
+  private slotTimer: NodeJS.Timeout | null = null;
+  private slotWait: SlotWait | null = null;
+  private slotNextTry = 0;
 
   constructor(p: Project, o: RunnerOptions) {
     this.p = p;
@@ -146,19 +158,54 @@ export class JobRunner {
   private schedule(): void {
     if (this.stopped) return;
     const queued = all<JobRow>(this.p.db.prepare("SELECT * FROM jobs WHERE state='queued' ORDER BY id"));
+    let heavyWaits = false;
     for (const job of queued) {
       if (this.active.has(job.id)) continue;
       const heavyBusy = job.lane === 'heavy' && get(this.p.db.prepare("SELECT 1 FROM jobs WHERE lane='heavy' AND state IN ('preparing','running','cancelling')"));
       const lightRunning = [...this.active.values()].filter((a) => a.job.lane === 'light').length;
-      if (heavyBusy) continue; // one heavy job at a time, strictly in queue order
+      if (heavyBusy || (job.lane === 'heavy' && heavyWaits)) continue; // one heavy job at a time, strictly in queue order
       if (job.lane === 'light' && lightRunning >= this.o.maxLight) continue;
+      if (job.lane === 'heavy' && !this.takeSlot(job)) { heavyWaits = true; continue; } // light jobs behind it still run
       this.begin(job);
       if (job.lane === 'heavy') break;
     }
+    if (!heavyWaits) this.slotWait = null;
     if (this.isIdle()) { for (const w of this.idleWaiters.splice(0)) w(); }
   }
 
-  stop(): void { this.stopped = true; }
+  /** The production slot is held for exactly the life of one heavy attempt. False: another project has it, and this job keeps waiting in the queue. */
+  private takeSlot(job: JobRow): boolean {
+    const s = this.o.slot;
+    if (!s) return true;
+    if (this.slotRelease) this.releaseSlot(); // an earlier release that failed: our own claim must not make us wait for ourselves
+    if (this.slotRelease) return false;
+    if (Date.now() < this.slotNextTry) return false; // the poll timer tries again: a refused claim may have waited on another process's transaction, so not on every schedule pass
+    const r = s.slot.tryAcquire({project: s.project, projectRoot: s.projectRoot, job: s.describe?.(job) ?? `${job.kind} ${job.subject}`.trim()});
+    if (r.ok) { this.slotRelease = r.release; this.slotWait = null; return true; }
+    this.slotNextTry = Date.now() + (s.pollMs ?? 1000) - 5;
+    const changed = this.slotWait?.jobId !== job.id || this.slotWait.holder?.token !== r.holder?.token;
+    this.slotWait = {jobId: job.id, holder: r.holder, unknown: r.unknown, why: r.why, orphans: r.orphans.length, since: changed ? Date.now() : this.slotWait!.since};
+    if (changed) this.event(job.id, null, 'waiting-for-slot', {why: r.why, orphans: r.orphans.length, holder: r.holder ? {project: r.holder.project, job: r.holder.job, pid: r.holder.pid, since: r.holder.since} : null});
+    if (!this.slotTimer && !this.stopped) {
+      this.slotTimer = setTimeout(() => { this.slotTimer = null; this.slotNextTry = 0; this.schedule(); }, s.pollMs ?? 1000);
+      this.slotTimer.unref();
+    }
+    return false;
+  }
+
+  private releaseSlot(): void {
+    const r = this.slotRelease;
+    if (!r) return;
+    try { r(); this.slotRelease = null; } catch (e) { this.event(null, null, 'slot-release-failed', {error: (e as Error).message}); } // kept: retried before the next claim and at exit
+  }
+
+  /** The queued heavy job that is waiting for another project's slot, if one is. */
+  slotWaiting(): SlotWait | null { return this.slotWait; }
+
+  stop(): void {
+    this.stopped = true;
+    if (this.slotTimer) { clearTimeout(this.slotTimer); this.slotTimer = null; }
+  }
 
   // ---- events and progress -------------------------------------------------------------------------------------
   event(jobId: number | null, attemptId: number | null, kind: string, data: unknown): void {
@@ -186,6 +233,7 @@ export class JobRunner {
     this.active.set(job.id, act);
     act.done = this.run(act).catch(() => { /* run() records its own outcome */ }).finally(() => {
       this.active.delete(job.id);
+      if (job.lane === 'heavy') this.releaseSlot(); // success, failure, cancellation or auto-retry: every process of the attempt is already stopped
       const now = this.row(job.id);
       if (TERMINAL.has(now.state)) { for (const w of this.waiters.get(job.id) ?? []) w(now); this.waiters.delete(job.id); } // an auto-retry stays pending
       this.schedule();
@@ -331,6 +379,7 @@ export class JobRunner {
   async shutdown(): Promise<void> {
     this.stop();
     await this.host?.shutdown();
+    this.releaseSlot(); // normally already released; a job that could not be stopped cleanly must not keep other projects waiting after the app is gone
   }
 }
 

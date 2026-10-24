@@ -1,0 +1,35 @@
+{
+ "studioPacket": 1,
+ "kind": "script",
+ "script": {
+  "segments": [
+   {
+    "text": "You type: Remind me to recharge my Jio plan tomorrow. Eight words."
+   },
+   {
+    "text": "But AI doesn't read eight words. A tokenizer cuts text into pieces called tokens."
+   },
+   {
+    "text": "Here, one tokenizer splits Remind into Rem and ind. Jio becomes J and io."
+   },
+   {
+    "text": "Then every piece becomes an ID number. The model works with those numbers."
+   },
+   {
+    "text": "So the count is tokens, not words. Eight words became ten tokens."
+   },
+   {
+    "text": "Language matters. With this tokenizer, an English alarm request is six tokens. In Hindi: twenty-three."
+   },
+   {
+    "text": "Another model could split it differently."
+   },
+   {
+    "text": "So before pasting a long prompt, check its tokens with your model's tokenizer."
+   },
+   {
+    "text": "AI reads tokens, not words. Count tokens."
+   }
+  ]
+ }
+}

@@ -4,7 +4,11 @@
 import {PipCardsParams} from './params.ts';
 import {resolveCues, type CueRef, type CueSegment, type CueSpec} from './cues.ts';
 import {SCENE_CUES} from './sceneSpecs.ts';
+import {TICKET_MOTION_CUES} from './ticketCues.ts';
 import type {AccentEvent} from './accents.ts';
+
+/** Scenes timed on words of their own script. Their rules are part of the timing's inputs (see core/deps.ts), not of the timeline-logic fingerprint. */
+export const DOCUMENT_SCENE_CUES: Record<string, CueSpec> = {'ticket-motion': TICKET_MOTION_CUES};
 
 export type SceneLike = {id?: string; type: string; params: unknown; segments: string[]};
 
@@ -12,7 +16,7 @@ const at = (a: {segment: number; word?: string | number; edge?: 'start' | 'end'}
 
 /** `card1..cardN` (a card appears), `action1..actionM` (something Pip does) and `voice_end`; undefined when the scene has none. */
 export function sceneCueSpec(scene: SceneLike): CueSpec | undefined {
-  const fixed = SCENE_CUES[scene.type];
+  const fixed = SCENE_CUES[scene.type] ?? DOCUMENT_SCENE_CUES[scene.type];
   if (fixed) return fixed;
   if (scene.type !== 'pip-cards') return undefined;
   const p = PipCardsParams.safeParse(scene.params);

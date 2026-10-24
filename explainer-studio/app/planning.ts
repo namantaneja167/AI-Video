@@ -4,6 +4,7 @@
 import {createHash} from 'node:crypto';
 import {all, get} from '../core/db.ts';
 import {ConflictError, createEpisode, createRevision, getEpisode, getEpisodeInfo, listEpisodes, saveEpisode, writeProjection} from '../core/episodes.ts';
+import {applyBrandDefaults} from '../core/brand.ts';
 import {hashJson} from '../core/hash.ts';
 import type {Project} from '../core/project.ts';
 import type {EpisodeV2} from '../src/schema2.ts';
@@ -47,16 +48,46 @@ function writeRevision(p: Project, doc: PlanDoc, docHash: string, kind: string, 
 }
 
 /** A new draft. The id comes from the title and never collides with an existing plan or episode. */
-export function createPlan(p: Project, input: {title: string; audience?: string; objective?: string; durationMin?: number | null}): StoredPlan {
+export function createPlan(p: Project, input: {title: string; audience?: string; objective?: string; durationMin?: number | null; brand?: 'pip-explains'}): StoredPlan {
   const title = String(input.title ?? '').trim();
   const id = uniqueId(slugify(title), [...listPlanIds(p), ...listEpisodes(p)]);
-  const doc = validated(newPlan({id, title, audience: input.audience, objective: input.objective, durationMin: input.durationMin ?? null}));
+  const doc = validated(newPlan({id, title, audience: input.audience, objective: input.objective, durationMin: input.durationMin ?? null, ...(input.brand ? {brand: input.brand} : {})}));
   const hash = hashJson(doc);
   p.tx('create-plan', () => {
     p.db.prepare('INSERT INTO plans(id,doc_json,doc_hash,seq,created_at,updated_at) VALUES(?,?,?,1,?,?)').run(id, JSON.stringify(doc), hash, p.now(), p.now());
     writeRevision(p, doc, hash, 'create', 'draft started');
   });
   return getPlan(p, id);
+}
+
+export class LinkError extends Error {}
+
+/**
+ * Give an episode that was made without a planning document (created from files, a script or the project API) the planning document the
+ * app's steps work on. Purely additive: one new row in `plans` and its first revision. The episode, its takes, builds and history are not
+ * read for rewriting and not changed, and since a plan is never part of what a build depends on, nothing becomes out of date.
+ * The brief and the storyboard are written down from what the episode already holds (title, learning objective, sources, scenes) and
+ * say so in the notes; nothing is invented (no audience, no claims). The plan has the episode's id, which is how the two are connected.
+ */
+export function linkPlanToEpisode(p: Project, episodeId: string, o: {audience?: string; brand?: boolean} = {}): StoredPlan {
+  if (!listEpisodes(p).includes(episodeId)) throw new LinkError(`there is no episode "${episodeId}" in this project`);
+  if (planExists(p, episodeId)) throw new LinkError(`episode "${episodeId}" already has its planning document`);
+  const doc = getEpisode(p, episodeId);
+  const info = getEpisodeInfo(p, episodeId);
+  const isUrl = (u: string | undefined): u is string => !!u && /^https?:\/\//i.test(u);
+  const hasHook = !!doc.scenes[0]?.openingHook;
+  const plan = validated({
+    ...newPlan({id: episodeId, title: doc.title, audience: o.audience ?? '', objective: doc.learningObjective, durationMin: null, ...(o.brand && hasHook ? {brand: 'pip-explains' as const} : {})}),
+    notes: `Linked to the existing episode "${episodeId}" (episode revision ${info.seq}) on ${new Date(p.now()).toISOString().slice(0, 10)}. The objective, sources and scenes below were copied from the episode itself; nothing was researched or imported. Fill in the audience, claims and intentions yourself.`,
+    sources: doc.sources.map((s, i) => ({id: `src${i + 1}`, title: s.title, url: isUrl(s.url) ? s.url : null, publisher: '', published: '', note: s.note ?? (s.url && !isUrl(s.url) ? s.url : ''), checked: null, provenance: null})),
+    storyboard: doc.scenes.map((s, i) => ({id: `sb${i + 1}`, segmentIds: s.segments, sceneType: s.type, intention: '', mechanism: '', pip: [], params: (s.params ?? null) as Record<string, unknown> | null, provenance: null})),
+  });
+  const hash = hashJson(plan);
+  p.tx('link-plan', () => {
+    p.db.prepare('INSERT INTO plans(id,doc_json,doc_hash,seq,created_at,updated_at) VALUES(?,?,?,1,?,?)').run(episodeId, JSON.stringify(plan), hash, p.now(), p.now());
+    writeRevision(p, plan, hash, 'link', 'linked to the existing episode');
+  });
+  return getPlan(p, episodeId);
 }
 
 export type PlanSave = {changed: boolean; seq: number; revision: number | null};
@@ -172,6 +203,7 @@ export function acceptImport(p: Project, planId: string, id: number, o: {selecti
       const c = createEpisode(p, out.episode.doc, {label: out.label, skipProjection: true});
       episodeSeq = c.seq;
       touched = planId;
+      if (nextPlan.brand === 'pip-explains') applyBrandDefaults(p, planId); // the quiet opening chime, once, for this episode only
     } else if (out.episode.mode === 'replace') {
       const s = saveEpisode(p, planId, out.episode.doc, {baseSeq: episode!.seq, kind: 'script-import', label: out.label, skipProjection: true});
       episodeSeq = s.seq;

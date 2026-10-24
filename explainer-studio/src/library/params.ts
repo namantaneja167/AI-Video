@@ -1,7 +1,29 @@
 // Scene parameter schemas for the scene library (pure zod, no React): validated when an episode is saved.
 import {z} from 'zod';
 
+export const CacheJourneyParams = z.object({}).strict();
+
 export const Pip10xParams = z.object({}).strict();
+
+/**
+ * Tokens explainer. Every piece, id and count shown comes from a real tokenizer run (samples/ai-maxxing-01/
+ * tokenizer-evidence.json); the scene never invents a split. Ids belong to the named tokenizer only.
+ */
+export const TokenJourneyParams = z.object({
+  tokenizer: z.object({name: z.string().min(1).max(60), note: z.string().min(1).max(120)}).strict(),
+  example: z.object({
+    text: z.string().min(1).max(80),
+    pieces: z.array(z.string().min(1)).min(2).max(16),
+    ids: z.array(z.number().int().min(0)).min(2).max(16),
+  }).strict(),
+  comparison: z.object({
+    english: z.object({text: z.string().min(1).max(60), tokens: z.number().int().min(1).max(500)}).strict(),
+    hindi: z.object({text: z.string().min(1).max(60), tokens: z.number().int().min(1).max(500)}).strict(),
+  }).strict(),
+}).strict().superRefine((p, ctx) => {
+  if (p.example.pieces.join('') !== p.example.text) ctx.addIssue({code: 'custom', path: ['example', 'pieces'], message: 'the pieces must spell the text exactly when joined'});
+  if (p.example.ids.length !== p.example.pieces.length) ctx.addIssue({code: 'custom', path: ['example', 'ids'], message: 'there must be one id for each piece'});
+});
 
 /** The AI context-window explainer. The token pieces are illustrative: a real tokenizer is not run. */
 export const ContextWindowParams = z
@@ -69,4 +91,4 @@ export const PipCardsParams = z.object({
   });
 });
 
-export const PIP_SCENE_TYPES = ['pip-scene-10x', 'context-window', 'pip-dense-fixture', 'pip-cards'] as const;
+export const PIP_SCENE_TYPES = ['pip-scene-10x', 'context-window', 'pip-dense-fixture', 'pip-cards', 'cache-journey', 'token-journey', 'rotating-ticket', 'prompt-injection', 'ticket-motion'] as const;

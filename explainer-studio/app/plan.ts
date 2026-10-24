@@ -7,13 +7,15 @@ import {computeExpected, UNSET} from '../core/deps.ts';
 import {getEpisode, getEpisodeInfo} from '../core/episodes.ts';
 import {hashJson, sha256} from '../core/hash.ts';
 import type {Project} from '../core/project.ts';
-import {getComponentHashes, getComponentValues, upstreamBlobs} from '../core/state.ts';
+import {currentRows, getComponentHashes, getComponentValues, upstreamBlobs} from '../core/state.ts';
 import {renderSettingsProblems, unsupportedInputs} from '../core/support.ts';
 import {fileSha, mixScriptFingerprint, renderSourceProblems, renderToolProblems, timelineLogicValue, type ToolPaths} from '../core/toolchain.ts';
 import type {SnapshotManifest} from '../core/artifacts.ts';
 import type {EpisodeV2} from '../src/schema2.ts';
 import {planningBlockers} from './planning.ts';
 import {accentCueProblems, sceneCueSpec} from '../src/library/dynamicCues.ts';
+import {resolveCues, type CueSegment} from '../src/library/cues.ts';
+import {SCENE_CUES} from '../src/library/sceneSpecs.ts';
 import {compareToBuild, spokenOf} from './shared/compare.ts';
 import {estimateFor, totalEstimate, type MeasuredRuns} from './shared/costs.ts';
 import type {Blocker, Plan, PlanStep} from './shared/plan-types.ts';
@@ -97,6 +99,48 @@ function timingWhy(p: Project, doc: EpisodeV2, e: StatusEntry): string[] {
   return out.length ? out : ['An input of the timing changed since it was built'];
 }
 
+/** An episode with no timing yet has nothing the recorded logic could contradict, so it may adopt the current logic. */
+export const neverTimed = (p: Project, episodeId: string): boolean => !p.db.prepare("SELECT 1 FROM artifacts WHERE episode_id=? AND kind='timing' LIMIT 1").get(episodeId);
+
+const CUE_RULES_FILE = 'src/library/sceneSpecs.ts';
+/** The timeline-logic files whose hash no longer matches what the episode recorded. */
+export function timelineLogicDrift(p: Project, episodeId: string, ctx: {sourceRoot: string; tools: ToolPaths}): string[] {
+  const logic = getComponentValues(p, episodeId).timelineLogic as Record<string, string> | undefined;
+  if (!logic) return [];
+  const now = timelineLogicValue(ctx.sourceRoot, ctx.tools.timeline);
+  return [...new Set([...Object.keys(logic), ...Object.keys(now)])].filter((k) => logic[k] !== now[k]).sort();
+}
+
+/**
+ * True when only the cue rules changed and every cue the recorded timing holds still resolves to the same time under the
+ * current rules, so re-timing cannot change what the existing scenes were timed on.
+ */
+export function cueRulesPreserved(p: Project, episodeId: string): boolean {
+  const row = currentRows(p, episodeId).find((r) => r.kind === 'timing' && r.subject === 'timeline');
+  if (!row) return false;
+  const tl = JSON.parse(readFileSync(blobPath(p, row.blob_hash), 'utf8')) as {segments: CueSegment[]; scenes: {id: string; type: string}[]; cues?: Record<string, Record<string, number>>};
+  const doc = getEpisode(p, episodeId);
+  const byId = new Map(tl.segments.map((s) => [s.id, s]));
+  for (const sc of tl.scenes) {
+    const recorded = tl.cues?.[sc.id];
+    const spec = SCENE_CUES[sc.type];
+    if (!recorded || !spec) continue;
+    const segs = doc.scenes.find((d) => d.id === sc.id)?.segments;
+    if (!segs) return false;
+    let now: Record<string, number>;
+    try { now = resolveCues(spec, segs.map((id) => byId.get(id)!)); } catch { return false; }
+    for (const [name, t] of Object.entries(recorded)) if (!(Math.abs((now[name] ?? NaN) - t) < 0.002)) return false;
+  }
+  return true;
+}
+
+/** Whether this episode may adopt the current timeline logic: it differs from what it recorded, and nothing it was timed on can change. */
+export function timelineLogicAdoptable(p: Project, episodeId: string, ctx: {sourceRoot: string; tools: ToolPaths}): boolean {
+  const drift = timelineLogicDrift(p, episodeId, ctx);
+  if (!drift.length) return false;
+  return neverTimed(p, episodeId) || (drift.every((f) => f === CUE_RULES_FILE) && cueRulesPreserved(p, episodeId));
+}
+
 export function buildPlan(p: Project, episodeId: string, ctx: PlanContext, active: Plan['active'] = null, mode: 'draft' | 'final' = 'final'): Plan {
   const doc = getEpisode(p, episodeId);
   const info = getEpisodeInfo(p, episodeId);
@@ -170,7 +214,10 @@ export function buildPlan(p: Project, episodeId: string, ctx: PlanContext, activ
     blockers.push(...cueTextProblems(doc));
     needSetting('timelineLogic', 'timing');
     const logic = values.timelineLogic as Record<string, string> | undefined;
-    if (logic && hashJson(logic) !== hashJson(timelineLogicValue(ctx.sourceRoot, ctx.tools.timeline))) blockers.push({message: 'The timeline logic files changed since they were recorded, so timing would not match the recorded settings and is refused.'});
+    if (logic && hashJson(logic) !== hashJson(timelineLogicValue(ctx.sourceRoot, ctx.tools.timeline))) {
+      if (timelineLogicAdoptable(p, episodeId, ctx)) notes.push(neverTimed(p, episodeId) ? 'The timeline logic (cue rules) changed since this workspace recorded it. This episode has never been timed, so starting the rebuild records the current logic for this episode only; other episodes keep what they recorded.' : 'Only the scene cue rules changed since this episode recorded its timeline logic, and every cue its timing holds still resolves to the same time. Starting the rebuild records the current rules for this episode only; other episodes keep what they recorded.');
+      else blockers.push({message: 'The timeline logic files changed since they were recorded, so timing would not match the recorded settings and is refused.'});
+    }
   }
   if (mixRuns) {
     needSetting('mixParams', 'the mix'); if (mode === 'final') needSetting('masteringParams', 'the final mix');

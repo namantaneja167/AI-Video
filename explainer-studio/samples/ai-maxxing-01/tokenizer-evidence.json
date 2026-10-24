@@ -1,0 +1,65 @@
+{
+ "purpose": "Evidence for AI Maxxing 01 (tokens). Every split, id and count shown in the video comes from this file.",
+ "tokenizer": {
+  "name": "Qwen3-TTS text tokenizer",
+  "class": "Qwen2Tokenizer",
+  "algorithm": "byte-level BPE (Qwen2Tokenizer)",
+  "vocabularySize": 151676,
+  "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+  "revision": "a6eb4f68e4b056f1215157bb696209bc82a6db48",
+  "files": {
+   "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+   "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+   "tokenizer_config.json": "dc3c31c3bdaedd5016382bb3cbe07323026775ad51f5a4fb564505992ae4a670"
+  },
+  "libraries": {
+   "transformers": "5.20.1",
+   "tokenizers": "0.23.3"
+  },
+  "addSpecialTokens": false,
+  "note": "One tokenizer of one model family. Other models split the same text differently, and token ids belong to one tokenizer only."
+ },
+ "example": {
+  "text": "Remind me to recharge my Jio plan tomorrow",
+  "words": 8,
+  "tokens": 10,
+  "pieces": [
+   "Rem",
+   "ind",
+   " me",
+   " to",
+   " recharge",
+   " my",
+   " J",
+   "io",
+   " plan",
+   " tomorrow"
+  ],
+  "ids": [
+   6590,
+   484,
+   752,
+   311,
+   46823,
+   847,
+   619,
+   815,
+   3119,
+   16577
+  ]
+ },
+ "languageComparison": {
+  "english": {
+   "text": "Wake me at six tomorrow morning",
+   "words": 6,
+   "tokens": 6
+  },
+  "hindi": {
+   "text": "मुझे कल सुबह छह बजे उठाना",
+   "words": 6,
+   "tokens": 23,
+   "note": "Pieces are not displayed: for Devanagari this tokenizer often splits inside a character, at byte level."
+  },
+  "meaning": "Wake me at six tomorrow morning (English) / the same request written in Hindi."
+ }
+}

@@ -1,0 +1,124 @@
+{
+ "studioPacket": 1,
+ "kind": "research",
+ "sources": [
+  {
+   "title": "OpenAI Help Center: Understanding and counting tokens",
+   "url": "https://help.openai.com/en/articles/4936856-understanding-and-counting-tokens",
+   "publisher": "OpenAI",
+   "published": "",
+   "note": "Primary source for what a token is, that counts differ by model, encoding and language, that token IDs depend on the encoding, the Tokenizer tool, and that the context window limits tokens. Read 2026-10-20 (page shows a relative 'Updated' date only)."
+  },
+  {
+   "title": "tiktoken README (OpenAI)",
+   "url": "https://github.com/openai/tiktoken",
+   "publisher": "OpenAI",
+   "published": "",
+   "note": "Primary source for 'language models see sequences of numbers (tokens)' and how byte pair encoding turns text into tokens. Read 2026-10-20."
+  },
+  {
+   "title": "Hugging Face Transformers: Tokenization algorithms",
+   "url": "https://huggingface.co/docs/transformers/tokenizer_summary",
+   "publisher": "Hugging Face",
+   "published": "",
+   "note": "Documentation of BPE, byte-level BPE, Unigram and WordPiece; lists Qwen2 among BPE models. Read 2026-10-20."
+  },
+  {
+   "title": "Neural Machine Translation of Rare Words with Subword Units (Sennrich, Haddow, Birch)",
+   "url": "https://arxiv.org/abs/1508.07909",
+   "publisher": "arXiv / ACL 2016",
+   "published": "2016-06-10",
+   "note": "Original paper applying byte pair encoding to subword units (arXiv v5 dated 2016-06-10; first submitted 2015-08-31). Used only for the idea of subword pieces."
+  },
+  {
+   "title": "Tokenizer evidence for this episode (local run)",
+   "url": null,
+   "publisher": "Local file, this project",
+   "published": "",
+   "note": "samples/ai-maxxing-01/tokenizer-evidence.json: Qwen3-TTS text tokenizer (Qwen2Tokenizer, 151676 entries), model mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16 revision a6eb4f68e4b056f1215157bb696209bc82a6db48, run with transformers 5.20.1 / tokenizers 0.23.3. Every split, id and count on screen comes from this run."
+  },
+  {
+   "title": "OpenAI Tokenizer (web tool)",
+   "url": "https://platform.openai.com/tokenizer",
+   "publisher": "OpenAI",
+   "published": "",
+   "note": "Named as the tool for seeing how text is divided in source 1. Not opened or run by this work; recorded only as the example of a model provider's own tokenizer."
+  }
+ ],
+ "claims": [
+  {
+   "text": "A token can be a character, part of a word, a whole word or punctuation, and spaces also affect how text is divided.",
+   "kind": "fact",
+   "sources": [
+    0
+   ],
+   "evidence": "OpenAI Help Center, Overview: 'A token can represent a character, part of a word, a whole word, or punctuation. Spaces also affect how text is divided into tokens.'",
+   "caveat": "Stated for OpenAI models; the splits shown in the video come from a different tokenizer."
+  },
+  {
+   "text": "A token count is not the same as a word count; the same text can give different counts depending on the model, its encoding and the language.",
+   "kind": "fact",
+   "sources": [
+    0
+   ],
+   "evidence": "OpenAI Help Center, Overview: 'A token count is not the same as a word count. The same text can produce different token counts depending on the model, its encoding, and the language.'",
+   "caveat": ""
+  },
+  {
+   "text": "Token IDs depend on the encoding; an example ID does not apply to every model.",
+   "kind": "fact",
+   "sources": [
+    0
+   ],
+   "evidence": "OpenAI Help Center: 'Token IDs also depend on the encoding. Do not assume that an example token ID applies to every model.'",
+   "caveat": "The IDs on screen are labelled as belonging to the named tokenizer."
+  },
+  {
+   "text": "Language models work on sequences of numbers (tokens); byte pair encoding converts text into tokens, can be reversed exactly, and lets the model see common subwords.",
+   "kind": "fact",
+   "sources": [
+    1,
+    2
+   ],
+   "evidence": "tiktoken README: 'Language models don't see text like you and I, instead they see a sequence of numbers (known as tokens)... It's reversible and lossless... It attempts to let the model see common subwords.' Hugging Face docs describe BPE and byte-level BPE.",
+   "caveat": "Describes BPE tokenizers; other tokenizer designs (Unigram, WordPiece) cut text differently."
+  },
+  {
+   "text": "With the Qwen3-TTS text tokenizer (byte-level BPE (Qwen2Tokenizer)), the message 'Remind me to recharge my Jio plan tomorrow' is 8 words and 10 tokens: Rem | ind | ·me | ·to | ·recharge | ·my | ·J | io | ·plan | ·tomorrow (a dot marks a leading space).",
+   "kind": "fact",
+   "sources": [
+    4
+   ],
+   "evidence": "Measured: samples/ai-maxxing-01/tokenizer-evidence.json (decode of the ids reproduces the exact text).",
+   "caveat": "One tokenizer of one model family. Another model will cut this text differently."
+  },
+  {
+   "text": "With the same tokenizer, 'Wake me at six tomorrow morning' is 6 tokens and a Hindi version of the request is 23 tokens.",
+   "kind": "fact",
+   "sources": [
+    4
+   ],
+   "evidence": "Measured: tokenizer-evidence.json, languageComparison.",
+   "caveat": "One sentence pair on one tokenizer; not a general ratio. The Hindi wording was written for this episode and should be checked by a fluent reader before publishing."
+  },
+  {
+   "text": "The context window limits the tokens a model can work with in a request; check your model's documentation for its limit.",
+   "kind": "fact",
+   "sources": [
+    0
+   ],
+   "evidence": "OpenAI Help Center, 'Stay within model limits'.",
+   "caveat": "Limits differ between models."
+  },
+  {
+   "text": "Before pasting a long prompt, check its token count with your model's tokenizer.",
+   "kind": "proposed-wording",
+   "sources": [
+    0,
+    5
+   ],
+   "evidence": "Practical takeaway drawn from the Help Center's 'Count tokens before sending a request' (Tokenizer tool, tiktoken).",
+   "caveat": "Not every app exposes a tokenizer or token counter, and a plain-text count does not include everything in an API request."
+  }
+ ]
+}

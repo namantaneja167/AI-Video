@@ -41,9 +41,9 @@ export function reachableBlobs(p: Project, opts: {includeDrafts?: boolean; exclu
   q(`SELECT a.blob_hash FROM artifacts a WHERE a.pinned=1${notDraftArt}`);
   q('SELECT blob_hash FROM components WHERE blob_hash IS NOT NULL');
   q(`SELECT blob_hash FROM snapshot_refs WHERE snapshot_id IN (SELECT snapshot_id FROM jobs WHERE state IN ${RETAINED_SQL})${notDraftRole}`);
-  // what approval rested on, and the check report of every video that is kept (its review screen reads it)
+  // what approval rested on, and the check report and cover of every video that is kept (its review screen reads them)
   q('SELECT a.blob_hash FROM approval_review ar JOIN artifacts a ON a.id=ar.checks_artifact_id');
-  for (const c of all<{blob_hash: string; render_hash: string}>(p.db.prepare("SELECT c.blob_hash, r.blob_hash AS render_hash FROM artifacts c JOIN artifacts r ON r.id=CAST(c.subject AS INTEGER) AND r.kind='render' WHERE c.kind='check'"))) {
+  for (const c of all<{blob_hash: string; render_hash: string}>(p.db.prepare("SELECT c.blob_hash, r.blob_hash AS render_hash FROM artifacts c JOIN artifacts r ON r.id=CAST(c.subject AS INTEGER) AND r.kind='render' WHERE c.kind IN ('check','cover')"))) {
     if (keep.has(c.render_hash)) keep.add(c.blob_hash);
   }
   const children = p.db.prepare('SELECT blob_hash FROM fileset_files WHERE manifest_hash=?');

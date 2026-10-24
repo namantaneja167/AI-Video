@@ -1,0 +1,73 @@
+{
+ "studioPacket": 1,
+ "kind": "storyboard",
+ "storyboard": {
+  "scenes": [
+   {
+    "segments": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "sceneType": "token-journey",
+    "intention": "Show that an AI is given pieces and numbers, not words, and that the count depends on the text, the language and the tokenizer.",
+    "mechanism": "One typed message becomes plain text in a card; on the word 'tokenizer' it separates, piece by piece, into chips (a dot marks a leading space). Remind and Jio are outlined where they break. Each chip gains its ID; the chips dim and the list of ids is what the model gets. Word and token counters sit side by side. An English and a Hindi request fill bars to their real token counts; a dashed row of question marks stands for another tokenizer without inventing its output; a paste, tokenizer, count, send strip closes the working diagram before the full-page takeaway.",
+    "pip": [
+     "Pip watches the message, tilts his head at the cut",
+     "Pip points at Remind and at Jio as they break",
+     "Pip is surprised at the Hindi count",
+     "Pip nods at the check step"
+    ],
+    "params": {
+     "tokenizer": {
+      "name": "Qwen3-TTS text tokenizer",
+      "note": "byte-level BPE; ids belong to this tokenizer"
+     },
+     "example": {
+      "text": "Remind me to recharge my Jio plan tomorrow",
+      "pieces": [
+       "Rem",
+       "ind",
+       " me",
+       " to",
+       " recharge",
+       " my",
+       " J",
+       "io",
+       " plan",
+       " tomorrow"
+      ],
+      "ids": [
+       6590,
+       484,
+       752,
+       311,
+       46823,
+       847,
+       619,
+       815,
+       3119,
+       16577
+      ]
+     },
+     "comparison": {
+      "english": {
+       "text": "Wake me at six tomorrow morning",
+       "tokens": 6
+      },
+      "hindi": {
+       "text": "मुझे कल सुबह छह बजे उठाना",
+       "tokens": 23
+      }
+     }
+    }
+   }
+  ]
+ }
+}

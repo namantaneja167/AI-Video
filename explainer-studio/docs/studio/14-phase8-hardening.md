@@ -1,7 +1,6 @@
 # 14 · Phase 8: hardening and core-workflow acceptance
 
-Status: **implemented and technically verified by the checks listed here; not human-approved.** Nothing about the voice, the look of any video
-or any approval is recorded as judged: listening, viewing and approving are yours. Approval and export were exercised only in isolated test
+Status: **implemented and technically verified by the checks listed here; not human-approved.** No approval, export or sign-off is recorded in the app, and none is claimed here. Some builds have been *watched* by the author and carry positive or comparative visual feedback; that is recorded build by build in `15-creative-benchmark-and-review-records.md` and is not approval. Approval and export were exercised only in isolated test
 projects with explicitly simulated sign-offs. The real demonstration video (Phase 7) and the new journey episode are left awaiting you.
 
 Scope kept: no packaging, publishing, 3D work or external-tool integration was started. Real-checkout `init`/`adopt` is still paused (the app now
@@ -15,7 +14,7 @@ demo's revisions and builds (their earlier builds are kept).
 |---|---|---|
 | **Implemented** | The control or behaviour exists in the app. | Project screen, `./studio-app new`, bundled-font default |
 | **Technically verified** | A check ran in this work and its result is recorded with counts, or a measurement was taken. | test counts below, the clean-snapshot run, the backup restore comparison, timings |
-| **Human-approved** | You listened, looked, decided. | **Nothing.** Not the narration, not any video, not the bundled fonts' look, not the Phase 7 demo, not the new journey episode. |
+| **Human-approved** | You listened, looked and signed off or approved for export. | **Nothing.** The app holds 0 approvals, 0 sign-offs and 0 exports in either project. Build-specific visual feedback you gave afterwards (revision 2 "clear and fun"; the slice 2 rebuild preferred over the Phase 8 final) is recorded in `15-creative-benchmark-and-review-records.md`; it is not export approval, not word-by-word verification, and not approval of any other build. Not approved: the narration, the bundled fonts' look, the Phase 7 demo, the journey video. |
 
 ## What was done, against the request
 
@@ -244,7 +243,7 @@ Read from official sources on 2026-10-19. This records what they say; **it is no
 
 ## Final core-feature checklist
 
-Each line: implemented (I), technically verified (V, with where), human-approved (H). H is empty throughout.
+Each line: implemented (I), technically verified (V, with where), human-approved (H). H is empty throughout: it means sign-off or approval, which nobody has given; visual feedback is in document 15.
 
 | Feature | I | V | H |
 |---|---|---|---|
@@ -261,9 +260,59 @@ Each line: implemented (I), technically verified (V, with where), human-approved
 | Connection loss, restart, shutdown, job recovery | yes | `hardening.slow`, earlier suites | |
 | Clean install and the whole journey from a snapshot | yes | section 3 | |
 
+## Closeout: preferred benchmark, review records, one heavy job on the whole computer
+
+Requested after the Phase 8 hand-over. No packaging, publishing, 3D work, external-tool integration or new video sample was started.
+
+### Benchmark and review records (documents, no code)
+
+* The preferred visual benchmark is `out/phase4/slice2/context-window_slice2_rebuilt.mp4`, SHA-256 `cd6fa2aaf645b7df120c40edc9c5feebdb1c9c4e107acff53038202dd2d7fd08`, read-only and unchanged; its record is `docs/studio/benchmark/benchmark.json`, re-checked by `tests/benchmark-record.test.ts` (4 tests).
+* The comparison with the Phase 8 final output, the observations kept apart from the hypotheses, the production guidance, and the build-by-build review records are in `15-creative-benchmark-and-review-records.md`. The pip-production skill, the plan, the project instructions and the documents that said "nobody has viewed any video" were updated.
+* Measured, read from the project databases: 0 approvals, 0 sign-offs, 0 exports, 0 playback records in the demo project; 0, 0, 0, 0 in the journey project (one review round, made by the Phase 8 UI test). The author's spoken feedback is not entered as a sign-off.
+
+### One heavy job on the whole computer
+
+The runner already ran one heavy job at a time inside a project. Two apps on two projects each did the same, so two models or renders could run at once on a 16 GB Mac. Every heavy job now also needs the **production slot** (`core/slot.ts`), shared by every Explainer Studio process of the same user. No new scheduler: `core/runner.ts` asks for the slot at the point where it already decides whether a heavy job may start.
+
+**Coordination primitive (second pass).** The first version used a lock file plus a mutex folder that was itself recovered by deleting it; two recoverers could race (one replaces a stale mutex, the other deletes the replacement) and the unlock did not check ownership. It was replaced. The slot is one row in a SQLite file (`~/.explainer-studio/production-slot.sqlite`, override `STUDIO_SLOT_DIR`). Acquiring, replacing a stale claim and releasing are each one `BEGIN IMMEDIATE` transaction. SQLite takes the operating system's file locks for it: the OS serialises the transactions of different processes and releases the lock if the process dies (the half-done transaction rolls back). So there is no lock file or mutex to recover, nothing is "recovered recursively", and no timing window is relied on. A claim is deleted only `WHERE token = ours` inside its transaction, so a delayed old unlock after ownership changed deletes nothing.
+
+| Question | Behaviour |
+|---|---|
+| Who holds it | A heavy job holds it from before it is marked preparing until every process of the attempt has been stopped and released: success, failure, cancellation, an automatic retry after a worker crash, and app shutdown all release it. The claim records the app's pid, its start time, the project folder and a plain-words job description |
+| When is a claim stale | Only when the app is confirmed gone (no such pid, or the pid has another start time) **and** no process that the claimant project's own registry (`job_procs`, read-only) still lists is alive with the identity it was recorded with (descendants of those processes count). An app that dies while its heavy worker keeps running therefore keeps the slot taken, and the waiting project says so ("its app stopped but its work is still running"). It ends when the worker ends, or when that project is opened again: the existing recovery (`reapAllSync`) stops only what the project recorded, with identity checks |
+| Cannot be inspected | If the app, the project's worker records, the process table or the slot database cannot be read, the answer is "unknown" and **nothing else starts**; the page says so and nothing is deleted |
+| Waiting | The job stays `queued` in its own project (nothing is stored in the slot for it). The runner retries about once a second, not on every scheduling pass, and records one `waiting-for-slot` event naming the holder. Heavy jobs keep their queue order; light jobs are not held |
+| While acquisition is blocked | A claim waits at most 250 ms for another process's transaction, then reports "another process is claiming the slot" and the job keeps waiting; reading the slot is not blocked by a transaction in progress. Editing, light jobs, review and the page keep working (tested with the event loop's longest gap) |
+| What the page shows | The Jobs tray says "Waiting for <project> to finish: <job>" (or that its app stopped but its work still runs) and shows a notice while another project holds the slot (`GET /api/jobs` carries `slot`) |
+| Cancelling a waiting job | The normal cancel: only that project's queued job is cancelled; the holder is not touched |
+| Never signals another project | The slot module has no way to signal a process (a test checks the source) and a waiting project only reads the records. It never kills anything to acquire the slot |
+
+**Tests** (controlled handlers and plain child processes; no model, no render, no real job):
+
+* `tests/store/slot.test.ts`, 22 tests. The slot itself (10): exclusive claim and hand-over; **a delayed old unlock after ownership changed removes nothing**; **simultaneous recovery of one stale claim, deterministic** (a second recoverer is held out while the first is between judging and replacing, then sees the first's fresh claim and cannot remove it); **simultaneous recovery by eight processes** released together by a start file (exactly one wins, its claim stands); a holder killed with `kill -9`; pid reuse; anything uninspectable (including a project's unreadable worker records) never admits a second job and leaves the claim; an unreadable slot database is "unknown" and untouched; **a process killed in the middle of its exclusive transaction frees the lock by itself**; waiting never signals a live owner. Through the job runner (12): never two heavy jobs at once; a waiting request shows the holder, is recorded once and can be cancelled alone; light jobs run while a heavy job waits; release on success, failure and cancellation each hand over; shutdown releases; an owner app killed with no worker lets the other project run; **app death with a surviving heavy worker** (the worker is a recorded owned process; the app is killed; the other project does not start, says why, keeps editing and light work available, signals nothing, and an unrelated process is untouched); **recovery after the owned worker has exited**; **recovery through the existing mechanism** (reopening the dead app's project stops its recorded leftovers only); and blocked acquisition keeps heavy work waiting while light work, an edit and the event loop continue, then proceeds by itself when the blocking process dies.
+* `tests/app/slot-service.test.ts`, 2 tests: the view names the holder and the waiting job's step; cancelling the waiting job leaves the holder.
+* A defect found while writing them: a test helper's database connection was garbage-collected and gave up its lock, so the first blocked-acquisition check passed vacuously; the helper now keeps its connection. A second defect, in the runner's retry back-off, left a waiting job without a timer; it is fixed and covered by the light-jobs test.
+
+**Limits.** It covers Explainer Studio processes of one user on one Mac, on a local disk (SQLite file locks are not reliable on a network folder). It does not see other programs or users, and it does not lower the memory of the job that holds it. **Workers a project never recorded are not known**, and a worker that is still alive after its app died blocks other projects until it ends or the project is reopened: the app shows who and why but does not kill it. **A model kept loaded by an idle audio worker after its job (released after about 8 seconds of idleness) is not held by the slot**: another project's heavy job can start in that window. A transaction held open by a stuck process makes acquisition retry about once a second, each attempt waiting up to 250 ms. Waiting is polling, not a notification. Automated tests ran in temporary folders; the app windows use the real folder.
+
+### Verification of the closeout (this session)
+
+| Command | Result |
+|---|---|
+| `npx tsc --noEmit` | clean |
+| `npm run test:ts` | **749 tests, 149 suites: 749 pass, 0 fail, 0 cancelled, 0 skipped** (721 from before, plus 22 slot, 2 slot-service, 4 benchmark record) |
+| `STUDIO_SLOW=1 node --test tests/app/browser.slow.test.ts tests/app/rebuild.slow.test.ts` (real browser on the settled code: the Jobs tray and the rebuild path) | **25 tests, 2 suites: 25 pass, 0 fail, 0 cancelled, 0 skipped** |
+| `.venv/bin/python -m unittest discover -s tests/py -p "test_legacy_cli.py" -k ReadmeDrift` | 4 tests, OK |
+
+Not re-run, with the reason: the other slow suites (voice, review, planner, probe, library render, hardening) and the Python suite and the clean-snapshot run were passing at the end of Phase 8 and the code they exercise was not changed; the closeout touched the runner's scheduling, the job service's views, the server's job reply and the Jobs tray, which the suites above cover. The slot is not part of those suites' fixtures (their job service has no slot), so they cannot show a slot regression; the slot's own tests do. A real two-window check is described under "Where things are".
+
+### Recovery backup after the closeout
+
+`../backups/explainer-studio-phase8-closeout/` (outside the repository, same disk): the whole repository's current files as a source archive, the `out/` tree, a byte copy of the benchmark file and its sibling files under `benchmark/` with their hashes, a verified project backup of each real project, a manifest of SHA-256 values and a record. The verification that was done on it, and the archive hashes, are in its `BACKUP-RECORD.txt` (the record cannot be inside the archive it describes). The source archive, git state, record and manifest of this backup were regenerated after the slot's second pass (the SQLite coordination); the `out/` archive, the benchmark copy and the two project backups were kept because nothing they hold changed (re-compared, see the record). The two earlier backups, `../backups/explainer-studio-phase8/` and `../backups/pip-baseline-phase3-rev2/`, are untouched.
+
 ## Known limitations, ranked by practical impact
 
-1. **No listening or viewing has been done by anyone.** The checks cannot find a dropped word or judge a join or a look; every video is unreviewed.
+1. **No video has been signed off, and no word-by-word listening is recorded.** The checks cannot find a dropped word or judge a join or a look. Three builds have been watched by the author with the feedback in `15-creative-benchmark-and-review-records.md` (not approvals); every other build is unreviewed.
 2. **Narration needs an Apple silicon Mac and about 10 GB of free memory**, and stops (saying why) if the machine is under sustained memory
    pressure. Retrying after closing apps works.
 3. **The saved takes belong to one episode and one exact text.** A new episode never reuses another's narration, and the voice models must be
@@ -277,7 +326,7 @@ Each line: implemented (I), technically verified (V, with where), human-approved
    exists.
 9. **The Phase 7 demo cannot be recreated** in a checkout without the saved outputs (it says so and points to `new`); its video still uses the
    system fonts and shows the SF Pro warning.
-10. **The jobs run one at a time**; two apps on two projects can both start heavy work. Run one heavy job at a time.
+10. **Heavy work is one job at a time on the whole computer** since the closeout (the production slot, section "Closeout"); it covers Explainer Studio processes of the same user on one Mac. It does not see other programs, other users, or a home folder shared over a network, and it does not lower the memory of the job that holds it.
 11. **Below 900 px wide, and browsers other than Chrome, were not examined.**
 12. **Sign-offs and playback record that something was done**, not that anyone paid attention.
 13. **Test-suite timing sensitivity remains** in a few browser tests under heavy load; failures write diagnostics where this phase added them.
@@ -312,9 +361,9 @@ headless Chrome only. Whether anything sounds or looks right was not and cannot 
 
 ## Where things are
 
-* Apps left running: the Phase 7 demo on port 4317 (`./studio-app`) and the journey project on port 4318 (`./studio-app open projects/journey --port 4318`).
-  Only one heavy job should run at a time across them.
-* Recovery backup after this phase: `../backups/explainer-studio-phase8/` (source tarball of the whole repository's current files, `out/`, a verified
+* App left running: the journey project on port 4318 (`./studio-app open projects/journey --port 4318`), started on the closeout code. No other app is running: when checked during the closeout the earlier demo app (port 4317) and journey app were no longer running (their terminals had ended), so nothing was interrupted; start the demo with `./studio-app`. Heavy work is one job at a time across any apps (the production slot).
+* **One real check of the slot with the running app** (not a test; repeated on the final code after the app was restarted): a controlled child process (no job, no model) was made the holder under the name "Live check holder"; the running journey app reported `other` with that holder (`GET /api/jobs` → `slot`: "Live check holder is using the production slot (a held claim). Heavy work here waits; editing and review are not affected."; the first version of this check also looked at the Jobs tray, which showed the same sentence). The holder was then killed with `kill -9`; the app reported the slot free. `~/.explainer-studio/production-slot.sqlite` remains and holds that one stale claim, which the next claim replaces. No real job was queued, so a real narration or render waiting on a real holder was not exercised outside the tests.
+* Latest recovery backup: `../backups/explainer-studio-phase8-closeout/` (see "Closeout"). Recovery backup at the end of the phase proper: `../backups/explainer-studio-phase8/` (source tarball of the whole repository's current files, `out/`, a verified
   project backup of each real project, a manifest of SHA-256 values and a record); the earlier `../backups/pip-baseline-phase3-rev2/` is untouched.
 * Evidence: `docs/studio/phase8-evidence/` (`journey/`, `audit/`, `recovery/`, `clean-snapshot/`, `perf/`, `demo-refresh/`, and `flake/` which is empty
   until that test fails again).

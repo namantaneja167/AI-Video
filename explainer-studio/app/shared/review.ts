@@ -5,6 +5,25 @@ import type {CheckReport} from '../../core/checks.ts';
 import type {Coverage, NoteAssessment, Readiness, SignoffRecord} from '../../core/review.ts';
 import type {JobView} from '../jobs.ts';
 
+/** The cover image of one video: its own branded opening without captions. */
+export type CoverView = {
+  state: 'none' | 'running' | 'fresh' | 'outdated';
+  /** The hook the video's opening shows. */
+  hook: string | null;
+  fileSha256: string | null;
+  bytes: number | null;
+  width: number | null;
+  height: number | null;
+  frame: number | null;
+  builtAt: number | null;
+  /** The SHA-256 of the video this cover belongs to. */
+  renderSha256: string;
+  why: string | null;
+  url: string | null;
+  downloadUrl: string | null;
+  filename: string;
+};
+
 export type VideoRow = {
   renderArtifactId: number;
   kind: 'draft' | 'final';
@@ -24,6 +43,8 @@ export type VideoRow = {
   imported: string | null;
   round: {id: number; number: number; closedAt: number | null} | null;
   checks: {state: 'none' | 'running' | 'done'; passed: boolean | null; fail: number; warn: number; unchecked: number; ranAt: number | null};
+  /** Null when this video has no branded opening (older episodes), so there is no cover to make. */
+  cover: CoverView | null;
 };
 
 export type NoteView = {

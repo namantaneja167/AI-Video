@@ -18,9 +18,10 @@ export const EP = 'context-window';
 export const FAKE_AUDIO = resolve(ROOT, 'tests/store/fake-worker.py');
 export const FAKE_RENDER = resolve(ROOT, 'tests/store/fake-render-worker.ts');
 export const FAKE_PROBE = resolve(ROOT, 'tests/store/fake-probe-worker.ts');
+export const FAKE_STILL = resolve(ROOT, 'tests/store/fake-still-worker.ts');
 
 export const fakeEnv = (extra: Partial<HandlerEnv> = {}): HandlerEnv => ({
-  root: ROOT, qwenPython: resolve(ROOT, '.venv-qwen/bin/python'), python: resolve(ROOT, '.venv/bin/python'), audioWorker: FAKE_AUDIO, renderWorker: FAKE_RENDER, probeWorker: FAKE_PROBE, renderConcurrency: 1, ...extra,
+  root: ROOT, qwenPython: resolve(ROOT, '.venv-qwen/bin/python'), python: resolve(ROOT, '.venv/bin/python'), audioWorker: FAKE_AUDIO, renderWorker: FAKE_RENDER, probeWorker: FAKE_PROBE, stillWorker: FAKE_STILL, renderConcurrency: 1, ...extra,
 });
 
 /** Record the fake workers as the workspace's tools, the way the product records the real ones. */

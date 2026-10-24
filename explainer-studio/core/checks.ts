@@ -147,7 +147,7 @@ export type SceneProbeInfo = {id: string; type: string; /** null when the layout
 export type LayoutInput = {style: string; /** false when the episode renders through a path the probe does not reach (the legacy renderer). */ probed: boolean; samples: ProbeSample[]; scenes: SceneProbeInfo[]};
 
 /** Scenes that are code written for one episode (spec tier 3): nothing about them is verified beyond the generic checks. */
-export const TIER3_SCENES = new Set(['pip-scene-10x', 'context-window', 'pip-dense-fixture']);
+export const TIER3_SCENES = new Set(['pip-scene-10x', 'context-window', 'pip-dense-fixture', 'cache-journey', 'token-journey', 'rotating-ticket', 'prompt-injection', 'ticket-motion']);
 
 const inside = (r: Rect, box: Rect) => r.x >= box.x - 0.5 && r.y >= box.y - 0.5 && r.x + r.w <= box.x + box.w + 0.5 && r.y + r.h <= box.y + box.h + 0.5;
 const overlap = (a: Rect, b: Rect) => Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > 1 && Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > 1;

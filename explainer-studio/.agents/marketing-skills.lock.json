@@ -1,0 +1,69 @@
+{
+  "repo": "coreyhaines31/marketingskills",
+  "stars": 55586,
+  "license": {
+    "key": "mit",
+    "name": "MIT License",
+    "spdx_id": "MIT",
+    "url": "https://api.github.com/licenses/mit",
+    "node_id": "MDc6TGljZW5zZTEz"
+  },
+  "commit": "e85f3cbc2e4a79bf33b2a12e9bdd9087d414735b",
+  "reviewPath": "/tmp/pip-marketing-skill-review",
+  "date": "2026-10-20",
+  "skills": {
+    "product-marketing": {
+      "files": {
+        "SKILL.md": "19ece0fa75c72a5a8b6e90db80f506586f54cc93bae6bffbb1bd2ef4ae7d603c",
+        "evals/evals.json": "0c6599b88f50ec1be91096a36ba6c5a15cf8312151394e3469e5ddb991b19afb",
+        "references/brand-voice.md": "932f3453db2761f03050792e39800150495dab449750b40913a4314ea97e7672"
+      },
+      "bytes": 29422
+    },
+    "content-strategy": {
+      "files": {
+        "SKILL.md": "5097ae8c11c27e2846be307b30f09ac17333fd1ffab1bae19728c81444767001",
+        "evals/evals.json": "10167e7125ee77cbabe4f03953750dd99ea147f7461027fdbb0cf8e089e5506d",
+        "references/content-distribution.md": "1861a1aab0627ab29c279000879a9889242da1ba85e677acdc759c66a6241778",
+        "references/headless-cms.md": "efc796ae9596d1efcb876683db2d9b7c10c83e76e1cb69e527097907d5b4fc3f"
+      },
+      "bytes": 43736
+    },
+    "social": {
+      "files": {
+        "SKILL.md": "dd4c01d0925f571562d4e8dea4af6b60bd9d491149187d94927e65280fad1bee",
+        "evals/evals.json": "1d2592a0cfc6378ba8742ce6e19f5974663b1d8018c4f136e5f529373bf17198",
+        "references/reverse-engineering.md": "c27bef59d463b3b11331c1770f4a23e9e6bbce7d7c8db1e7f7f4f14ba206243f",
+        "references/carousel-frameworks.md": "e703aa530ec9f68cdf5b58e8e0d4d1a5cc3f22b9e2d3e3222f16a9763d423247",
+        "references/short-form-video.md": "ed0976bd7ac1f85b7b8c162087e346118f2cf0ef46b3ccafc6a7a329118987d1",
+        "references/listening-sources-template.md": "c68bc6f57b0a48c432b1ce72c9324d41a04d0e7784d0bab91afb4a6065a43e38",
+        "references/platforms.md": "a070eda1f54bdba103a9c89613d83331fc5c53c9e8a48543e0198f1a2995cb0c",
+        "references/post-templates.md": "9cca4680c95801daedfd8acadf9089d0083784c2567784888807569896f71d9b",
+        "references/listening.md": "52cf68aaaa57a69b69b3587ffd9b848a6f1ca7e0d51378f566339ad7f2b730e0",
+        "references/platform-limits.md": "6ecc6b40ff82b95c48906341f7d3c58337671d4d94f624c858764f1ed5a77c3c",
+        "references/x-algorithm.md": "943b2c5a819aad53ebf62a1652adc47956d6fdf738e18cd98eeb609819a66180"
+      },
+      "bytes": 93124
+    },
+    "copywriting": {
+      "files": {
+        "SKILL.md": "13c580c2432a4499e9dfdcf5d553df7aa6589e90cf5bd869fb4fbde5caf9f567",
+        "evals/evals.json": "ccec86052a0edd8646d0e50e63c08e0e971f443d8f6e9178843a1629f79efdb0",
+        "references/copy-frameworks.md": "352122944bf9e891ceb0e003adce41591d111e9d97057700626249919dfe430d",
+        "references/natural-transitions.md": "9bd61b0de5be2c4de4ce130c68236b4f290b12737823827a458bb2b4c8584683",
+        "references/ai-tells.md": "b98c3a19b3a75c714d69e80a0076e4c07244b0e833c2ce81ff2631224fb7f7b2"
+      },
+      "bytes": 69232
+    },
+    "copy-editing": {
+      "files": {
+        "SKILL.md": "2a072606d9d5662509ea6ef62c65719487dcb68876acab9286bde4d1af5c030f",
+        "evals/evals.json": "cc18c9f51094058759267d465cfcc50da65f248f66b923326781aa642d622ca7",
+        "references/plain-english-alternatives.md": "df4f820d4c63ae8a517c64a243c101658352cd07d002355bf3c97de0a00f3775",
+        "references/checklist.md": "4cf94c922286223681fc53721fcc65ae7299f1e36e797e7397d369d674580c60",
+        "references/content-refresh.md": "ba73cdf278fe6b552eee27eb1452494f11f9d17ef67d720657e0982f76fb961b"
+      },
+      "bytes": 47764
+    }
+  }
+}

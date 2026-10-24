@@ -1,0 +1,203 @@
+{
+  "ranAt": "2026-10-20T05:34:05.522Z",
+  "disposableProject": "/tmp/p9-next-episode/project",
+  "real": [
+    "page and server",
+    "project store and job runner",
+    "timeline logic (Python)",
+    "audio mix with accents (Python + ffmpeg)",
+    "Remotion render",
+    "Remotion still (cover)",
+    "dependency hashes, freshness, export, checksums"
+  ],
+  "fake": [
+    "voice model (stand-in audio worker)",
+    "forced aligner (labelled estimate)",
+    "sign-offs for the export step (simulated in this disposable project only)"
+  ],
+  "steps": [
+    {
+      "name": "new episode defaults",
+      "style": "pip-paper-bundled",
+      "hook": null,
+      "chimeCount": 1,
+      "soundEvents": [
+        {
+          "accent": "chime",
+          "gainDb": -21,
+          "t": 0.12
+        }
+      ],
+      "mixParams": {
+        "accentBusDb": -12,
+        "accentDuck": 0.7,
+        "mixScriptSha256": "48414b4777f2a1d3e2fe912fe7ee2f1fd68d530a45b9d22bca6f323c2ebf4dfb",
+        "voiceGainDb": 0
+      },
+      "titleStaysDescriptive": "Why a long chat loses its beginning (disposable check)"
+    },
+    {
+      "name": "hook is required before the first build",
+      "blockers": [
+        "This is a Pip Explains episode and its opening hook is not set. Enter it on the Script or Scenes step (at most 48 characters): the opening, its sound and the cover come from it.",
+        "The planned scenes are ready but have not been applied to this episode: it still has only its stand-in scene."
+      ]
+    },
+    {
+      "name": "hook entered on the Script step",
+      "hook": "Chats forget their own start",
+      "title": "Why a long chat loses its beginning (disposable check)",
+      "chime": "On, once"
+    },
+    {
+      "name": "scenes configured; the shared opening shows in the preview",
+      "scenes": [
+        "pip-cards",
+        "pip-cards",
+        "pip-cards"
+      ],
+      "hookKept": "Chats forget their own start",
+      "previewShows": [
+        "PIP EXPLAINS",
+        "Chats forget their own start"
+      ]
+    },
+    {
+      "name": "first final video (real timing, mix, render)",
+      "wallSec": 22.4,
+      "plan": [
+        "take:b1:run",
+        "timing:run",
+        "mix:final:run",
+        "render:final:run"
+      ]
+    },
+    {
+      "name": "the chime in the delivered mix",
+      "accents": [
+        {
+          "accent": "chime",
+          "gain_db": -21,
+          "params": {},
+          "t": 0.12
+        }
+      ]
+    },
+    {
+      "name": "cover drawn and downloaded",
+      "state": "fresh",
+      "hook": "Chats forget their own start",
+      "belongsToVideoSha256": "3fa4513c92051e63f7d633c6e6ac5d42831946e709133ac3972133d53b4cb762",
+      "sameAsVideoFile": true,
+      "pngSize": [
+        1080,
+        1920
+      ],
+      "bytes": 418585,
+      "downloadSha256": "97996ae24e671346d7f2b578ee0c663a4cc6f1324d85b890dafc9de4934e1ec8",
+      "contentDisposition": "attachment; filename=\"why-a-long-chat-loses-its-beginning-disposable-c-cover.png\""
+    },
+    {
+      "name": "hook-only edit",
+      "rebuildPlanRuns": [
+        "render:final"
+      ],
+      "planSteps": [
+        "take:b1:current",
+        "timing:current",
+        "mix:final:current",
+        "render:final:run"
+      ],
+      "coverState": "outdated",
+      "videoFresh": false,
+      "outdatedNotice": "Out of date. The video it belongs to is out of date (inputs changed since it was built): something that appears in the video changed after it was made, such as the hook, the script, the scenes or the sound. Make the video again, then its cover."
+    },
+    {
+      "name": "second final video (video only)",
+      "wallSec": 19.2,
+      "plan": [
+        "take:b1:current",
+        "timing:current",
+        "mix:final:current",
+        "render:final:run"
+      ]
+    },
+    {
+      "name": "rebuild after the hook edit reused narration, timing and audio",
+      "narrationJobsEver": 1,
+      "timingJobsEver": 1,
+      "mixJobsEver": 1,
+      "renderJobsEver": 2,
+      "sameArtifacts": {
+        "mix:final": 3,
+        "take:b1": 1,
+        "timing:timeline": 2
+      }
+    },
+    {
+      "name": "new matching cover",
+      "hook": "Long chats lose their start",
+      "belongsToVideoSha256": "01bee25825f612c4a53701faed7cc60dde84be2fc8d39fd612f4c7230d3235c1",
+      "differentFromFirst": true
+    },
+    {
+      "name": "export package (approval simulated in this disposable project)",
+      "files": [
+        "video:why-a-long-chat-loses-its-beginning-disposable-c.mp4",
+        "cover:why-a-long-chat-loses-its-beginning-disposable-c-cover.png",
+        "captions:why-a-long-chat-loses-its-beginning-disposable-c.srt",
+        "captions:why-a-long-chat-loses-its-beginning-disposable-c.vtt",
+        "metadata:metadata.json",
+        "credits:credits.md",
+        "checksums:checksums.sha256"
+      ],
+      "coverSha256": "a2716ac1184b0b2dba8ef515144fddc03b9814f5d0098992ab4d28d650dd02e8",
+      "packageVerified": true,
+      "metadataCover": {
+        "file": "why-a-long-chat-loses-its-beginning-disposable-c-cover.png",
+        "sha256": "a2716ac1184b0b2dba8ef515144fddc03b9814f5d0098992ab4d28d650dd02e8",
+        "bytes": 416721,
+        "width": 1080,
+        "height": 1920,
+        "frame": 20,
+        "hook": "Long chats lose their start",
+        "belongsToVideoSha256": "01bee25825f612c4a53701faed7cc60dde84be2fc8d39fd612f4c7230d3235c1",
+        "note": "A clean frame of the video's own opening, without captions. It is not attached to a post automatically: choose it as the cover when uploading."
+      }
+    },
+    {
+      "name": "after a restart",
+      "hook": "Long chats lose their start",
+      "chime": "On, once",
+      "coverState": "fresh",
+      "sameCover": true,
+      "sameVideo": true
+    },
+    {
+      "name": "duplicate chime prevention",
+      "secondRequest": "changed: false",
+      "count": 1,
+      "mixedAccents": 1
+    }
+  ],
+  "invalidHookMessage": "The hook is 49 characters; at most 48 fit the opening.",
+  "coverVersusVideoFrame20": {
+    "note": "measured; the video frame is H.264-compressed and may carry a caption, the cover is a lossless still without captions",
+    "wholeFrame": {
+      "psnrDb": 16.823199,
+      "ssim": 0.956638
+    },
+    "aboveCaptionBand_y0to1500": {
+      "psnrDb": 39.342238,
+      "ssim": 0.990197
+    }
+  },
+  "outdatedNotice": "Out of date. The video it belongs to is out of date (inputs changed since it was built): something that appears in the video changed after it was made, such as the hook, the script, the scenes or the sound. Make the video again, then its cover.",
+  "browser": {
+    "consoleErrors": [],
+    "failedRequests": [
+      "422 http://127.0.0.1:62113/api/plans/why-a-long-chat-loses-its-beginning-disposable-c/imports"
+    ]
+  },
+  "result": "every assertion in this script passed"
+}

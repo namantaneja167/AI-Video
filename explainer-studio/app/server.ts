@@ -8,6 +8,9 @@ import {ApprovalError, statusReport} from '../core/artifacts.ts';
 import {ExportError} from '../core/export.ts';
 import {ReviewError} from '../core/review.ts';
 import {blobPath} from '../core/blobs.ts';
+import {ensureOpeningSignature, openingSignature, OPENING_SIGNATURE, removeOpeningSignature} from '../core/brand.ts';
+import {coverFor} from '../core/cover.ts';
+import {SoundSettingsError} from '../core/soundSettings.ts';
 import {createBackup, verifyBackup} from '../core/backup.ts';
 import {checkEnvironment} from '../core/environment.ts';
 import {SCHEMA_VERSION, all, get, readSchemaVersion} from '../core/db.ts';
@@ -16,10 +19,12 @@ import type {Project} from '../core/project.ts';
 import {readMeasuredRuns} from './demo.ts';
 import {displayBuild, listBuilds, parseBuildId, pickDefault} from './builds.ts';
 import {RebuildError, type JobService} from './jobs.ts';
+import {animaticFor} from '../core/animatic.ts';
+import {proofsFor} from '../core/proof.ts';
 import {VoiceError, VoiceService} from './voice.ts';
 import {ReviewService} from './review.ts';
 import {PreflightError} from '../core/runner.ts';
-import {ApplyError, ImportStateError, PlanConflictError, PlanValidationError, UnknownPlanError, acceptImport, applyStoryboard, createPlan, getImport, getPlan, listImports, listPlanIds, listPlanRevisions, planExists, previewApplication, rejectImport, restorePlanRevision, savePlan, submitImport} from './planning.ts';
+import {ApplyError, ImportStateError, LinkError, linkPlanToEpisode, PlanConflictError, PlanValidationError, UnknownPlanError, acceptImport, applyStoryboard, createPlan, getImport, getPlan, listImports, listPlanIds, listPlanRevisions, planExists, previewApplication, rejectImport, restorePlanRevision, savePlan, submitImport} from './planning.ts';
 import {ImportError, type Selection} from './shared/importing.ts';
 import {checkStoryboard, isPlaceholderEpisode} from './shared/storyboard.ts';
 import {revisionKindLabel, shortSummary, summarizeChange} from './shared/revisions.ts';
@@ -136,7 +141,7 @@ export function createApp(o: AppOptions): App {
     return {
       doc, seq: info.seq, docHash: info.docHash, status, build, planned: planExists(p, id), renderDrift: jobs && builds.length ? jobs.renderDrift(id) : [],
       builds: builds.map((b) => ({id: b.id, revision: b.revision, builtAt: b.builtAt, imported: b.imported, outdatedFlag: b.outdatedFlag, hasVideo: !!b.render, isLatest: b.id === current?.id, shown: b.id === shown?.info.id, hasFinalVideo: b.render?.kind === 'final', videoRevision: b.render?.revision ?? null, timingRevision: b.timingRevision})),
-      rebuilds: !!jobs, active: jobs?.activeWork(id) ?? null,
+      rebuilds: !!jobs, active: jobs?.activeWork(id) ?? null, animatic: animaticFor(p, id),
     };
   }
 
@@ -243,6 +248,27 @@ export function createApp(o: AppOptions): App {
         if (!mix || !timing || JSON.parse(readFileSync(blobPath(p, timing.blob_hash), 'utf8')).audio !== parts[3]) return json(res, 404, {error: 'not-found'});
         return sendFile(req, res, blobPath(p, mix.blob_hash), 'audio/wav');
       }
+      if (parts[0] === 'animatic' && parts.length === 3 && parts[2] === 'opening.mp4') {
+        if (!listEpisodes(p).includes(parts[1])) return json(res, 404, {error: 'not-found'});
+        const an = animaticFor(p, parts[1]);
+        if (!an.fileSha256 || !existsSync(blobPath(p, an.fileSha256))) return json(res, 404, {error: 'not-found'});
+        return sendFile(req, res, blobPath(p, an.fileSha256), 'video/mp4');
+      }
+      if (parts[0] === 'proof' && parts.length === 3 && /^\d+\.mp4$/.test(parts[2])) {
+        if (!listEpisodes(p).includes(parts[1])) return json(res, 404, {error: 'not-found'});
+        const pr = proofsFor(p, parts[1]).find((x) => x.artifactId === Number(parts[2].slice(0, -4)));
+        if (!pr || !existsSync(blobPath(p, pr.fileSha256))) return json(res, 404, {error: 'not-found'});
+        return sendFile(req, res, blobPath(p, pr.fileSha256), 'video/mp4');
+      }
+      if (parts[0] === 'cover' && parts.length === 3 && /^\d+\.png$/.test(parts[2])) {
+        // the cover of one video of the episode named in the address, and only while its file is in the project
+        const rid = Number(parts[2].slice(0, -4));
+        if (!listEpisodes(p).includes(parts[1])) return json(res, 404, {error: 'not-found'});
+        const cv = (() => { try { return coverFor(p, parts[1], rid); } catch { return null; } })();
+        if (!cv?.fileSha256 || !existsSync(blobPath(p, cv.fileSha256))) return json(res, 404, {error: 'not-found'});
+        if (url.searchParams.get('download') === '1') { res.setHeader('content-disposition', `attachment; filename="${parts[1]}-cover.png"`); }
+        return sendFile(req, res, blobPath(p, cv.fileSha256), 'image/png');
+      }
       if (parts[0] === 'render' && parts.length === 3 && /^\d+\.mp4$/.test(parts[2])) {
         const a = get<{blob_hash: string; kind: string; episode_id: string}>(p.db.prepare('SELECT blob_hash, kind, episode_id FROM artifacts WHERE id=?'), Number(parts[2].slice(0, -4)));
         if (!a || a.kind !== 'render' || a.episode_id !== parts[1] || !existsSync(blobPath(p, a.blob_hash))) return json(res, 404, {error: 'not-found'});
@@ -314,9 +340,9 @@ export function createApp(o: AppOptions): App {
 
     // ---- jobs ------------------------------------------------------------------------------------------------------
     if (path === '/api/jobs' && method === 'GET') {
-      if (!jobs) return json(res, 200, {available: false, jobs: [], rebuilds: []});
+      if (!jobs) return json(res, 200, {available: false, jobs: [], rebuilds: [], slot: null});
       const ep = url.searchParams.get('episode');
-      return json(res, 200, {available: true, jobs: jobs.list(ep ?? undefined), rebuilds: ep ? jobs.rebuilds(ep) : []});
+      return json(res, 200, {available: true, jobs: jobs.list(ep ?? undefined), rebuilds: ep ? jobs.rebuilds(ep) : [], slot: jobs.slotView()});
     }
     const jobAct = /^\/api\/jobs\/(\d+)\/(cancel|retry)$/.exec(path);
     if (jobAct && method === 'POST') {
@@ -352,7 +378,7 @@ export function createApp(o: AppOptions): App {
         if (!id) {
           if (method !== 'POST') return json(res, 405, {error: 'method-not-allowed'});
           const b = await readBody(req);
-          const made = createPlan(p, {title: b.title, audience: b.audience, objective: b.objective, durationMin: b.durationMin ?? null});
+          const made = createPlan(p, {title: b.title, audience: b.audience, objective: b.objective, durationMin: b.durationMin ?? null, ...(b.brand === 'pip-explains' ? {brand: 'pip-explains' as const} : {})});
           broadcast('plan', {planId: made.plan.id, seq: made.seq, tab: String(b.tab ?? '')});
           return json(res, 201, planPayload(made.plan.id));
         }
@@ -474,7 +500,7 @@ export function createApp(o: AppOptions): App {
     }
 
     // ---- the Review stage: rounds, notes, checks, playback, sign-offs, approval, export ---------------------------------------
-    const rv = /^\/api\/episodes\/([a-z0-9][a-z0-9_-]*)\/review(?:\/(round|checks|playback|signoff|note|confirm-diff|approve|export))?(?:\/([a-z0-9_-]+))?$/.exec(path);
+    const rv = /^\/api\/episodes\/([a-z0-9][a-z0-9_-]*)\/review(?:\/(round|checks|cover|playback|signoff|note|confirm-diff|approve|export))?(?:\/([a-z0-9_-]+))?$/.exec(path);
     if (rv) {
       if (!review || !jobs) return json(res, 404, {error: 'not-found', message: 'The Review screen is not available in this session.'});
       const id = rv[1];
@@ -499,6 +525,12 @@ export function createApp(o: AppOptions): App {
           if (sub === 'checks') {
             if (num(b.renderArtifactId) === null) return json(res, 400, {error: 'bad-request', message: 'renderArtifactId is required.'});
             const jobId = review.runChecks(id, b.renderArtifactId);
+            broadcast('review', {episodeId: id});
+            return json(res, 202, {ok: true, jobId, view: review.view(id, b.renderArtifactId)});
+          }
+          if (sub === 'cover') {
+            if (num(b.renderArtifactId) === null) return json(res, 400, {error: 'bad-request', message: 'renderArtifactId is required.'});
+            const jobId = review.makeCover(id, b.renderArtifactId);
             broadcast('review', {episodeId: id});
             return json(res, 202, {ok: true, jobId, view: review.view(id, b.renderArtifactId)});
           }
@@ -558,8 +590,40 @@ export function createApp(o: AppOptions): App {
       }
     }
 
+    // ---- the Pip Explains opening: its sound signature, and linking an episode to its planning document ---------------------
+    const op = /^\/api\/episodes\/([a-z0-9][a-z0-9_-]*)\/(opening|link-plan)$/.exec(path);
+    if (op) {
+      const id = op[1];
+      if (!listEpisodes(p).includes(id)) return json(res, 404, {error: 'not-found', message: `No episode "${id}" in this workspace.`});
+      try {
+        if (op[2] === 'opening' && method === 'GET') {
+          const doc = getEpisode(p, id);
+          return json(res, 200, {hook: doc.scenes[0]?.openingHook ?? null, title: doc.title, brand: planExists(p, id) ? getPlan(p, id).plan.brand ?? null : null, signature: openingSignature(p, id), signatureSpec: OPENING_SIGNATURE, pipStyle: doc.style === 'pip-paper' || doc.style === 'pip-paper-bundled'});
+        }
+        if (op[2] === 'opening' && method === 'POST') {
+          const b = await readBody(req);
+          if (typeof b.signature !== 'boolean') return json(res, 400, {error: 'bad-request', message: 'signature: true or false is required.'});
+          const r = b.signature ? ensureOpeningSignature(p, id) : removeOpeningSignature(p, id);
+          broadcast('committed', {episodeId: id, seq: getEpisodeInfo(p, id).seq, docHash: getEpisodeInfo(p, id).docHash, tab: String(b.tab ?? '')});
+          return json(res, 200, {ok: true, ...r, signature: openingSignature(p, id)});
+        }
+        if (op[2] === 'link-plan' && method === 'POST') {
+          const b = await readBody(req);
+          const stored = linkPlanToEpisode(p, id, {audience: typeof b.audience === 'string' ? b.audience : undefined, brand: b.brand === true});
+          broadcast('plan', {planId: id, tab: String(b.tab ?? '')});
+          return json(res, 201, {ok: true, seq: stored.seq, plan: stored.plan});
+        }
+        return json(res, 405, {error: 'method-not-allowed'});
+      } catch (e) {
+        if (e instanceof LinkError) return json(res, 409, {error: 'link-refused', message: e.message});
+        if (e instanceof SoundSettingsError) return json(res, 422, {error: 'sound-refused', message: e.message, problems: e.problems});
+        if (e instanceof PlanValidationError) return json(res, 422, {error: 'invalid', message: e.message, issues: e.issues});
+        return json(res, 500, {error: 'failed', message: (e as Error).message});
+      }
+    }
+
     // ---- episodes --------------------------------------------------------------------------------------------------
-    const ep = /^\/api\/episodes\/([a-z0-9][a-z0-9_-]*)(?:\/(plan|rebuild|revisions|restore))?(?:\/(\d+))?$/.exec(path);
+    const ep = /^\/api\/episodes\/([a-z0-9][a-z0-9_-]*)(?:\/(plan|rebuild|revisions|restore|animatic|proof))?(?:\/(\d+))?$/.exec(path);
     if (ep) {
       const id = ep[1];
       const sub = ep[2];
@@ -582,6 +646,26 @@ export function createApp(o: AppOptions): App {
         if (!jobs) return json(res, 404, {error: 'not-found', message: 'Rebuilding is not available in this session.'});
         const m = url.searchParams.get('mode');
         return json(res, 200, jobs.plan(id, m === 'draft' ? 'draft' : 'final'));
+      }
+      if (sub === 'animatic' && method === 'POST') {
+        if (!jobs) return json(res, 404, {error: 'not-found', message: 'Building is not available in this session.'});
+        try {
+          const jobId = jobs.startAnimatic(id);
+          broadcast('review', {episodeId: id});
+          return json(res, 202, {ok: true, jobId, animatic: animaticFor(p, id)});
+        } catch (e) { return json(res, e instanceof RebuildError ? 409 : 500, {error: 'failed', message: (e as Error).message}); }
+      }
+      if (sub === 'animatic' && method === 'GET') return json(res, 200, animaticFor(p, id));
+      if (sub === 'proof' && method === 'GET') return json(res, 200, {proofs: proofsFor(p, id)});
+      if (sub === 'proof' && method === 'POST') {
+        if (!jobs) return json(res, 404, {error: 'not-found', message: 'Building is not available in this session.'});
+        const b = await readBody(req);
+        if (typeof b.label !== 'string' || typeof b.from !== 'number' || typeof b.to !== 'number') return json(res, 400, {error: 'bad-request', message: 'label, from and to are required.'});
+        try {
+          const jobId = jobs.startProof(id, b.label, b.from, b.to);
+          broadcast('review', {episodeId: id});
+          return json(res, 202, {ok: true, jobId, proofs: proofsFor(p, id)});
+        } catch (e) { return json(res, e instanceof RebuildError ? 409 : 500, {error: 'failed', message: (e as Error).message}); }
       }
       if (sub === 'rebuild' && method === 'POST') {
         if (!jobs) return json(res, 404, {error: 'not-found', message: 'Rebuilding is not available in this session.'});

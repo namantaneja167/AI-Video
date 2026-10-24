@@ -52,7 +52,58 @@ export const CONTEXT_WINDOW_CUES: CueSpec = {
   voice_end: {segment: 7, at: 'end'},
 };
 
+/** Application-cache example: explicit invalidation, with persistent source and copied value. */
+export const CACHE_JOURNEY_CUES: CueSpec = {
+  intro: {segment: 0, at: 'start'},
+  miss: {segment: 1, at: {word: 'Nothing'}},
+  fetch: {segment: 2, at: {word: 'fetches'}},
+  result: {segment: 2, at: {word: 'Twenty'}},
+  store: {segment: 3, at: {word: 'copy'}},
+  repeat: {segment: 4, at: 'start'},
+  hit: {segment: 4, at: {word: 'hit'}},
+  change: {segment: 5, at: {word: 'changes'}},
+  stale: {segment: 6, at: 'start'},
+  evict: {segment: 7, at: {word: 'invalidate'}},
+  refresh: {segment: 7, at: {word: 'fetches'}},
+  fresh: {segment: 7, at: {word: 'stores'}},
+  resolve: {segment: 8, at: 'start'},
+  voice_end: {segment: 8, at: 'end'},
+};
+
+/** Tokens explainer (AI Maxxing 01). Segments are named by position within the scene; words are matched on the narration. */
+export const TOKEN_JOURNEY_CUES: CueSpec = {
+  example_start: {segment: 0, at: {word: "You"}},
+  intro: {segment: 0, at: 'start'},
+  type: {segment: 0, at: {word: 'Remind'}},
+  words: {segment: 0, at: {word: 'Eight'}},
+  split: {segment: 1, at: {word: 'tokenizer'}},
+  pieces: {segment: 1, at: {word: 'pieces'}},
+  break: {segment: 2, at: {word: 'Remind'}},
+  jio: {segment: 2, at: {word: 'Jio'}},
+  numbers: {segment: 3, at: {word: 'ID'}},
+  model: {segment: 3, at: {word: 'model'}},
+  count: {segment: 4, at: {word: 'count'}},
+  ten: {segment: 4, at: {word: 'ten'}},
+  language: {segment: 5, at: 'start'},
+  english: {segment: 5, at: {word: 'English'}},
+  hindi: {segment: 5, at: {word: 'Hindi'}},
+  other: {segment: 6, at: 'start'},
+  check: {segment: 7, at: 'start'},
+  resolve: {segment: 8, at: 'start'},
+  voice_end: {segment: 8, at: 'end'},
+};
+
+/** Nine-line story scenes (prompt injection, rotating ticket): the start of each line, where the explanation begins and the ending. */
+export const STORY_CUES: CueSpec = {
+  ...Object.fromEntries(Array.from({length: 9}, (_, i) => ['s' + i, {segment: i, at: 'start' as const}])),
+  explain: {segment: 1, at: 'start'}, resolve: {segment: 8, at: 'start'}, voice_end: {segment: 8, at: 'end'},
+};
+
 export const SCENE_CUES: Record<string, CueSpec> = {
   'pip-scene-10x': PIP_10X_CUES,
   'context-window': CONTEXT_WINDOW_CUES,
+  'cache-journey': CACHE_JOURNEY_CUES,
+  'token-journey': TOKEN_JOURNEY_CUES,
+  'rotating-ticket': STORY_CUES,
+  'prompt-injection': STORY_CUES,
 };

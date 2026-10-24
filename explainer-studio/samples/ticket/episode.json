@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 2,
+  "status": "draft",
+  "style": "pip-paper-bundled",
+  "voice": {
+    "engine": "qwen3-tts",
+    "profile": "pip-voice-v1"
+  },
+  "pacing": {
+    "leadInSec": 0.7,
+    "tailSec": 1.2,
+    "segmentGapSec": 0.16
+  },
+  "id": "rotating-ticket-pip-explains",
+  "title": "Your ticket screenshot can expire",
+  "learningObjective": "Explain time-limited rotating barcodes and why an old screenshot can be rejected while the underlying ticket remains valid; distinguish static tickets and issuer rules.",
+  "narration": {
+    "segments": [
+      {
+        "id": "s0",
+        "text": "Tech Under the Hood, episode one. Your ticket screenshot can expire."
+      },
+      {
+        "id": "s1",
+        "text": "Your ticket is still valid. But this pass uses a rotating barcode."
+      },
+      {
+        "id": "s2",
+        "text": "You take a screenshot. Both images contain the same code."
+      },
+      {
+        "id": "s3",
+        "text": "Time moves on. The live pass displays a new code. Your screenshot stays frozen."
+      },
+      {
+        "id": "s4",
+        "text": "At the gate, the reader checks the code against its allowed time window. That old copy can fail."
+      },
+      {
+        "id": "s5",
+        "text": "Open the live pass. Its current code can pass that time check."
+      },
+      {
+        "id": "s6",
+        "text": "This makes old screenshots harder to reuse. The reader checks the code, not whether the image is a screenshot."
+      },
+      {
+        "id": "s7",
+        "text": "Some tickets use static codes instead. Follow your issuer\u2019s instructions."
+      },
+      {
+        "id": "s8",
+        "text": "For a rotating ticket, open the live pass before you queue. A saved picture cannot refresh itself."
+      }
+    ],
+    "blocks": [
+      {
+        "id": "b1",
+        "segments": [
+          "s0",
+          "s1"
+        ]
+      },
+      {
+        "id": "b2",
+        "segments": [
+          "s2",
+          "s3"
+        ]
+      },
+      {
+        "id": "b3",
+        "segments": [
+          "s4",
+          "s5"
+        ]
+      },
+      {
+        "id": "b4",
+        "segments": [
+          "s6",
+          "s7"
+        ]
+      },
+      {
+        "id": "b5",
+        "segments": [
+          "s8"
+        ]
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "id": "world",
+      "type": "rotating-ticket",
+      "segments": [
+        "s0",
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "s8"
+      ],
+      "params": {},
+      "layout": {
+        "template": "content-led",
+        "captionZone": "bottom",
+        "mascot": {
+          "mode": "docked",
+          "position": "bottom-left",
+          "scale": 0.42
+        }
+      },
+      "openingHook": "Your ticket screenshot can expire",
+      "seriesLabel": "TECH UNDER THE HOOD \u00b7 01",
+      "openingUntilCue": "explain"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Google Wallet: rotating barcodes",
+      "url": "https://developers.google.com/wallet/generic/resources/rotating-barcodes",
+      "note": "Checked 22 October 2026. Time-varying barcode and reader validation; screenshot-reuse mitigation. Intervals configurable."
+    },
+    {
+      "title": "Google Wallet: partner-generated rotating barcodes",
+      "url": "https://developers.google.com/wallet/tickets/transit-passes/partner-generated-rotating-barcode/get-started/overview",
+      "note": "Checked 22 October 2026. Time-limited pre-generated values also supported. No named Indian operator claim."
+    }
+  ]
+}

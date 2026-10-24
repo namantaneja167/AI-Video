@@ -13,6 +13,7 @@ import {ROOT, WorkspaceError, createProject, openProjectAt} from './workspace.ts
 import {scopeSoundToEpisodes} from '../core/soundSettings.ts';
 import {DIST, buildUi} from './build.ts';
 import {JobService} from './jobs.ts';
+import {ProductionSlot} from '../core/slot.ts';
 import {createApp} from './server.ts';
 
 const args = process.argv.slice(2);
@@ -90,7 +91,7 @@ const scoped = scopeSoundToEpisodes(project);
 if (scoped.done) console.log(`Sound settings now belong to their episodes: ${scoped.episodes.join(', ')} keep what they were built with; new episodes start without accents.`);
 // The real workers: the Qwen audio worker, the Python timeline logic, the mixer and the Remotion render worker, on the opened project's own job runner.
 const qwenPython = join(ROOT, '.venv-qwen/bin/python');
-const jobs = new JobService({project, env: {root: ROOT, qwenPython, python: join(ROOT, '.venv/bin/python'), renderConcurrency: 2}, workerPython: qwenPython, measuredFile: join(projectRoot, 'measured-runs.json')});
+const jobs = new JobService({project, env: {root: ROOT, qwenPython, python: join(ROOT, '.venv/bin/python'), renderConcurrency: 2}, workerPython: qwenPython, measuredFile: join(projectRoot, 'measured-runs.json'), slot: {slot: new ProductionSlot(), project: workspaceLabel, projectRoot}});
 const app = createApp({project, projectRoot, workspaceLabel, kind: isDemo ? 'demo' : 'project', jobs, distDir: DIST, publicDir: resolve(ROOT, 'public'), port: flag('--port') ? Number(value('--port')) : 4317, faultFile: process.env.STUDIO_APP_TEST_FAULT});
 let port: number;
 try {

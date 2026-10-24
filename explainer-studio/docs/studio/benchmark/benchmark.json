@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "note": "The author's preferred visual benchmark for Pip explainer videos. The file is git-ignored output; the only copies are in the recovery backups. Verify with: shasum -a 256 <path>. Described in docs/studio/15-creative-benchmark-and-review-records.md.",
+  "preferredVisualBenchmark": {
+    "path": "out/phase4/slice2/context-window_slice2_rebuilt.mp4",
+    "sha256": "cd6fa2aaf645b7df120c40edc9c5feebdb1c9c4e107acff53038202dd2d7fd08",
+    "bytes": 3545672,
+    "durationSec": 24.043,
+    "video": "h264 1080x1920 30 fps, 721 frames",
+    "audio": "aac 48 kHz stereo"
+  },
+  "comparedWith": [
+    {
+      "role": "Phase 8 final output (workflow demonstration)",
+      "path": "out/phase8/journey/why-a-model-forgets-the-start-of-a-long-chat-final.mp4",
+      "sha256": "eac37082184c10f19419247500716081d60b214d2d33c978b3aa7c611cbf713e",
+      "bytes": 1667368
+    },
+    {
+      "role": "Revision 2 of the context-window sample (viewed by the author: \"clear and fun\")",
+      "path": "out/phase3/context-window-rev2/context-window_final.mp4",
+      "sha256": "fa8d8a6ba67e0520acf79a5afba8dc22cf8ea0846061890afd81dbc4c106a769"
+    }
+  ],
+  "brandedOpeningReferences": {
+    "note": "The author's positive visual feedback on the branded caching build and its cover. It is visual feedback on these two files only: not export approval, not verification of the words, not approval of any other build. Kept read-only and never overwritten; the app's cover is compared with the cover but never replaces it.",
+    "video": {
+      "path": "out/caching-v2/why-caching-is-faster.mp4",
+      "sha256": "61d6448957daa03f1d6b9619f27623bb02a0f92d80dba8455bdd10e675af84d3",
+      "bytes": 4357335,
+      "durationSec": 39.467
+    },
+    "cover": {
+      "path": "out/caching-v2/faster-apps-do-less-work-cover.png",
+      "sha256": "bbf4d3b4503fc6a7b8e9222840b44ca59b859a12af85611e2429bde5c3922d49",
+      "bytes": 341062,
+      "note": "frame 0.666667 s (frame 20) of the video, taken with ffmpeg"
+    }
+  }
+}

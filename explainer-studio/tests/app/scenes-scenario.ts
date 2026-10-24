@@ -62,6 +62,10 @@ export async function applyAndAdjustThroughUi(t: Tab, planId: string, shot: (nam
   await t.click(sel('escene-save-sb1'));
   await t.waitFor('document.querySelector("[data-testid=scenes-msg]")?.dataset.tone === "ok"', 15000, 'the scene to be saved');
   const savedMessage = await text(t, sel('scenes-msg'));
+  // ---- a new Pip Explains episode needs its opening hook before a build; enter it on this step
+  await paste(t, sel('hook-input'), 'Tokens are small pieces');
+  await t.click(sel('hook-save'));
+  await waitFor(t, sel('hook-saved'));
   await waitFor(t, sel('preflight-ok'));
   const preflight = await text(t, sel('preflight-ok'));
   const rebuildSteps = await t.eval<string[]>(`[...document.querySelectorAll('[data-testid=rebuild-steps] li')].map((e) => e.innerText)`);

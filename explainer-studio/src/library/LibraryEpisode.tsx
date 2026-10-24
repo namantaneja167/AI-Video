@@ -7,6 +7,7 @@ import {ProbeReporter} from './probe';
 import {SCENES} from './registry';
 import type {LibData} from './types';
 import {P} from '../art/palette';
+import {PipOpening, openingReveal} from './PipOpening';
 
 export type LibraryProps = {episode: string; variant: string; data: LibData | null};
 
@@ -26,6 +27,9 @@ export const LibraryEpisode: React.FC<LibraryProps> = ({episode: id, variant, da
   }
   const {episode, timeline} = data;
   const t = frame / fps;
+  const first = episode.scenes[0];
+  const openingEnd = first.openingUntilCue ? timeline.cues?.[first.id]?.[first.openingUntilCue] : undefined;
+  if (first.openingUntilCue && !Number.isFinite(openingEnd)) throw new Error(`Missing opening cue: ${first.openingUntilCue}`);
   const tScene = timeline.scenes.find((s) => t >= s.start - 1e-6 && t < s.end) ?? timeline.scenes[timeline.scenes.length - 1];
   const scene = episode.scenes.find((s) => s.id === tScene.id)!;
   const def = SCENES[scene.type];
@@ -37,7 +41,10 @@ export const LibraryEpisode: React.FC<LibraryProps> = ({episode: id, variant, da
   return (
     <AbsoluteFill style={{background: P.cream, overflow: 'hidden'}}>
       {data.previewOnly ? null : <Audio src={staticFile(`generated/${id}/${variant}/${timeline.audio}`)} />}
+      <AbsoluteFill style={{opacity: episode.scenes[0].openingHook && !first.openingOverlap ? openingReveal(t, openingEnd) : 1}}>
       <Scene scene={scene} timeline={timeline} segments={segments} cues={timeline.cues?.[scene.id] ?? {}} t={t} fps={fps} fonts={fonts} sceneData={data.sceneData?.[scene.id]} audioSrc={`generated/${id}/${variant}/${timeline.audio}`} />
+      </AbsoluteFill>
+      {episode.scenes[0].openingHook ? <PipOpening overlap={first.openingOverlap} settleAt={openingEnd} seriesLabel={episode.scenes[0].seriesLabel} hook={episode.scenes[0].openingHook} t={t} fps={fps} fonts={fonts} mouth={timeline.mouth ?? []} /> : null}
       {caption ? <PipCaption cap={caption.cap} opacity={caption.opacity} lift={caption.lift} fonts={fonts} /> : null}
       {data.probe ? <ProbeReporter frame={frame} t={t} scene={scene.id} bundledFonts={style === 'pip-paper-bundled'} /> : null}
     </AbsoluteFill>

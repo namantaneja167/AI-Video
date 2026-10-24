@@ -15,20 +15,22 @@ import {makeHandlers, type HandlerEnv} from '../core/handlers.ts';
 import {OwnerRegistry, systemMemory} from '../core/proc.ts';
 import type {Project} from '../core/project.ts';
 import {JobRunner, type JobRow, type RunnerOptions} from '../core/runner.ts';
+import type {ProductionSlot, SlotHolder} from '../core/slot.ts';
 import {unsupportedInputs} from '../core/support.ts';
-import {captureRenderSources, defaultTools, renderToolProblems, renderSourceProblems, versionsValue, type ToolPaths} from '../core/toolchain.ts';
+import {PROOF_LABEL, proofSubject} from '../core/proof.ts';
+import {captureRenderSources, defaultTools, renderToolProblems, renderSourceProblems, timelineLogicValue, versionsValue, type ToolPaths} from '../core/toolchain.ts';
 import {ModelHost, type HostOptions} from '../core/worker.ts';
 import {currentRows, getComponentHashes, getComponentValues, setComponent} from '../core/state.ts';
 import type {SnapshotManifest} from '../core/artifacts.ts';
-import {buildPlan} from './plan.ts';
+import {buildPlan, timelineLogicAdoptable} from './plan.ts';
 import type {MeasuredRuns} from './shared/costs.ts';
 import type {ActiveWork, Plan} from './shared/plan-types.ts';
 
-export type Stage = 'narration' | 'timing' | 'mix' | 'render' | 'checks';
+export type Stage = 'narration' | 'timing' | 'mix' | 'render' | 'checks' | 'cover';
 export type BuildMode = 'draft' | 'final';
 const GROUPS: Stage[] = ['narration', 'timing', 'mix', 'render'];
 const kindOf = (stage: Stage, mode: BuildMode): JobKind => (stage === 'narration' ? 'tts.block' : stage === 'timing' ? 'timing.build' : stage === 'mix' ? `mix.${mode}` : stage === 'render' ? `render.${mode}` : 'check.suite');
-const STAGE_OF: Record<string, Stage> = {'tts.block': 'narration', 'timing.build': 'timing', 'mix.final': 'mix', 'render.final': 'render', 'mix.draft': 'mix', 'render.draft': 'render', 'check.suite': 'checks'};
+const STAGE_OF: Record<string, Stage> = {'tts.block': 'narration', 'timing.build': 'timing', 'mix.final': 'mix', 'render.final': 'render', 'mix.draft': 'mix', 'render.draft': 'render', 'check.suite': 'checks', 'cover.build': 'cover'};
 const ACTIVE = new Set(['queued', 'preparing', 'running', 'cancelling']);
 
 export class RebuildError extends Error {
@@ -86,6 +88,19 @@ export type JobServiceOptions = {
   host?: Partial<HostOptions>;
   /** Stop the idle audio worker (and so free its memory) after this long with no work. */
   idleShutdownMs?: number;
+  /** The machine-wide production slot shared by every app instance, and how this project is named to the others. Without it only this project's own one-at-a-time rule applies. */
+  slot?: {slot: ProductionSlot; project: string; projectRoot: string; pollMs?: number};
+};
+
+/** The machine-wide production slot as this app sees it. */
+export type SlotView = {
+  enabled: boolean;
+  /** free: nobody; mine: this project's heavy job; other: another project's; unknown: a holder that cannot be identified (nothing else is let in). */
+  state: 'disabled' | 'free' | 'mine' | 'other' | 'unknown';
+  holder: {project: string; job: string; since: number; pid: number} | null;
+  /** The queued job of this project that is waiting for the slot. */
+  waitingJobId: number | null;
+  summary: string;
 };
 
 /** The error text of a step that was waiting when the app stopped; shown as a plain sentence. */
@@ -120,8 +135,8 @@ export class JobService {
     const reg = new OwnerRegistry(this.p.db, this.p.now);
     this.host = new ModelHost(reg, {cmd: o.workerPython, args: [this.tools.audioWorker], cwd: env.root, ...o.host});
     this.runner = new JobRunner(this.p, {
-      host: this.host, reg, memory: systemMemory, pollMs: 1000, criticalSamples: 5, releaseBefore: (k) => k.startsWith('render.') || k === 'check.suite', preflight: unsupportedInputs,
-      handlers: makeHandlers(env), ...o.runner,
+      host: this.host, reg, memory: systemMemory, pollMs: 1000, criticalSamples: 5, releaseBefore: (k) => k.startsWith('render.') || k === 'check.suite' || k === 'cover.build' || k === 'animatic.build' || k === 'proof.build', preflight: unsupportedInputs,
+      handlers: makeHandlers(env), ...(o.slot ? {slot: {...o.slot, describe: (j: JobRow) => this.label(j.kind, j.subject)}} : {}), ...o.runner,
     });
     this.leaveNothingWaiting();
     this.timer = setInterval(() => void this.tick(), 400);
@@ -224,6 +239,7 @@ export class JobService {
     const plan = this.plan(episodeId, mode);
     if (plan.blockers.length) throw new RebuildError('blocked', 'This episode cannot be rebuilt yet.', {blockers: plan.blockers});
     if (plan.nothingToDo) throw new RebuildError('nothing', 'Everything is already up to date; there is nothing to rebuild.');
+    if (timelineLogicAdoptable(this.p, episodeId, {sourceRoot: this.sourceRoot, tools: this.tools})) setComponent(this.p, 'timelineLogic', timelineLogicValue(this.sourceRoot, this.tools.timeline), episodeId);
     const drift = this.sourceDrift(episodeId);
     if (drift.sources) captureRenderSources(this.p, this.sourceRoot);
     if (drift.tools) setComponent(this.p, 'versions', versionsValue(this.sourceRoot, this.tools.renderWorker));
@@ -349,10 +365,55 @@ export class JobService {
     return id;
   }
 
+  /** Queue the cover image of one rendered video: its own opening without captions, drawn by the render engine. Nothing else is started. */
+  startCover(episodeId: string, renderArtifactId: number): number {
+    const r = get<{kind: string; episode_id: string}>(this.p.db.prepare('SELECT kind, episode_id FROM artifacts WHERE id=?'), renderArtifactId);
+    if (!r || r.kind !== 'render' || r.episode_id !== episodeId) throw new RebuildError('unknown', 'That is not a rendered video of this episode.');
+    const open = all<JobRow>(this.p.db.prepare("SELECT * FROM jobs WHERE episode_id=? AND kind='cover.build' AND subject=? AND state IN ('queued','preparing','running','cancelling')"), episodeId, String(renderArtifactId));
+    if (open.length) return open[0].id;
+    const id = this.runner.enqueue({episodeId, jobKind: 'cover.build', subject: String(renderArtifactId), params: {renderArtifactId}});
+    this.emit();
+    return id;
+  }
+
+  /** Queue the silent five-second opening animatic of the episode as it is now. Nothing else is started. */
+  startAnimatic(episodeId: string): number {
+    if (!listEpisodes(this.p).includes(episodeId)) throw new RebuildError('unknown', `No episode "${episodeId}" in this workspace.`);
+    const open = all<JobRow>(this.p.db.prepare("SELECT * FROM jobs WHERE episode_id=? AND kind='animatic.build' AND state IN ('queued','preparing','running','cancelling')"), episodeId);
+    if (open.length) return open[0].id;
+    // the animatic is drawn from the working checkout: record it first, exactly as a rebuild does
+    const drift = this.sourceDrift(episodeId);
+    if (drift.sources) captureRenderSources(this.p, this.sourceRoot);
+    if (drift.tools) setComponent(this.p, 'versions', versionsValue(this.sourceRoot, this.tools.renderWorker));
+    const id = this.runner.enqueue({episodeId, jobKind: 'animatic.build', params: {}});
+    this.emit();
+    return id;
+  }
+
+  /** Queue a proof clip: seconds `from` to `to` of the episode as it is now, from its recorded timing and final mix. Nothing else is started. */
+  startProof(episodeId: string, label: string, from: number, to: number): number {
+    if (!listEpisodes(this.p).includes(episodeId)) throw new RebuildError('unknown', `No episode "${episodeId}" in this workspace.`);
+    if (!PROOF_LABEL.test(label)) throw new RebuildError('unknown', 'A proof label is lowercase letters, digits and dashes.');
+    if (!(from >= 0) || !(to > from) || to - from > 60) throw new RebuildError('unknown', 'A proof window is at most 60 seconds, from before to.');
+    const subject = proofSubject(label, from, to);
+    const open = all<JobRow>(this.p.db.prepare("SELECT * FROM jobs WHERE episode_id=? AND kind='proof.build' AND subject=? AND state IN ('queued','preparing','running','cancelling')"), episodeId, subject);
+    if (open.length) return open[0].id;
+    // drawn from the working checkout: record it first, exactly as a rebuild does
+    const drift = this.sourceDrift(episodeId);
+    if (drift.sources) captureRenderSources(this.p, this.sourceRoot);
+    if (drift.tools) setComponent(this.p, 'versions', versionsValue(this.sourceRoot, this.tools.renderWorker));
+    const id = this.runner.enqueue({episodeId, jobKind: 'proof.build', subject, params: {label, from, to}});
+    this.emit();
+    return id;
+  }
+
   // ---- what the tray shows -----------------------------------------------------------------------------------------
   label(kind: string, subject: string): string {
     const stage = STAGE_OF[kind];
     if (kind === 'check.suite') return 'Production checks';
+    if (kind === 'cover.build') return 'Cover image';
+    if (kind === 'animatic.build') return 'Opening animatic (5 s)';
+    if (kind === 'proof.build') return `Proof clip ${subject.split('@')[0]}`;
     return stage === 'narration' ? `Narration, block ${subject}` : stage === 'timing' ? 'Timing and captions' : stage === 'mix' ? (kind === 'mix.draft' ? 'Draft audio mix' : 'Final audio mix') : kind === 'render.draft' ? 'Draft video' : 'Final video';
   }
 
@@ -386,9 +447,27 @@ export class JobService {
 
   /** The step a job is shown at. A job never claims to be generating speech while the engine is not holding the voice model. */
   private displayStep(r: JobRow, step: string | null, engine: EngineView): string | null {
-    if (r.state === 'queued') return 'waiting in the queue';
+    if (r.state === 'queued') {
+      const w = this.runner.slotWaiting();
+      if (w?.jobId === r.id) return w.holder ? (w.orphans ? `waiting for ${w.holder.project}: its app stopped but its work is still running` : `waiting for ${w.holder.project} to finish: ${w.holder.job}`) : 'waiting: the production slot has a holder that cannot be identified';
+      return 'waiting in the queue';
+    }
     if (r.kind === 'tts.block' && r.state === 'running' && step === 'generating speech' && !(engine.loaded === 'tts' && engine.worker === 'running')) return 'waiting for the voice engine';
     return step;
+  }
+
+  /** Who holds the machine-wide production slot, read from the slot itself. Light work (editing, review) never depends on it. */
+  slotView(): SlotView {
+    const s = this.o.slot;
+    if (!s) return {enabled: false, state: 'disabled', holder: null, waitingJobId: null, summary: 'Heavy work is limited to one job at a time in this project only.'};
+    const w = this.runner.slotWaiting();
+    const r = s.slot.read();
+    const brief = (h: SlotHolder) => ({project: h.project, job: h.job, since: h.since, pid: h.pid});
+    if (r.state === 'free') return {enabled: true, state: 'free', holder: null, waitingJobId: w?.jobId ?? null, summary: 'The production slot is free.'};
+    if (r.state === 'unknown') return {enabled: true, state: 'unknown', holder: r.holder ? brief(r.holder) : null, waitingJobId: w?.jobId ?? null, summary: `The production slot cannot be used right now (${r.why}). Nothing else starts until it can be, or the holder is confirmed gone.`};
+    const mine = r.holder.projectRoot === s.projectRoot && r.holder.pid === process.pid;
+    if (r.orphans.length) return {enabled: true, state: 'other', holder: brief(r.holder), waitingJobId: w?.jobId ?? null, summary: `${r.holder.project}'s app has stopped but its work (${r.holder.job}) is still running, so the production slot stays taken. Heavy work here waits; opening that project again stops its leftover work safely. Editing and review are not affected.`};
+    return {enabled: true, state: mine ? 'mine' : 'other', holder: brief(r.holder), waitingJobId: w?.jobId ?? null, summary: mine ? `This project is using the production slot (${r.holder.job}).` : `${r.holder.project} is using the production slot (${r.holder.job}). Heavy work here waits; editing and review are not affected.`};
   }
 
   /** Worker, loaded model and the heavy job in one reading. */

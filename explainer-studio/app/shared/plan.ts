@@ -65,6 +65,8 @@ export const PlanSchema = z.object({
   schemaVersion: z.literal(1),
   id,
   title: z.string().min(1, 'the episode needs a title').max(200),
+  /** Set for episodes started as Pip Explains episodes: the brand standard (opening hook, chime, cover) applies to them. Absent on older plans, which are left as they were. */
+  brand: z.literal('pip-explains').optional(),
   audience: z.string().max(500),
   objective: z.string().max(1500),
   /** Approximate length the author is aiming for, in minutes. */
@@ -92,9 +94,9 @@ export function pathOf(path: PropertyKey[]): string {
   return out || '(root)';
 }
 
-export type NewPlan = {id: string; title: string; audience?: string; objective?: string; durationMin?: number | null};
+export type NewPlan = {id: string; title: string; audience?: string; objective?: string; durationMin?: number | null; brand?: 'pip-explains'};
 export const newPlan = (n: NewPlan): PlanDoc => ({
-  schemaVersion: 1, id: n.id, title: n.title.trim(), audience: (n.audience ?? '').trim(), objective: (n.objective ?? '').trim(),
+  schemaVersion: 1, id: n.id, title: n.title.trim(), ...(n.brand ? {brand: n.brand} : {}), audience: (n.audience ?? '').trim(), objective: (n.objective ?? '').trim(),
   durationMin: n.durationMin ?? null, notes: '', sources: [], claims: [], storyboard: [], script: {provenance: null},
 });
 

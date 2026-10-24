@@ -9,6 +9,7 @@
 // everything built on the old output even when the text is unchanged.
 import type {EpisodeV2} from '../src/schema2.ts';
 import {hasDynamicCues, sceneCueSpec} from '../src/library/dynamicCues.ts';
+import {ANIMATIC_FRAMES, ANIMATIC_VERSION} from './animaticSpec.ts';
 import {hashJson} from './hash.ts';
 
 export const COMPONENT_NAMES = [
@@ -41,6 +42,8 @@ export type Expected = {
   timing: string;
   mix: Record<RenderKind, string>;
   render: Record<RenderKind, {hash: string; parts: RenderParts}>;
+  /** The silent five-second opening animatic: drawn from the document and the render sources on an estimated clock. */
+  animatic: string;
 };
 
 const spoken = (s: EpisodeV2['narration']['segments'][number]): string => s.speech ?? s.text;
@@ -120,5 +123,8 @@ export function computeExpected(doc: EpisodeV2, c: ComponentHashes, up: Upstream
     };
     render[kind] = {hash: hashJson({kind: 'render', mode: kind, parts}), parts};
   }
-  return {take, timing, mix, render};
+  // The animatic uses an estimated clock made from the script's word counts, so it depends on the content, pacing and render
+  // sources, not on any narration, timing or mix.
+  const animatic = hashJson({kind: 'animatic', version: ANIMATIC_VERSION, frames: ANIMATIC_FRAMES, content, pacing: doc.pacing, theme: c.theme, assets: c.assets, fonts: c.fonts, code: c.code, versions: c.versions});
+  return {take, timing, mix, render, animatic};
 }

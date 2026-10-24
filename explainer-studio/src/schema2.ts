@@ -4,7 +4,8 @@
 // because Node scripts and tests load this file directly.
 import {z} from 'zod';
 import {AtSchema, CardsParams, EXPRESSIONS, KpiMismatchParams, TablesLabParams} from './schema.ts';
-import {ContextWindowParams, DenseFixtureParams, Pip10xParams, PipCardsParams} from './library/params.ts';
+import {INJECTION_TREATMENTS} from './library/scenes/injection/passage.ts';
+import {ContextWindowParams, DenseFixtureParams, Pip10xParams, PipCardsParams, CacheJourneyParams, TokenJourneyParams} from './library/params.ts';
 
 const id = z.string().regex(/^[a-z0-9][a-z0-9_-]*$/, 'use lowercase letters, digits, - or _');
 
@@ -33,13 +34,18 @@ export const LayoutSchema = z.object({
 });
 export type Layout = z.infer<typeof LayoutSchema>;
 
-const sceneBase = {id, segments: z.array(id).min(1), layout: LayoutSchema.prefault({})};
+const sceneBase = {id, openingUntilCue: id.optional(), openingOverlap: z.boolean().optional(), seriesLabel: z.string().trim().min(1).max(40).optional(), openingHook: z.string().trim().min(1).max(48).optional(), segments: z.array(id).min(1), layout: LayoutSchema.prefault({})};
 export const SceneSchemaV2 = z.discriminatedUnion('type', [
   z.object({...sceneBase, type: z.literal('kpi-mismatch'), params: KpiMismatchParams}),
   z.object({...sceneBase, type: z.literal('tables-lab'), params: TablesLabParams}),
   z.object({...sceneBase, type: z.literal('cards'), params: CardsParams}),
   // Pip scenes (warm paper). `pip-scene-10x` is the prototype's own component, adopted unchanged.
   z.object({...sceneBase, type: z.literal('pip-scene-10x'), params: Pip10xParams.prefault({})}),
+  z.object({...sceneBase, type: z.literal('cache-journey'), params: CacheJourneyParams.prefault({})}),
+  z.object({...sceneBase, type: z.literal('token-journey'), params: TokenJourneyParams}),
+  ...(['rotating-ticket', 'ticket-motion'] as const).map((type) => z.object({...sceneBase, type: z.literal(type), params: z.object({}).strict()})),
+  // `treatment` opts the shared passage in to one of the presentation proofs; absent is the baseline scene.
+  z.object({...sceneBase, type: z.literal('prompt-injection'), params: z.object({treatment: z.enum(INJECTION_TREATMENTS).optional()}).strict()}),
   z.object({...sceneBase, type: z.literal('context-window'), params: ContextWindowParams}),
   z.object({...sceneBase, type: z.literal('pip-dense-fixture'), params: DenseFixtureParams}),
   // The reusable Pip scene: cards of the author's own text, with Pip's actions listed explicitly.
@@ -140,6 +146,9 @@ export const EpisodeSchemaV2 = z.object({
   previews: z.record(id, z.object({segments: z.array(id).min(1)})).prefault({}),
   migration: z.object({from: z.literal(1), tool: z.string(), sourceSha256: z.string()}).optional(),
 }).superRefine((ep, ctx) => {
+  ep.scenes.forEach((s, i) => {
+    if (s.openingHook && (i !== 0 || ep.style === 'legacy-dark')) ctx.addIssue({code: 'custom', path: ['scenes', i, 'openingHook'], message: 'the branded opening belongs only on the first scene of a Pip-style episode'});
+  });
   ep.narration.segments.forEach((seg, si) => {
     if (!seg.emphasis) return;
     const words = seg.text.split(/\s+/).filter(Boolean);

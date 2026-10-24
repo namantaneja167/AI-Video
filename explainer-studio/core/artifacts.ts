@@ -9,6 +9,7 @@ import {
 import {createRevision, getEpisode} from './episodes.ts';
 import {hashJson, sha256File, stableStringify} from './hash.ts';
 import {CHECKS_VERSION} from './checks.ts';
+import {COVER_FRAME, COVER_VERSION} from './coverSpec.ts';
 import type {Project} from './project.ts';
 import {collectRefs, currentRows, getComponentHashes, getComponentValues, upstreamBlobs} from './state.ts';
 
@@ -40,6 +41,12 @@ export const JOB_KINDS = {
   'render.final': {kind: 'render', subject: 'final'},
   // The production checks of one rendered video (the subject is that render's artifact id).
   'check.suite': {kind: 'check'},
+  // The cover image of one rendered video (the subject is that render's artifact id).
+  'cover.build': {kind: 'cover'},
+  // The silent opening animatic of the episode as it is now (not tied to a build).
+  'animatic.build': {kind: 'animatic', subject: 'opening'},
+  // A short window of the episode as it is now, drawn from its recorded timing and final mix (the subject names the window).
+  'proof.build': {kind: 'proof'},
 } as const;
 export type JobKind = keyof typeof JOB_KINDS;
 
@@ -56,8 +63,21 @@ export function checkInputsHash(p: Project, renderArtifactId: number): string {
   return hashJson({kind: 'check', render: r.blob_hash, version: CHECKS_VERSION});
 }
 
+/** The inputs of a cover: the exact bytes of the video, the frame and the drawing version. */
+export function coverInputsHash(p: Project, renderArtifactId: number): string {
+  const r = get<{blob_hash: string; kind: string}>(p.db.prepare('SELECT blob_hash, kind FROM artifacts WHERE id=?'), renderArtifactId);
+  if (!r || r.kind !== 'render') throw new JobError(`artifact ${renderArtifactId} is not a rendered video`);
+  return hashJson({kind: 'cover', render: r.blob_hash, frame: COVER_FRAME, version: COVER_VERSION});
+}
+
+/** A proof clip is current while everything a final render would be made from is what it was drawn from. */
+export const proofInputsHash = (e: Expected, subject: string): string => hashJson({kind: 'proof', render: e.render.final.hash, subject});
+
 function inputsFor(e: Expected, t: Target, p?: Project): string {
+  if (t.kind === 'proof') return proofInputsHash(e, t.subject);
   if (t.kind === 'check') return checkInputsHash(p!, Number(t.subject));
+  if (t.kind === 'cover') return coverInputsHash(p!, Number(t.subject));
+  if (t.kind === 'animatic') return e.animatic;
   if (t.kind === 'take') return e.take[t.subject];
   if (t.kind === 'timing') return e.timing;
   if (t.kind === 'mix') return e.mix[t.subject as RenderKind];

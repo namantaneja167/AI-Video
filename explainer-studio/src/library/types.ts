@@ -13,7 +13,7 @@ export type Timeline = {
   cues?: Record<string, Record<string, number>>;
   mouth?: number[];
 };
-export type EpisodeScene = {id: string; type: string; params: Record<string, unknown>; layout?: {template?: string; captionZone?: string; mascot?: {mode?: string; position?: string; scale?: number}}; segments: string[]};
+export type EpisodeScene = {id: string; type: string; openingHook?: string; openingUntilCue?: string; /** The scene stays visible under the full opening (the problem is shown at once). */ openingOverlap?: boolean; seriesLabel?: string; params: Record<string, unknown>; layout?: {template?: string; captionZone?: string; mascot?: {mode?: string; position?: string; scale?: number}}; segments: string[]};
 export type LibData = {
   episode: {id: string; style?: string; scenes: EpisodeScene[]};
   timeline: Timeline;

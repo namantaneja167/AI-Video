@@ -63,7 +63,7 @@ export function PlanDialog({state, onStart, onClose, onOpenSegment}: {state: Pla
         )}
         {plan && plan.notes.length > 0 && <details className="more"><summary>More about this rebuild</summary><ul>{plan.notes.map((n) => <li key={n}>{n}</li>)}</ul></details>}
         <div className="dfoot">
-          <span className="muted small">Estimates come only from durations measured in earlier runs. Heavy steps run one at a time.</span>
+          <span className="muted small">Estimates come only from durations measured in earlier runs. Heavy steps run one at a time, across every open project on this computer.</span>
           <span className="acts"><button className="btn" onClick={onClose}>Not now</button><button className="btn pri" disabled={!canStart} onClick={onStart} data-testid="plan-start">{state.starting ? 'Starting…' : draft ? 'Start draft' : 'Start rebuild'}</button></span>
         </div>
       </div>

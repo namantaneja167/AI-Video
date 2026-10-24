@@ -25,6 +25,9 @@ import {all, get} from './db.ts';
 import {getSnapshot} from './artifacts.ts';
 import {readBlob} from './blobs.ts';
 import {sha256File} from './hash.ts';
+import {COVER_FRAME, COVER_SIZE, COVER_VERSION, pngSize} from './coverSpec.ts';
+import {ANIMATIC_FRAMES} from './animaticSpec.ts';
+import {estimatedPreview} from '../app/shared/estimate.ts';
 import {emphasisPerCaption} from '../src/library/emphasis.ts';
 import {checkFonts} from '../src/library/fontCheck.ts';
 import {dynamicCues} from '../src/library/dynamicCues.ts';
@@ -45,6 +48,7 @@ export type HandlerEnv = {
   mixScript?: string;
   renderWorker?: string;
   probeWorker?: string;
+  stillWorker?: string;
   timelineFiles?: string[];
   /** Where render sources are read from (default: root). */
   sourceRoot?: string;
@@ -116,7 +120,7 @@ function stageTakes(ctx: JobCtx): Record<string, string> {
 type VoiceRuntime = {engine: string; model: string; revision: string; mlxAudio: string; mlx: string; referenceSha256: string; referenceTranscriptSha256: string; generation: {maxTokens: number}; workerSha256: string};
 
 export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandler>> {
-  const tools = {...defaultTools(env.root), ...(env.audioWorker ? {audioWorker: env.audioWorker} : {}), ...(env.mixScript ? {mix: env.mixScript} : {}), ...(env.renderWorker ? {renderWorker: env.renderWorker} : {}), ...(env.probeWorker ? {probeWorker: env.probeWorker} : {}), ...(env.timelineFiles ? {timeline: env.timelineFiles} : {})};
+  const tools = {...defaultTools(env.root), ...(env.audioWorker ? {audioWorker: env.audioWorker} : {}), ...(env.mixScript ? {mix: env.mixScript} : {}), ...(env.renderWorker ? {renderWorker: env.renderWorker} : {}), ...(env.probeWorker ? {probeWorker: env.probeWorker} : {}), ...(env.stillWorker ? {stillWorker: env.stillWorker} : {}), ...(env.timelineFiles ? {timeline: env.timelineFiles} : {})};
   const cli = join(env.root, 'pipeline', 'timeline_cli.py');
   const sourceRoot = env.sourceRoot ?? env.root;
 
@@ -246,7 +250,8 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     return {blobHash: hash, meta: {...facts, durationSec: layout.totalSec, used: {mastering: master ?? null, voiceGainDb: params.voiceGainDb ?? 0, mixScriptSha256: params.mixScriptSha256, accents, accentBusDb: params.accentBusDb ?? -12, accentDuck: params.accentDuck ?? 0.55}}};
   };
 
-  const render = (kind: 'draft' | 'final'): JobHandler => async (ctx) => {
+  /** `windowed`: a proof clip, the frames from `params.from` to `params.to` seconds of the same recorded timing and mix (audio is not re-made). */
+  const render = (kind: 'draft' | 'final', windowed = false): JobHandler => async (ctx) => {
     guard(ctx);
     const {doc, snapshot} = ctx;
     const timelineHash = recordedBlob(ctx, 'the timing', snapshot.blobs.timing);
@@ -260,6 +265,14 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     const srcBad = renderSourceProblems(ctx.p, snapshot, sourceRoot);
     if (srcBad.length) throw new PreflightError(`render refused; the working checkout differs from the sources recorded when the job was queued (${srcBad.length}):\n- ${srcBad.slice(0, 8).join('\n- ')}${srcBad.length > 8 ? '\n- ...' : ''}`);
     const timeline = JSON.parse(readFileSync(blobPath(ctx.p, timelineHash), 'utf8'));
+    let frameRange: [number, number] | undefined;
+    if (windowed) {
+      const {from, to} = ctx.params as {from?: number; to?: number};
+      const fps = (settings.fps as number | undefined) ?? 30;
+      if (typeof from !== 'number' || typeof to !== 'number' || !(from >= 0) || !(to > from) || to - from > 60) throw new PreflightError('a proof clip needs a window of at most 60 seconds (from, to)');
+      frameRange = [Math.round(from * fps), Math.round(to * fps) - 1];
+      if (frameRange[1] >= Math.floor(timeline.durationSec * fps)) throw new PreflightError('the proof window ends after the episode does');
+    }
     // The timing hash does not cover emphasis (the render's content hash does), so the render applies its own document's emphasis.
     if (Array.isArray(timeline.captions) && timeline.captions.every((c: any) => Array.isArray(c.words))) {
       const per = emphasisPerCaption(timeline.captions, doc.narration.segments);
@@ -282,6 +295,7 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     writeFileSync(spec, JSON.stringify({
       entry: join(sourceRoot, 'src', 'index.ts'), publicDir: join(ctx.ws, 'public'), bundleDir: join(ctx.ws, 'bundle'), out, composition: 'studio-episode',
       inputProps: {episode: doc.id, variant, data: {episode: {id: doc.id, style: doc.style ?? 'legacy-dark', scenes: doc.scenes}, timeline}}, crf, concurrency: env.renderConcurrency ?? 2,
+      ...(frameRange ? {frameRange} : {}),
     }));
     const child = ctx.spawn('render-worker', process.execPath, [tools.renderWorker, spec], {cwd: sourceRoot, stdio: ['ignore', 'pipe', 'pipe'], env: {TMPDIR: join(ctx.ws, 'tmp')}});
     const result = await new Promise<any>((resolve, reject) => {
@@ -301,7 +315,7 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
       child.on('exit', (code, sig) => (code === 0 && res ? resolve(res) : reject(new Error(failure ?? `render worker ${sig ? `was stopped (${sig})` : `exited with code ${code}`}: ${err.trim().split('\n').slice(-3).join(' | ')}`))));
     });
     const {hash} = putFile(ctx.p, out);
-    return {blobHash: hash, meta: {...result, kind, mastered: kind === 'final', used: {crf, settings, timelineBlob: timelineHash, mixBlob: mixHash, sourcesVerifiedAgainstRecorded: true, remotion: versions?.remotion}}};
+    return {blobHash: hash, meta: {...result, kind, mastered: kind === 'final', ...(frameRange ? {proof: {from: (ctx.params as {from: number}).from, to: (ctx.params as {to: number}).to, frameRange}} : {}), used: {crf, settings, timelineBlob: timelineHash, mixBlob: mixHash, sourcesVerifiedAgainstRecorded: true, remotion: versions?.remotion}}};
   };
 
   /** Scenes whose captions are drawn by the scene itself, not by the composition. */
@@ -421,5 +435,126 @@ export function makeHandlers(env: HandlerEnv): Partial<Record<JobKind, JobHandle
     return {blobHash: hash, meta: {passed: report.passed, summary: report.summary, renderArtifactId: renderId, renderKind, fileSha256: row.blob_hash, version: CHECKS_VERSION, sampledFrames: samples.length}};
   };
 
-  return {'tts.block': tts, 'timing.build': timing, 'mix.draft': mix('draft'), 'mix.final': mix('final'), 'render.draft': render('draft'), 'render.final': render('final'), 'check.suite': checkSuite} satisfies Partial<Record<JobKind, JobHandler>>;
+  /**
+   * The cover of one rendered video: its own branded opening, drawn without captions by the same engine from the inputs the video was
+   * rendered from. Refuses when the working sources differ from the recorded ones (the frame would not be this video's frame).
+   */
+  const coverBuild: JobHandler = async (ctx) => {
+    const renderId = Number(ctx.subject);
+    const row = get<{kind: string; subject: string; blob_hash: string; snapshot_id: string | null; episode_id: string}>(ctx.p.db.prepare('SELECT kind, subject, blob_hash, snapshot_id, episode_id FROM artifacts WHERE id=?'), renderId);
+    if (!row || row.kind !== 'render' || row.episode_id !== ctx.episodeId) throw new PreflightError(`artifact ${ctx.subject} is not a rendered video of this episode`);
+    if (!row.snapshot_id) throw new PreflightError('this video has no recorded inputs (it was not built by this workspace), so its cover cannot be drawn from them');
+    const rsnap = getSnapshot(ctx.p, row.snapshot_id);
+    const doc = JSON.parse(readBlob(ctx.p, rsnap.docBlob).toString()) as EpisodeV2;
+    const style = doc.style ?? 'legacy-dark';
+    if (!doc.scenes[0]?.openingHook) throw new PreflightError('this video has no branded opening (its first scene has no opening hook), so there is no opening to make a cover from');
+    if (style === 'legacy-dark') throw new PreflightError('the branded opening exists only in Pip-style episodes');
+    const timelineBlob = rsnap.blobs.timing;
+    if (!timelineBlob) throw new PreflightError('this video has no recorded timing');
+    const versions = (rsnap.componentValues?.versions ?? undefined) as {remotion?: string; remotionRenderer?: string} | undefined;
+    const toolBad = renderToolProblems(sourceRoot, versions ? {...versions, renderWorkerSha256: fileSha(tools.renderWorker)} : versions, tools.renderWorker);
+    if (toolBad.length) throw new PreflightError(`cover refused; the toolchain differs from the one the video was made with:\n- ${toolBad.join('\n- ')}`);
+    const drift = renderSourceProblems(ctx.p, rsnap, sourceRoot);
+    if (drift.length) throw new PreflightError(`cover refused; the working checkout differs from the sources this video was rendered from (${drift.length}), so a frame drawn now would not be this video's frame:\n- ${drift.slice(0, 6).join('\n- ')}${drift.length > 6 ? '\n- ...' : ''}`);
+    const timeline = JSON.parse(readFileSync(blobPath(ctx.p, timelineBlob), 'utf8'));
+    const settings = (rsnap.componentValues?.renderSettings ?? {}) as {width?: number; height?: number; fps?: number};
+    const fps = settings.fps ?? 30;
+    if (fps !== 30) throw new PreflightError(`covers are drawn for 30 fps videos (this one is ${fps} fps)`);
+    // the cover is the opening without captions: the same timeline with its captions taken out
+    const coverTimeline = {...timeline, captions: []};
+    const pub = join(ctx.ws, 'public');
+    mkdirSync(pub, {recursive: true});
+    mkdirSync(join(ctx.ws, 'tmp'), {recursive: true});
+    const libraryPublic = join(sourceRoot, 'public', 'library');
+    if (style === 'pip-paper-bundled') {
+      const bad = checkFonts(join(libraryPublic, 'fonts'));
+      if (bad.length) throw new PreflightError(`cover refused: the bundled fonts are not intact (${bad.join('; ')}). Restore public/library/fonts.`);
+    }
+    if (existsSync(libraryPublic)) cpSync(libraryPublic, join(pub, 'library'), {recursive: true});
+    const out = join(ctx.ws, 'cover.png');
+    const spec = join(ctx.ws, 'cover-job.json');
+    writeFileSync(spec, JSON.stringify({entry: join(sourceRoot, 'src', 'index.ts'), publicDir: pub, bundleDir: join(ctx.ws, 'bundle'), out, composition: 'studio-episode',
+      inputProps: {episode: doc.id, variant: 'full', data: {episode: {id: doc.id, style, scenes: doc.scenes}, timeline: coverTimeline, previewOnly: true}}, frame: COVER_FRAME}));
+    const child = ctx.spawn('still-worker', process.execPath, [tools.stillWorker, spec], {cwd: sourceRoot, stdio: ['ignore', 'pipe', 'pipe'], env: {TMPDIR: join(ctx.ws, 'tmp')}});
+    const result = await new Promise<any>((resolve, reject) => {
+      let buf = '', err = '', res: any, failure: string | undefined;
+      child.stdout!.setEncoding('utf8').on('data', (d: string) => {
+        buf += d;
+        const lines = buf.split('\n'); buf = lines.pop()!;
+        for (const l of lines) {
+          let m: any; try { m = JSON.parse(l); } catch { continue; }
+          if (m.event === 'progress') ctx.progress({step: m.step});
+          else if (m.event === 'result') res = m.data;
+          else if (m.event === 'error') failure = m.message;
+        }
+      });
+      child.stderr!.setEncoding('utf8').on('data', (d: string) => { err = (err + d).slice(-4000); });
+      child.on('error', reject);
+      child.on('exit', (code, sig) => (code === 0 && res ? resolve(res) : reject(new Error(failure ?? `still worker ${sig ? `was stopped (${sig})` : `exited with code ${code}`}: ${err.trim().split('\n').slice(-3).join(' | ')}`))));
+    });
+    const bytes = readFileSync(out);
+    const size = pngSize(bytes);
+    if (!size || size.width !== COVER_SIZE.width || size.height !== COVER_SIZE.height) throw new Error(`the cover is ${size ? `${size.width} x ${size.height}` : 'not a readable PNG'}, not ${COVER_SIZE.width} x ${COVER_SIZE.height}`);
+    const {hash} = putFile(ctx.p, out);
+    return {blobHash: hash, meta: {renderArtifactId: renderId, renderKind: row.subject, renderSha256: row.blob_hash, hook: doc.scenes[0].openingHook, frame: COVER_FRAME, timeSec: Math.round((COVER_FRAME / fps) * 1000) / 1000, width: size.width, height: size.height, bytes: bytes.length, captions: 'none', version: COVER_VERSION, totalMs: result.totalMs}};
+  };
+
+
+  /**
+   * The silent five-second opening animatic of the episode as it is now: the branded opening and the first scene's first beat,
+   * drawn by the render engine on an estimated clock (word counts, no narration). It is a planning preview, never a build.
+   */
+  const animaticBuild: JobHandler = async (ctx) => {
+    guard(ctx);
+    const {doc, snapshot} = ctx;
+    const style = doc.style ?? 'legacy-dark';
+    if (style === 'legacy-dark') throw new PreflightError('the branded opening exists only in Pip-style episodes');
+    if (!doc.scenes[0]?.openingHook) throw new PreflightError('the first scene has no opening hook, so there is no opening to preview');
+    const est = estimatedPreview(doc);
+    if (est.problems.length) throw new PreflightError(`animatic refused; the scenes cannot be drawn on an estimated clock:\n- ${est.problems.slice(0, 6).join('\n- ')}`);
+    if (est.durationSec * 30 < ANIMATIC_FRAMES) throw new PreflightError('the episode is shorter than five seconds');
+    const versions = recorded<{remotion?: string; remotionRenderer?: string; renderWorkerSha256?: string}>(ctx, 'versions');
+    const toolBad = renderToolProblems(sourceRoot, versions, tools.renderWorker);
+    if (toolBad.length) throw new PreflightError(`animatic refused; the toolchain differs from the one recorded:\n- ${toolBad.join('\n- ')}`);
+    const srcBad = renderSourceProblems(ctx.p, snapshot, sourceRoot);
+    if (srcBad.length) throw new PreflightError(`animatic refused; the working checkout differs from the sources recorded when the job was queued (${srcBad.length}):\n- ${srcBad.slice(0, 8).join('\n- ')}`);
+    const pub = join(ctx.ws, 'public');
+    mkdirSync(pub, {recursive: true});
+    mkdirSync(join(ctx.ws, 'tmp'), {recursive: true});
+    const libraryPublic = join(sourceRoot, 'public', 'library');
+    if (style === 'pip-paper-bundled') {
+      const bad = checkFonts(join(libraryPublic, 'fonts'));
+      if (bad.length) throw new PreflightError(`animatic refused: the bundled fonts are not intact (${bad.join('; ')}). Restore public/library/fonts.`);
+    }
+    if (existsSync(libraryPublic)) cpSync(libraryPublic, join(pub, 'library'), {recursive: true});
+    const out = join(ctx.ws, 'animatic.mp4');
+    const spec = join(ctx.ws, 'animatic-job.json');
+    writeFileSync(spec, JSON.stringify({
+      entry: join(sourceRoot, 'src', 'index.ts'), publicDir: pub, bundleDir: join(ctx.ws, 'bundle'), out, composition: 'studio-episode',
+      inputProps: {episode: doc.id, variant: 'full', data: {...est.data, episode: {id: doc.id, style, scenes: doc.scenes}}},
+      crf: 28, concurrency: env.renderConcurrency ?? 2, frameRange: [0, ANIMATIC_FRAMES - 1],
+    }));
+    ctx.progress({step: 'drawing the opening'});
+    const child = ctx.spawn('render-worker', process.execPath, [tools.renderWorker, spec], {cwd: sourceRoot, stdio: ['ignore', 'pipe', 'pipe'], env: {TMPDIR: join(ctx.ws, 'tmp')}});
+    const result = await new Promise<any>((resolve, reject) => {
+      let buf = '', err = '', res: any, failure: string | undefined;
+      child.stdout!.setEncoding('utf8').on('data', (d: string) => {
+        buf += d;
+        const lines = buf.split('\n'); buf = lines.pop()!;
+        for (const l of lines) {
+          let m: any; try { m = JSON.parse(l); } catch { continue; }
+          if (m.event === 'progress') ctx.progress({step: m.step, ...(typeof m.fraction === 'number' ? {fraction: m.fraction} : {})});
+          else if (m.event === 'result') res = m.data;
+          else if (m.event === 'error') failure = m.message;
+        }
+      });
+      child.stderr!.setEncoding('utf8').on('data', (d: string) => { err = (err + d).slice(-4000); });
+      child.on('error', reject);
+      child.on('exit', (code, sig) => (code === 0 && res ? resolve(res) : reject(new Error(failure ?? `render worker ${sig ? `was stopped (${sig})` : `exited with code ${code}`}: ${err.trim().split('\n').slice(-3).join(' | ')}`))));
+    });
+    const {hash} = putFile(ctx.p, out);
+    return {blobHash: hash, meta: {...result, frames: ANIMATIC_FRAMES, fps: 30, silent: true, estimatedClock: true, hook: doc.scenes[0].openingHook, seriesLabel: doc.scenes[0].seriesLabel ?? null}};
+  };
+
+  return {'tts.block': tts, 'timing.build': timing, 'mix.draft': mix('draft'), 'mix.final': mix('final'), 'render.draft': render('draft'), 'render.final': render('final'), 'check.suite': checkSuite, 'cover.build': coverBuild, 'animatic.build': animaticBuild, 'proof.build': render('final', true)} satisfies Partial<Record<JobKind, JobHandler>>;
 }

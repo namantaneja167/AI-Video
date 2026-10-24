@@ -4,6 +4,8 @@ Phase 4 (the app UI) has not started. Real-project `init`/`adopt` is still pause
 
 ## Status: three separate states
 
+*Later note:* the author has since watched revision 2 and called it "clear and fun" (build `fa8d8a6b...`). That is visual feedback on that build, not a sign-off or approval, and the table below is unchanged: `15-creative-benchmark-and-review-records.md`.
+
 **Built** means the code and the outputs exist. **Technically passing** means a tool measured it against a stated check in this session. **Human-approved** means you decided it by looking or listening. Nothing below is human-approved: no sign-off (`listened`, `watchedPhoneSize`, `customScenesReviewed`) was recorded, and nothing here says the narration sounds natural, the words are right, the video looks good or the fonts are chosen. Where I looked at frames I say what I saw; that is not approval.
 
 | Item | Built | Technically passing (measured) | Human-approved |

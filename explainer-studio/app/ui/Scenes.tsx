@@ -16,6 +16,7 @@ import type {Plan} from '../shared/plan-types.ts';
 import type {PlanDoc} from '../shared/plan.ts';
 import {KIND_LABEL, STATE_LABEL, checkSceneInput, isPlaceholderEpisode, sceneTypeInfo, type SceneState} from '../shared/storyboard.ts';
 import {TAB_ID, getEpisode, getPlan, saveEpisode} from './api';
+import {OpeningHook} from './OpeningHook';
 
 type Scene = EpisodeV2['scenes'][number];
 type Seg = EpisodeV2['narration']['segments'][number];
@@ -243,6 +244,7 @@ export function Scenes({plan, episodeSeq, hasEpisode, onStoryboard, onScript}: {
           <p>The episode holds only its stand-in scene, so that its script can be edited and saved. The storyboard plans the real scenes; applying an accepted, complete storyboard puts them here, where their content and layout can be adjusted.</p>
           <div className="hrow"><button className="btn sm pri" onClick={onStoryboard} data-testid="go-storyboard">Go to the storyboard</button></div>
         </section>
+        <OpeningHook id={id} refreshKey={episodeSeq} onChanged={() => void refreshProd()} />
         <Production plan={prod} />
       </div>
     );
@@ -288,6 +290,8 @@ export function Scenes({plan, episodeSeq, hasEpisode, onStoryboard, onScript}: {
         <div className="small">Which scenes are reusable, which are tied to particular content and which need a developer is shown on each scene. The storyboard's own wording for Pip is kept as a planning note and never moves him.</div>
       </div>
       {msg && <div className={`plannote ${msg.tone === 'ok' ? 'ok' : 'warn'}`} role="status" data-testid="scenes-msg" data-tone={msg.tone}>{msg.text}</div>}
+
+      <OpeningHook id={id} refreshKey={seq} onChanged={() => void load()} />
 
       {(doc.style === 'pip-paper' || doc.style === 'pip-paper-bundled') && (
         <section aria-label="Typeface" className="card" data-testid="typeface-card" data-style={doc.style}>

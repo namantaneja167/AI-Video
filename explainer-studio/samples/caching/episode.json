@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "id": "why-caching-is-faster",
+  "title": "Why caching makes apps faster",
+  "learningObjective": "Explain a cache miss, cache hit, reduced repeated work, stale data and explicit invalidation using a product-price lookup.",
+  "status": "draft",
+  "style": "pip-paper-bundled",
+  "voice": {
+    "engine": "qwen3-tts",
+    "profile": "pip-voice-v1"
+  },
+  "pacing": {
+    "leadInSec": 0.5,
+    "tailSec": 1.6,
+    "segmentGapSec": 0.2
+  },
+  "narration": {
+    "segments": [
+      {
+        "id": "s1",
+        "text": "Same app. Same price. Why is the second request faster?"
+      },
+      {
+        "id": "s2",
+        "text": "The first request checks the cache. Nothing there. A cache miss."
+      },
+      {
+        "id": "s3",
+        "text": "So it fetches the price from the database. Twenty dollars."
+      },
+      {
+        "id": "s4",
+        "text": "The app saves a copy in the cache for later."
+      },
+      {
+        "id": "s5",
+        "text": "Ask again. The cache already has it. A cache hit. Less work, less waiting."
+      },
+      {
+        "id": "s6",
+        "text": "But copies can go stale. The database price changes to twenty five dollars."
+      },
+      {
+        "id": "s7",
+        "text": "The cache still says twenty. Fast, but wrong."
+      },
+      {
+        "id": "s8",
+        "text": "Here, we invalidate that old copy. The next request fetches and stores the new price."
+      },
+      {
+        "id": "s9",
+        "text": "That is caching. Reuse work you have already done, with a plan to keep it fresh."
+      }
+    ],
+    "blocks": [
+      {
+        "id": "b1",
+        "segments": [
+          "s1",
+          "s2",
+          "s3"
+        ],
+        "gapAfterSec": 0.25
+      },
+      {
+        "id": "b2",
+        "segments": [
+          "s4",
+          "s5"
+        ],
+        "gapAfterSec": 0.3
+      },
+      {
+        "id": "b3",
+        "segments": [
+          "s6",
+          "s7"
+        ],
+        "gapAfterSec": 0.25
+      },
+      {
+        "id": "b4",
+        "segments": [
+          "s8",
+          "s9"
+        ]
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "id": "cache-world",
+      "type": "cache-journey",
+      "segments": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "s8",
+        "s9"
+      ],
+      "params": {},
+      "layout": {
+        "template": "content-led",
+        "captionZone": "bottom",
+        "mascot": {
+          "mode": "docked",
+          "position": "bottom-left",
+          "scale": 0.42
+        }
+      },
+      "openingHook": "Faster apps do less work"
+    }
+  ],
+  "sources": [
+    {
+      "title": "AWS: Caching overview",
+      "url": "https://aws.amazon.com/caching/",
+      "note": "Cache hit/miss, reuse and latency; this video shows an application cache with explicit invalidation, not every cache policy."
+    },
+    {
+      "title": "MDN: HTTP caching",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching",
+      "note": "Freshness and stale responses; HTTP cache directives are outside this application-cache example."
+    }
+  ],
+  "beats": [],
+  "chapters": [],
+  "reviewNotes": [],
+  "previews": {
+    "hit": {
+      "segments": [
+        "s4",
+        "s5"
+      ]
+    }
+  }
+}
