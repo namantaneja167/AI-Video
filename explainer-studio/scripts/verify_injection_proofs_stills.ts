@@ -18,7 +18,7 @@ const root = process.cwd();
 const sha = (f: string) => createHash('sha256').update(readFileSync(f)).digest('hex');
 const serveUrl = await bundle({entryPoint: `${root}/src/index.ts`, publicDir: `${root}/public`, outDir: '/tmp/vp-bundle'});
 const result: Record<string, unknown> = {window: win, frames};
-for (const treatment of ['baseline', 'interface', 'investigation', 'mechanism']) {
+for (const treatment of (process.env.PROOF_NAMES ?? 'baseline,interface,investigation,mechanism').split(',')) {
   const d = structuredClone(doc);
   d.scenes[0].params = treatment === 'baseline' ? {} : {treatment};
   const props = {episode: d.id, variant: 'full', data: {episode: {id: d.id, style: d.style, scenes: d.scenes}, timeline, previewOnly: true}};

@@ -16,5 +16,6 @@ export const passageWindow = (segments: CueSegment[]): {from: number; to: number
   return {from: Math.round((c.open - WINDOW_LEAD) * 100) / 100, to: Math.round((c.end + WINDOW_TAIL) * 100) / 100};
 };
 /** The treatments a prompt-injection scene can opt in to with `params.treatment`; absent means the baseline scene. */
-export const INJECTION_TREATMENTS = ['interface', 'investigation', 'mechanism'] as const;
+/** `-r2` are the revised versions after the editorial review; the first three stay as they were. */
+export const INJECTION_TREATMENTS = ['interface', 'investigation', 'mechanism', 'interface-r2', 'investigation-r2', 'mechanism-r2'] as const;
 export type InjectionTreatment = (typeof INJECTION_TREATMENTS)[number];

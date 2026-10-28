@@ -53,7 +53,7 @@ describe('the opt-in treatment', () => {
 
   test('a treatment is one of the three named ones; anything else is refused', () => {
     for (const t of INJECTION_TREATMENTS) assert.ok(SceneSchemaV2.safeParse(scene({treatment: t})).success, t);
-    assert.deepEqual([...INJECTION_TREATMENTS], ['interface', 'investigation', 'mechanism']);
+    assert.deepEqual([...INJECTION_TREATMENTS], ['interface', 'investigation', 'mechanism', 'interface-r2', 'investigation-r2', 'mechanism-r2']);
     assert.ok(!SceneSchemaV2.safeParse(scene({treatment: 'cinematic'})).success);
     assert.ok(!SceneSchemaV2.safeParse(scene({treatment: 'interface', extra: 1})).success, 'params stay strict');
   });
@@ -75,7 +75,7 @@ describe('the dispatcher', () => {
   });
   test('a treatment replaces the baseline only inside the passage window', async () => {
     const E = await load();
-    for (const name of ['interface', 'investigation', 'mechanism']) {
+    for (const name of ['interface', 'investigation', 'mechanism', 'interface-r2', 'investigation-r2', 'mechanism-r2']) {
       assert.equal(E.chosen(props(E, {treatment: name}, 9.9)), name, `${name} at the first frame`);
       assert.equal(E.chosen(props(E, {treatment: name}, 23.16)), name, `${name} at the last frame`);
       assert.equal(E.chosen(props(E, {treatment: name}, 9.8)), 'baseline', `${name} before the window`);
@@ -84,7 +84,7 @@ describe('the dispatcher', () => {
   });
   test('every treatment keeps the fictional-example labels on screen through the passage', async () => {
     const E = await load();
-    for (const name of ['interface', 'investigation', 'mechanism']) {
+    for (const name of ['interface', 'investigation', 'mechanism', 'interface-r2', 'investigation-r2', 'mechanism-r2']) {
       for (const t of [9.9, 13, 16.5, 19.5, 22.5]) {
         const html = E.html(props(E, {treatment: name}, t));
         assert.match(html, /Fictional products and prices/, `${name} at ${t}: footnote`);
@@ -93,6 +93,8 @@ describe('the dispatcher', () => {
     }
     assert.match(E.html(props(E, {treatment: 'interface'}, 12)), /RECONSTRUCTED · FICTIONAL SHOP/);
     assert.match(E.html(props(E, {treatment: 'investigation'}, 12)), /FICTIONAL SHOP PAGE/);
+    assert.match(E.html(props(E, {treatment: 'interface-r2'}, 12)), /RECONSTRUCTED · FICTIONAL SHOP/);
+    assert.match(E.html(props(E, {treatment: 'investigation-r2'}, 12)), /fictional page/);
   });
   test('the treatments differ in their chrome: a compact tag, a full strip that clears for the close-up, and none', async () => {
     const E = await load();
@@ -101,6 +103,60 @@ describe('the dispatcher', () => {
     assert.match(at('investigation', 10.5), /TASK/); // the full strip is shown on the wide shot
     assert.match(at('investigation', 10.5), /CHECK/);
     assert.doesNotMatch(at('mechanism', 16), /DRIFT/);
+  });
+});
+
+describe('the revisions after the editorial review', () => {
+  const q = passageCues(SEGMENTS), from = passageWindow(SEGMENTS).from, to = passageWindow(SEGMENTS).to;
+  const steps = (a: number, b: number) => { const out: number[] = []; for (let t = a; t <= b + 1e-9; t += 0.05) out.push(t); return out; };
+  const props = (E: any, params: unknown, t: number) => ({scene: {id: 'world', type: 'prompt-injection', params, segments: SEGMENTS.map((s) => s.id)}, timeline: {durationSec: 44.54, mouth: [], segments: SEGMENTS, captions: [], scenes: [], cues: {}, audio: 'audio.wav', version: 1}, segments: SEGMENTS, cues: {s0: 1.02, s1: 6.22, s2: 10.22, s3: 15.26, s4: 18.22, s5: 23.34, s6: 27.9, s7: 32.14, s8: 36.78, explain: 6.22, resolve: 36.78, voice_end: 43.26}, t, fps: 30, fonts: E.fonts, audioSrc: ''});
+
+  test('interface: the changed recommendation is in view from the moment the consequence is spoken until the end', async () => {
+    const E = await load();
+    for (const t of steps(q.if + 1.2, to)) assert.ok(E.interfaceShows(q, from, t), `answer panel in view at ${t.toFixed(2)}`);
+    assert.ok(!E.interfaceShows(q, from, q.quote_end - 0.5), 'while the planted line is read up close the answer is out of frame, by design');
+  });
+
+  test('mechanism: both destinations are in view while the capsule is redirected, and a compact overview covers the close reading', async () => {
+    const E = await load();
+    for (const t of steps(q.if + 0.9, to)) { const s = E.mechanismShows(q, from, t); assert.ok(s.a && s.b, `both answers in view at ${t.toFixed(2)}`); }
+    for (const t of steps(q.planted + 2, q.quote_end)) assert.ok(E.mechanismShows(q, from, t).hint > 0.9, `overview hint at ${t.toFixed(2)}`);
+    assert.equal(E.mechanismShows(q, from, q.hijacked).hint, 0, 'the hint is gone once everything is in view');
+  });
+
+  test('investigation: fewer words compete in the wide shots, and the same three primary things are still on screen', async () => {
+    const E = await load();
+    for (const t of [13.0, 22.25]) {
+      const before = E.visibleText(props(E, {treatment: 'investigation'}, t)).split(' ').length;
+      const after = E.visibleText(props(E, {treatment: 'investigation-r2'}, t)).split(' ').length;
+      assert.ok(after < before * 0.8, `${after} words after against ${before} before at ${t}`);
+    }
+    const end = E.visibleText(props(E, {treatment: 'investigation-r2'}, 22.6));
+    assert.match(end, /Compare headphones/); assert.match(end, /text from the page/); assert.match(end, /Recommend Product B/);
+  });
+
+  test('investigation: the crossing is announced on screen while the packet is on the boundary, and not before', async () => {
+    const E = await load();
+    assert.doesNotMatch(E.html(props(E, {treatment: 'investigation-r2'}, q.if)), /PAGE TEXT CROSSES/);
+    const crossT = q.if + 0.15 + (q.command - q.if - 0.15) * (0.34 + 0.36 * 0.5);
+    assert.match(E.html(props(E, {treatment: 'investigation-r2'}, crossT + 0.1)), /PAGE TEXT CROSSES/);
+  });
+
+  test('interface: the finished comparison carries its result: the answer, the limit and how far over', async () => {
+    const E = await load();
+    const html = E.visibleText(props(E, {treatment: 'interface-r2'}, q.end));
+    assert.match(html, /Recommend Product B/); assert.match(html, /limit was ignored/); assert.match(html, /\+₹1,200 OVER/); assert.match(html, /BUDGET ₹5,000/);
+  });
+
+  test('mechanism: the instruction is whole and large while it is read, and a short label when it travels', async () => {
+    const E = await load();
+    const reading = E.html(props(E, {treatment: 'mechanism-r2'}, q.recommend + 0.9));
+    assert.match(reading, /Ignore the budget\./); assert.match(reading, /Recommend this/); assert.match(reading, /font-size:30px/);
+    assert.match(E.html(props(E, {treatment: 'mechanism-r2'}, q.if + 1.2)), /PAGE TEXT/);
+  });
+
+  test('the first versions are still selectable and unchanged in name', () => {
+    for (const n of ['interface', 'investigation', 'mechanism']) assert.ok((INJECTION_TREATMENTS as readonly string[]).includes(n));
   });
 });
 
@@ -141,5 +197,21 @@ describe('shot helpers', () => {
     assert.match(shot, /overflow:hidden/); assert.match(shot, /scale\(2\)/); assert.match(shot, /left:60px;top:300px;width:960px;height:1208px/);
     const tag = E.tagHtml({stages: ['TASK', 'PAGE', 'INJECT', 'DRIFT', 'CHECK'], active: 2, fonts: E.fonts});
     assert.match(tag, /03 · INJECT/);
+  });
+  test('a focus plan reads the target and returns to the overview exactly, and reads only while it is close', async () => {
+    const E = await load();
+    const {focusKeys, focusRead} = await import('../../src/library/motion.ts');
+    const plan = {overview: {k: 1, x: 100, y: 100}, focus: {k: 2, x: 300, y: 200}, arriveAt: 4, arriveDur: 1, leaveAt: 8, leaveDur: 1, drift: {k: 2.2, x: 310, y: 205}};
+    const keys = focusKeys(1, plan);
+    assert.deepEqual(camTrack(0, keys), plan.overview);
+    assert.deepEqual(camTrack(4, keys), plan.focus);
+    assert.deepEqual(camTrack(8, keys), plan.drift);
+    assert.deepEqual(camTrack(9, keys), plan.overview);
+    assert.deepEqual(camTrack(20, keys), plan.overview);
+    assert.equal(focusRead(0, plan), 0); assert.equal(focusRead(6, plan), 1); assert.equal(focusRead(9.5, plan), 0);
+    assert.ok(focusRead(3.8, plan) > 0 && focusRead(3.8, plan) < 1);
+    const without = focusKeys(1, {...plan, drift: undefined});
+    assert.deepEqual(camTrack(8, without), plan.focus);
+    assert.deepEqual(E.irisClip([0, 0], 1, 1), 'circle(1px at 0px 0px)');
   });
 });

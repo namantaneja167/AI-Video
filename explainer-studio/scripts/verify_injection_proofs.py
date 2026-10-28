@@ -1,6 +1,6 @@
 """Measurements for the injection presentation proofs (all by ffmpeg/ffprobe/numpy; nothing here is a viewing or listening judgement).
 
-usage: .venv/bin/python scripts/verify_injection_proofs.py <proofsDir> <stillsDir> <mix.wav> <published.mp4> <out.json>
+usage: [PROOF_NAMES=baseline,interface-r2,...] .venv/bin/python scripts/verify_injection_proofs.py <proofsDir> <stillsDir> <mix.wav> <published.mp4> <out.json>
   proofsDir   baseline.mp4 interface.mp4 investigation.mp4 mechanism.mp4 (a second copy of each as <name>.run2.mp4 is optional)
   stillsDir   output of scripts/verify_injection_proofs_stills.ts
 """
@@ -8,7 +8,7 @@ import json, re, subprocess, sys, hashlib, os, tempfile
 import numpy as np
 
 proofs, stills, mix, published, out = sys.argv[1:6]
-NAMES = ['baseline', 'interface', 'investigation', 'mechanism']
+NAMES = os.environ.get('PROOF_NAMES', 'baseline,interface,investigation,mechanism').split(',')  # the first is the baseline the others are compared with
 FPS = 30
 st = json.load(open(f'{stills}/stills.json'))
 FROM, TO = st['window']['from'], st['window']['to']

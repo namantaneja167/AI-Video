@@ -47,3 +47,15 @@ export const camTrack = (t: number, keys: CamKey[]): Cam => {
   }
   return cam;
 };
+
+/** Look at a target and come back: overview, push in to read, optionally drift while reading, then return to the overview. */
+export type FocusPlan = {overview: Cam; focus: Cam; arriveAt: number; arriveDur: number; leaveAt: number; leaveDur: number; drift?: Cam};
+/** The camera keys for a focus plan, from `start`; append more keys after them for what follows the return. */
+export const focusKeys = (start: number, p: FocusPlan): CamKey[] => [
+  {at: start, cam: p.overview},
+  {at: p.arriveAt, dur: p.arriveDur, cam: p.focus},
+  ...(p.drift ? [{at: p.leaveAt, dur: p.leaveAt - p.arriveAt, ease: (x: number) => x, cam: p.drift}] : []),
+  {at: p.leaveAt + p.leaveDur, dur: p.leaveDur, cam: p.overview},
+];
+/** 0 to 1: how much the focus target is being read (eased in as the camera arrives, out as it leaves). Drives spotlights and overview hints. */
+export const focusRead = (t: number, p: FocusPlan): number => pr(t, p.arriveAt - p.arriveDur * 0.4, p.arriveDur * 0.6) * (1 - pr(t, p.leaveAt, p.leaveDur * 0.6));
